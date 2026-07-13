@@ -1,0 +1,42 @@
+[
+    {
+        "driver_id": "WSX-6548",
+        "route": [
+            {"latitude": 38.7749, "longitude": -128.4194},
+            {"latitude": 38.8044, "longitude": -128.2711}
+        ],
+        "current_position": {"latitude": 38.7749, "longitude": -128.4194},
+        "speed_factor": 1.0,
+        "status": "MOVING"
+    },
+    {
+        "driver_id": "QWE-1234",
+        "route": [
+            {"latitude": 37.7749, "longitude": -122.4194},
+            {"latitude": 37.8044, "longitude": -122.2711}
+        ],
+        "current_position": {"latitude": 37.7749, "longitude": -122.4194},
+        "speed_factor": 1.0,
+        "status": "MOVING"
+    },
+    {
+        "driver_id": "ASD-9876",
+        "route": [
+            {"latitude": 40.7128, "longitude": -74.0060},
+            {"latitude": 40.7306, "longitude": -73.9352}
+        ],
+        "current_position": {"latitude": 40.7128, "longitude": -74.0060},
+        "speed_factor": 1.0,
+        "status": "STOPPED"
+    },
+    {
+        "driver_id": "ZXC-4321",
+        "route": [
+            {"latitude": 34.0522, "longitude": -118.2437},
+            {"latitude": 34.0522, "longitude": -118.2437}
+        ],
+        "current_position": {"latitude": 34.0522, "longitude": -118.2437},
+        "speed_factor": 1.0,
+        "status": "IDLE"
+    }
+]

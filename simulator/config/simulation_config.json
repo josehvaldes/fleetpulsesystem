@@ -1,0 +1,8 @@
+{
+  "time_acceleration": 1.0,
+  "base_ping_interval_seconds": 1.0,
+  "ping_interval_jitter_seconds": 0.3,
+  "gps_noise_meters": 4.0,
+  "mqtt_topic": "fleet_pulse",
+  "mqtt_qos": 0
+}

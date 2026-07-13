@@ -4,6 +4,8 @@ networks:
     driver: bridge
 volumes:
   redpanda-0: null
+  emqx-data: null
+  psgdata: null
 services:
   redpanda-0:
     image: docker.redpanda.com/redpandadata/redpanda:latest
@@ -48,13 +50,47 @@ services:
     container_name: emqx
     ports:
       - "1883:1883"     # MQTT TCP
-      - "8883:8883"     # MQTT SSL
+      - "8883:8883"    # MQTT SSL change from 8883 since that port is reserved by windows NAT
       - "8083:8083"     # MQTT WebSocket
       - "8084:8084"     # MQTT WebSockets SSL
       - "18083:18083"   # EMQX Dashboard Dashboard
     environment:
       - EMQX_NODE__NAME=emqx@redpanda-node
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=emqx!@#$
+    volumes:
+      - emqx-data:/opt/emqx/data
     networks:
       - redpanda_network
     depends_on:
       - redpanda-0
+
+  emqx-bootstrapper:
+    image: curlimages/curl:latest
+    container_name: emqx_bootstrapper
+    networks:
+      - redpanda_network
+    depends_on:
+      emqx:
+        condition: service_started
+    volumes:
+      # Mount the script we just created
+      - ./bootstrap.sh:/bootstrap.sh 
+    # Execute the script
+    command: ["/bin/sh", "/bootstrap.sh"]
+  
+  # Add to docker-compose.yml
+  timescaledb:
+    image: timescale/timescaledb:latest-pg18
+    environment:
+      POSTGRES_USER: fleetpulse
+      POSTGRES_PASSWORD: fleetpulse_dev
+      POSTGRES_DB: fleetpulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - psgdata:/var/lib/postgresql/
+      - ../db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - redpanda_network
+
+

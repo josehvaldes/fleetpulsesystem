@@ -1,0 +1,10 @@
+
+__pycache__/
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+
+.codacy/cli.sh
+.codacy/codacy.yaml
+.github/instructions/codacy.instructions.md
+simulator/.github/instructions/codacy.instructions.md
+simulator/data/routes/processed/*
