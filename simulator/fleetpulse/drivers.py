@@ -18,3 +18,12 @@ class Driver:
     current_position: Coordinate
     speed_factor: float  # 0.5 = slow, 1.0 = normal, 1.5 = fast
     status: DriverStatus  # moving, stopped, idle
+
+
+@dataclass
+class DriverConfig:
+    driver_id: str
+    name: str
+    vehicle_type: str
+    route_id: str
+    start_offset_seconds: float
