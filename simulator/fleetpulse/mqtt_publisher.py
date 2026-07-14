@@ -45,10 +45,8 @@ class MQTTPublisher(MQTTPublisherInterface):
         self.client.publish(topic, json.dumps(payload), qos=1)
     
     async def publish(self, message: dict):
-        topic = f"fleet_pulse"
-        
+        topic = f"fleet_pulse/{message['driver_id']}/gps"
         try :
-            print(f" * Publishing message to topic {topic}: {message}")
             self.client.publish(topic, json.dumps(message), qos=1)
         except Exception as e:
             print(f"Error publishing message: {e}")
