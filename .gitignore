@@ -13,3 +13,4 @@ FleetPulse.DbWriter/.vs/*
 FleetPulse.DbWriter/FleetPulse.DbWriter/bin/*
 FleetPulse.DbWriter/FleetPulse.DbWriter/obj/*
 FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json
+.vs/*

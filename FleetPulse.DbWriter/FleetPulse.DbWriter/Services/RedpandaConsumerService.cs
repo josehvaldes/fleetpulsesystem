@@ -43,7 +43,7 @@ namespace FleetPulse.DbWriter.Services
             {
                 BootstrapServers = _settings.BootstrapServers,
                 GroupId = _settings.GroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
+                AutoOffsetReset = AutoOffsetReset.Earliest, // Start from the earliest message if no offset is found
                 EnableAutoCommit = false,  // Manual commit for reliability
                 SessionTimeoutMs = 10000,
                 MaxPollIntervalMs = 300000
@@ -121,7 +121,12 @@ namespace FleetPulse.DbWriter.Services
         {
             try
             {
-                return JsonSerializer.Deserialize<GpsPing>(result.Message.Value, JsonOptions);
+                var message = result.Message.Value;
+                var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
+                if (wrapper is not null)
+                    return JsonSerializer.Deserialize<GpsPing>(wrapper.Payload, JsonOptions);
+                else
+                    return null;                    
             }
             catch (JsonException ex)
             {

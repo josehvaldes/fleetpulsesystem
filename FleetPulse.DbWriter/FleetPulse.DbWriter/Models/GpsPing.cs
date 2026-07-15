@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 
 namespace FleetPulse.DbWriter.Models
 {
+
+
     /// <summary>
     /// Message format for the GPS ping data received from Kafka:
     ///   message = {
@@ -46,10 +48,6 @@ namespace FleetPulse.DbWriter.Models
         public string? VehicleType { get; init; }
 
         [JsonPropertyName("timestamp")]
-        public long TimestampEpoch { get; init; }
-
-        [JsonIgnore]
-        public DateTime TimestampUtc =>
-            DateTimeOffset.FromUnixTimeMilliseconds(TimestampEpoch).UtcDateTime;
+        public DateTimeOffset Timestamp { get; init; }
     }
 }

@@ -38,13 +38,13 @@ echo "Connector created. "
 curl -s -X POST 'http://emqx:18083/api/v5/actions' \
 -H "Authorization: Bearer $TOKEN" \
 -H 'Content-Type: application/json' \
--d "{  \"name\": \"to_gps_pings\",  \"type\": \"kafka_producer\",  \"enable\": true,  \"connector\": \"to_redpanda\", \"description\": \"Action to send messages to Redpanda\", \"parameters\": { \"topic\": \"$REDPANDA_TOPIC\"  } }"
+-d "{  \"name\": \"to_gps_pings\",  \"type\": \"kafka_producer\",  \"enable\": true,  \"connector\": \"to_redpanda\", \"description\": \"Action to send messages to Redpanda\", \"parameters\": { \"topic\": \"$REDPANDA_TOPIC\", \"partition_strategy\": \"key_dispatch\", \"message\":{\"key\":\"${kafka_key}\", \"value\": \"${.}\" }   } }"
 
 echo "Action created. Creating Rule..."
 # 4. Create the Rule
 curl -s -X POST 'http://emqx:18083/api/v5/rules' \
 -H "Authorization: Bearer $TOKEN" \
 -H 'Content-Type: application/json' \
--d "{  \"id\": \"fleet_pulse_to_kafka_rule\",  \"name\": \"fleet_pulse_to_kafka_rule\",  \"enable\": true,  \"sql\": \"SELECT * FROM \\\"$EMQX_TOPIC/#\\\"\",  \"actions\": [\"kafka_producer:to_gps_pings\"]}"
+-d "{  \"id\": \"fleet_pulse_to_kafka_rule\",  \"name\": \"fleet_pulse_to_kafka_rule\",  \"enable\": true,  \"sql\": \"SELECT clientid, payload.driver_id as kafka_key, payload FROM \\\"$EMQX_TOPIC/#\\\"\",  \"actions\": [\"kafka_producer:to_gps_pings\"]}"
 
 echo -e "\nDeployment complete."
