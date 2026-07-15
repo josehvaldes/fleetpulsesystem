@@ -8,3 +8,8 @@ __pycache__/
 .github/instructions/codacy.instructions.md
 simulator/.github/instructions/codacy.instructions.md
 simulator/data/routes/processed/*
+FleetPulse.DbWriter/.dockerignore
+FleetPulse.DbWriter/.vs/*
+FleetPulse.DbWriter/FleetPulse.DbWriter/bin/*
+FleetPulse.DbWriter/FleetPulse.DbWriter/obj/*
+FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json

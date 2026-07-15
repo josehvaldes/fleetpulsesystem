@@ -141,6 +141,83 @@ During local development, the entire distributed system is orchestrated via a si
 ```
 	
 ## Repository Structure
-(NOT YET)
+
+```SQL
+-- Hypertable for historical GPS data
+CREATE TABLE gps_history (
+    driver_id      VARCHAR(50) NOT NULL,
+    timestamp      TIMESTAMPTZ NOT NULL,
+    latitude       DOUBLE PRECISION NOT NULL,
+    longitude      DOUBLE PRECISION NOT NULL,
+    speed          DOUBLE PRECISION,
+    heading        INTEGER,
+    accuracy       DOUBLE PRECISION,
+    raw_payload    JSONB
+);
+
+-- Latest state table (one row per driver)
+CREATE TABLE driver_latest_state (
+    driver_id      VARCHAR(50) PRIMARY KEY,
+    latitude       DOUBLE PRECISION NOT NULL,
+    longitude      DOUBLE PRECISION NOT NULL,
+    speed          DOUBLE PRECISION,
+    heading        INTEGER,
+    last_seen      TIMESTAMPTZ NOT NULL,
+    status         VARCHAR(20) DEFAULT 'moving'  -- moving, stopped, offline
+);
+```
 
 
+## Data Models
+** MQTT message model
+
+```JSON
+	message = {
+		"driver_id": "string"
+		"timestamp": "datetime - isoformat",
+		"latitude": "float",
+		"longitude": "float",
+		"speed_kmh": "int",
+		"heading_degrees": "float",
+		"accuracy_meters": "float",
+		"status": "string" "decelerating" else "moving",
+		"vehicle_type": "string",
+	}
+```
+
+```
+	message = {
+		"driver_id": self.config.driver_id,
+		"timestamp": datetime.now(timezone.utc).isoformat(),
+		"latitude": round(lat, 6),
+		"longitude": round(lng, 6),
+		"speed_kmh": round(self.current_speed_kmh, 1),
+		"heading_degrees": round(self.heading, 1),
+		"accuracy_meters": round(abs(random.gauss(4.0, 1.5)), 1),
+		"status": self.status if self.status != "decelerating" else "moving",
+		"vehicle_type": self.config.vehicle_type,
+	}
+	
+```
+
+## DbBatchWriterWorker
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DbBatchWriterWorker                          │
+│                                                                 │
+│  ┌─────────────────────┐     ┌──────────────────────────────┐   │
+│  │ RedpandaConsumer    │     │  Flush Loop (every 5s)       │   │
+│  │ Service             │     │                              │   │
+│  │                     │     │  1. GetBatchedPings()        │   │
+│  │  Consume() ────────►│     │  2. Compress (TODO)          │   │
+│  │       │             │     │  3. BulkInsert (TODO)        │   │
+│  │       ▼             │     │  4. UpsertLatest (TODO)      │   │
+│  │  ┌──────────────┐   │     │  5. ClearBatch()             │   │
+│  │  │  Concurrent  │   │     └──────────────────────────────┘   │
+│  │  │  Bag<GpsPing>│   │                                        │
+│  │  │  (Buffer)    │   │                                        │
+│  │  └──────────────┘   │                                        │
+│  └─────────────────────┘                                        │
+└─────────────────────────────────────────────────────────────────┘
+```
