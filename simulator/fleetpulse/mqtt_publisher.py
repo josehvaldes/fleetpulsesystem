@@ -63,6 +63,7 @@ class MQTTMockPublisher(MQTTPublisherInterface):
         pass
 
     async def publish_gps(self, driver: Driver):
+        topic = f"fleet_pulse/{driver.driver_id}/gps"
         payload = {
             "driver_id": driver.driver_id,
             "timestamp": datetime.now().isoformat(),
@@ -70,11 +71,12 @@ class MQTTMockPublisher(MQTTPublisherInterface):
             "longitude": driver.current_position.longitude,
             "speed": driver.speed_factor,
             "heading": 0.0,  # Placeholder for heading
-            "accuracy": 5.0
+            "accuracy": 5.0,
+            #"topic": topic
         }
-        topic = f"fleet_pulse/{driver.driver_id}/gps"
-        self.published_messages.append((topic, payload))
+        self.published_messages.append(payload)
 
     async def publish(self, message: dict):
         topic = f"fleet_pulse/{message['driver_id']}/gps"
-        self.published_messages.append((topic, message))
+        #message["topic"] = topic
+        self.published_messages.append(message)

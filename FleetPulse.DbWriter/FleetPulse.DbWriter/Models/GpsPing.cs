@@ -23,6 +23,8 @@ namespace FleetPulse.DbWriter.Models
     /// </summary>
     public class GpsPing
     {
+        public int Id { get; set; }
+
         [JsonPropertyName("driver_id")]
         public string DriverId { get; init; } = string.Empty;
 
@@ -33,7 +35,7 @@ namespace FleetPulse.DbWriter.Models
         public double Longitude { get; init; }
 
         [JsonPropertyName("speed_kmh")]
-        public double SpeedKmh { get; init; }
+        public double SpeedKmh { get; set; }
 
         [JsonPropertyName("heading_degrees")]
         public double HeadingDegrees { get; init; }

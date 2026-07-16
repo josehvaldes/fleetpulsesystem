@@ -5,7 +5,7 @@ using FleetPulse.DbWriter.Workers;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
-
+builder.Services.AddSingleton<ICompressionService, CompressionService>();
 builder.Services.AddSingleton<IRedpandaConsumerService, RedpandaConsumerService>();
 
 builder.Services.AddHostedService<DbBatchWriterWorker>();

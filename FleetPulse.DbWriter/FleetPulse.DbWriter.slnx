@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FleetPulse.DbWriter/FleetPulse.DbWriter.csproj" />
+  <Project Path="FleetPulse.Tests/FleetPulse.Tests.csproj" Id="7e0d52af-2fd6-4b34-9aaa-5062a81f7879" />
 </Solution>

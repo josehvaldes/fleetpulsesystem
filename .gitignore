@@ -6,11 +6,12 @@ __pycache__/
 .codacy/cli.sh
 .codacy/codacy.yaml
 .github/instructions/codacy.instructions.md
+.vs/*
+**/bin/
+**/obj/
+
 simulator/.github/instructions/codacy.instructions.md
 simulator/data/routes/processed/*
 FleetPulse.DbWriter/.dockerignore
 FleetPulse.DbWriter/.vs/*
-FleetPulse.DbWriter/FleetPulse.DbWriter/bin/*
-FleetPulse.DbWriter/FleetPulse.DbWriter/obj/*
 FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json
-.vs/*

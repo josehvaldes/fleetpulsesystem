@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 
 namespace FleetPulse.DbWriter.Workers
 {
-    internal class DbBatchWriterWorker(ILogger<DbBatchWriterWorker> logger, IRedpandaConsumerService consumerService) : BackgroundService
+    internal class DbBatchWriterWorker(ILogger<DbBatchWriterWorker> logger, 
+        IRedpandaConsumerService consumerService,
+        ICompressionService compressionService) : BackgroundService
     {
         private const int FlushIntervalSeconds = 5;
         private const int MaxBatchSize = 1000;
@@ -53,14 +55,20 @@ namespace FleetPulse.DbWriter.Workers
 
             try
             {
-                // TODO: Phase 4.3 - Add compression logic here
-                // var compressedPings = Compressor.ApplyTemporalCompression(pings);
+                logger.LogInformation("Flushing {Count} pings to database...", pings.Count);
+                foreach (var p in pings) 
+                {
+                    logger.LogInformation("DriverId: {DriverId}, Timestamp: {Timestamp}, Lat: {Latitude}, Lon: {Longitude}, Speed: {SpeedKmh}, Heading: {HeadingDegrees}, Accuracy: {AccuracyMeters}, Status: {Status}, VehicleType: {VehicleType}",
+                        p.DriverId, p.Timestamp, p.Latitude, p.Longitude, p.SpeedKmh, p.HeadingDegrees, p.AccuracyMeters, p.Status, p.VehicleType);
+                }
+                    // TODO: Phase 4.3 - Add compression logic here
+                    var compressedPings = await compressionService.ApplyTemporalCompression(pings);
 
-                // TODO: Phase 4.4 - Add database operations here
-                // await _dbRepository.BulkInsertHistoryAsync(compressedPings);
-                // await _dbRepository.UpsertLatestStateAsync(compressedPings);
+                    // TODO: Phase 4.4 - Add database operations here
+                    // await _dbRepository.BulkInsertHistoryAsync(compressedPings);
+                    // await _dbRepository.UpsertLatestStateAsync(compressedPings);
 
-                logger.LogInformation(
+                 logger.LogInformation(
                     "Flushed {Count} pings in {ElapsedMs}ms",
                     pings.Count, stopwatch.ElapsedMilliseconds);
 

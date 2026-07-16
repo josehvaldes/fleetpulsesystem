@@ -1,6 +1,6 @@
 import asyncio
 import json
-from fleetpulse.mqtt_publisher import MQTTPublisher
+from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
 from utils.route_preprocessor import resample_geojson
@@ -25,7 +25,8 @@ class FleetPulseSimulator:
         route = resample_geojson(path, route_id)
         print(f"Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
         
-        async with MQTTPublisher(self.broker, self.port) as publisher:
+        #async with MQTTPublisher(self.broker, self.port) as publisher:
+        async with MQTTMockPublisher() as publisher:
             simulator = DriverSimulator(
                 config=driver_config,
                 route=route,
@@ -37,6 +38,9 @@ class FleetPulseSimulator:
             print("FleetPulse Simulator is running. Press Ctrl+C to stop.")
             # wait for the simulation to complete
             await task
+
+            json.dump(publisher.published_messages, open("data/simulator_output.json", "w"), indent=2)
+
 
 
 if __name__ == '__main__':
