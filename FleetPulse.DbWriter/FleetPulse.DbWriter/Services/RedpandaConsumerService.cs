@@ -13,14 +13,15 @@ namespace FleetPulse.DbWriter.Services
         private readonly ILogger<RedpandaConsumerService> _logger;
         private readonly ConcurrentBag<GpsPing> _buffer = new();
         private IConsumer<string, string> _consumer = null!;
-
+        
         private const int MaxBufferSize = 1000;
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public RedpandaConsumerService(IOptions<KafkaSettings> settings, ILogger<RedpandaConsumerService> logger)
+        public RedpandaConsumerService(IOptions<KafkaSettings> settings, 
+            ILogger<RedpandaConsumerService> logger)
         {
             _settings = settings.Value;
             _logger = logger;
@@ -123,8 +124,16 @@ namespace FleetPulse.DbWriter.Services
             {
                 var message = result.Message.Value;
                 var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
-                if (wrapper is not null)
-                    return JsonSerializer.Deserialize<GpsPing>(wrapper.Payload, JsonOptions);
+                if (wrapper is not null) 
+                {
+                    var ping = JsonSerializer.Deserialize<GpsPing>(wrapper.Payload, JsonOptions);
+                    if (ping is not null)
+                    {
+                        ping.RawPayloadJson = wrapper.Payload;
+                    }
+
+                    return ping;
+                }                    
                 else
                     return null;                    
             }

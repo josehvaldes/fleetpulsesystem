@@ -34,14 +34,19 @@ namespace FleetPulse.DbWriter.Services
         public async Task<List<GpsPing>> ApplyHighSpeedCompression(List<GpsPing> pings)
         {
             var seenBuckets = new HashSet<long>();
-
+            var size = pings.Count;
             var compressed = pings
-                .Where(ping =>
+                .Where((ping, index) =>
                 {
-                    if (ping.SpeedKmh <= _kafkaSettings.HighSpeedCompressionThreshold)
+                    // Always keep the first and last pings in the list
+                    if (index == 0 || index == size - 1)
+                        return true;
+
+                    if (ping.Speed <= _kafkaSettings.HighSpeedCompressionThreshold)
                         return true;
 
                     long bucket = ping.Timestamp.ToUnixTimeSeconds() / _kafkaSettings.HighSpeedCompressionBucketKey;
+                    
                     return seenBuckets.Add(bucket); // Add returns false if bucket was already seen
                 })
                 .ToList();
@@ -117,7 +122,7 @@ namespace FleetPulse.DbWriter.Services
 
         public bool StoppedConditional(GpsPing ping)
         {
-            return ping.Status == "stopped" || ping.Status == "idle" || ping.Status == "parked" || ping.SpeedKmh < 1;
+            return ping.Status == "stopped" || ping.Status == "idle" || ping.Status == "parked" || ping.Speed < 1;
         }
 
 

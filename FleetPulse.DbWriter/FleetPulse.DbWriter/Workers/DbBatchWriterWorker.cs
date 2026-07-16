@@ -12,14 +12,17 @@ namespace FleetPulse.DbWriter.Workers
 {
     internal class DbBatchWriterWorker(ILogger<DbBatchWriterWorker> logger, 
         IRedpandaConsumerService consumerService,
-        ICompressionService compressionService) : BackgroundService
+        ICompressionService compressionService,
+        IDatabaseService databaseService) : BackgroundService
     {
         private const int FlushIntervalSeconds = 5;
         private const int MaxBatchSize = 1000;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
-   
+            logger.LogInformation("DbBatchWriterWorker starting...");
+            logger.LogInformation("Database Version: {Version}", await databaseService.GetVersion(stoppingToken));
+
             // Start Kafka consumption in background
             var consumeTask = consumerService.StartConsumingAsync(stoppingToken);
 
@@ -28,11 +31,11 @@ namespace FleetPulse.DbWriter.Workers
 
             while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await FlushBatchAsync();
+                await FlushBatchAsync(stoppingToken);
             }
 
             // Final flush on shutdown
-            await FlushBatchAsync();
+            await FlushBatchAsync(stoppingToken);
 
             try
             {
@@ -44,7 +47,7 @@ namespace FleetPulse.DbWriter.Workers
             }
         }
 
-        private async Task FlushBatchAsync()
+        private async Task FlushBatchAsync(CancellationToken cancellationToken)
         {
             var pings = consumerService.GetBatchedPings();
 
@@ -59,16 +62,16 @@ namespace FleetPulse.DbWriter.Workers
                 foreach (var p in pings) 
                 {
                     logger.LogInformation("DriverId: {DriverId}, Timestamp: {Timestamp}, Lat: {Latitude}, Lon: {Longitude}, Speed: {SpeedKmh}, Heading: {HeadingDegrees}, Accuracy: {AccuracyMeters}, Status: {Status}, VehicleType: {VehicleType}",
-                        p.DriverId, p.Timestamp, p.Latitude, p.Longitude, p.SpeedKmh, p.HeadingDegrees, p.AccuracyMeters, p.Status, p.VehicleType);
+                        p.DriverId, p.Timestamp, p.Latitude, p.Longitude, p.Speed, p.Heading, p.Accuracy, p.Status, p.VehicleType);
                 }
                     // TODO: Phase 4.3 - Add compression logic here
                     var compressedPings = await compressionService.ApplyTemporalCompression(pings);
 
-                    // TODO: Phase 4.4 - Add database operations here
-                    // await _dbRepository.BulkInsertHistoryAsync(compressedPings);
-                    // await _dbRepository.UpsertLatestStateAsync(compressedPings);
+                    await databaseService.BulkInsertPingsAsync(compressedPings, cancellationToken);
 
-                 logger.LogInformation(
+                    await databaseService.UpsertLatestStateAsync(compressedPings, cancellationToken);
+
+                logger.LogInformation(
                     "Flushed {Count} pings in {ElapsedMs}ms",
                     pings.Count, stopwatch.ElapsedMilliseconds);
 

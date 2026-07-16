@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="8.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="NSubstitute" Version="6.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -22,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="data\recoleta_route_1.json">
+    <None Update="data\recoleta_route_sample_output.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

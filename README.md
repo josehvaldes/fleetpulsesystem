@@ -200,6 +200,64 @@ CREATE TABLE driver_latest_state (
 	
 ```
 
+** .net DbBatchWriterWorker Data Model
+```c#
+ public class GpsPing
+ {
+     public int Id { get; set; }
+
+     [JsonPropertyName("driver_id")]
+     public string DriverId { get; init; } = string.Empty;
+
+     [JsonPropertyName("latitude")]
+     public double Latitude { get; init; }
+
+     [JsonPropertyName("longitude")]
+     public double Longitude { get; init; }
+
+     [JsonPropertyName("speed_kmh")]
+     public double Speed { get; set; }
+
+     [JsonPropertyName("heading_degrees")]
+     public double Heading { get; init; }
+
+     [JsonPropertyName("accuracy_meters")]
+     public double Accuracy { get; init; }
+
+     [JsonPropertyName("status")]
+     public string Status { get; init; } = string.Empty;
+
+     [JsonPropertyName("vehicle_type")]
+     public string? VehicleType { get; init; }
+
+     [JsonPropertyName("timestamp")]
+     public DateTimeOffset Timestamp { get; init; }
+
+     [JsonIgnore]
+     public string? RawPayloadJson { get; set; }
+
+ }
+ 
+ public class DriverLastState
+ {
+     public string Driver_Id { get; set; } = string.Empty;
+
+     public double Latitude { get; set; }
+
+     public double Longitude { get; set; }
+
+     public double Speed { get; set; }
+
+     public double Heading { get; set; }
+
+     public DateTimeOffset Last_Seen { get; set; }
+
+     public string Status { get; set; } = string.Empty;
+
+ }
+ 
+```
+
 ## DbBatchWriterWorker
 
 ```
