@@ -13,5 +13,7 @@ __pycache__/
 simulator/.github/instructions/codacy.instructions.md
 simulator/data/routes/processed/*
 FleetPulse.DbWriter/.dockerignore
-FleetPulse.DbWriter/.vs/*
+**/.vs/
 FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json
+
+FleetPulse.SignalRHub/FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj.user

@@ -41,9 +41,58 @@ Current Status
 ## Phase 5: .NET SignalR Worker
 ** Goal: Real-time push to frontend via WebSockets
 5.1 Project Setup
+```bash
+	dotnet new web -n FleetPulse.SignalRHub --framework net10.0
+```
+
 5.2 Architecture
+```
+FleetPulse.SignalRHub/
+├── Program.cs
+├── Hubs/
+│   └── FleetHub.cs                # SignalR hub
+├── Workers/
+│   ├── GpsPingConsumer.cs         # Consumes gps-pings topic
+│   └── AlertConsumer.cs           # Consumes ai-alerts topic
+├── Services/
+│   └── FleetStateManager.cs       # Tracks connected clients & subscriptions
+└── Models/
+    ├── GpsUpdateDto.cs
+    └── AlertDto.cs
+```
+
 5.3 Hub Contract
+```csharp
+// Hubs/FleetHub.cs
+public class FleetHub : Hub
+{
+    // Client can subscribe to specific fleet/region
+    public async Task SubscribeFleet(string fleetId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"fleet:{fleetId}");
+    }
+    
+    public async Task UnsubscribeFleet(string fleetId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"fleet:{fleetId}");
+    }
+}
+
+// Methods called FROM server TO client
+// - ReceiveGpsUpdate(GpsUpdateDto update)
+// - ReceiveAlert(AlertDto alert)
+// - ReceiveDriverOffline(string driverId)
+```
+
+
 5.4 Kafka → SignalR Flow
+```csharp
+// Workers/GpsPingConsumer.cs
+// Consumes gps-pings, calls _hubContext.Clients.Group(...).SendAsync("ReceiveGpsUpdate", dto)
+// Throttle: Don't send every ping, aggregate and send at 2Hz per driver max
+```
+Deliverable: WebSocket endpoint broadcasting live GPS updates
+
 
 ## Phase 6: Python AI Anomaly Worker
 ** Goal: Detect and explain anomalies using LLMs
