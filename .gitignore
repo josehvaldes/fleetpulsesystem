@@ -17,3 +17,5 @@ FleetPulse.DbWriter/.dockerignore
 FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json
 
 FleetPulse.SignalRHub/FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj.user
+fleetpulse.frontend/.env
+fleetpulse.frontend/.github/instructions/codacy.instructions.md

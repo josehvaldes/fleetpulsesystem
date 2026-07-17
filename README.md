@@ -445,7 +445,7 @@ In development mode the server allows credentials from the Vite SPA at `http://l
     "BootstrapServers": "localhost:19092",
     "GroupId":          "fleetpulse-hub-consumer",
     "Topic":            "gps-pings",
-    "AutoOffsetReset":  "Latest",
+    "AutoOffsetReset":  "Earliest",
     "EnableAutoCommit": "true"
   },
   "SignalR": {

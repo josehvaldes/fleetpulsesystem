@@ -79,7 +79,7 @@ public class FleetHub : Hub
 }
 
 // Methods called FROM server TO client
-// - ReceiveGpsUpdate(GpsUpdateDto update)
+// - ReceiveGpsPing(GpsUpdateDto update)
 // - ReceiveAlert(AlertDto alert)
 // - ReceiveDriverOffline(string driverId)
 ```
@@ -88,7 +88,7 @@ public class FleetHub : Hub
 5.4 Kafka → SignalR Flow
 ```csharp
 // Workers/GpsPingConsumer.cs
-// Consumes gps-pings, calls _hubContext.Clients.Group(...).SendAsync("ReceiveGpsUpdate", dto)
+// Consumes gps-pings, calls _hubContext.Clients.Group(...).SendAsync("ReceiveGpsPing", dto)
 // Throttle: Don't send every ping, aggregate and send at 2Hz per driver max
 ```
 Deliverable: WebSocket endpoint broadcasting live GPS updates
