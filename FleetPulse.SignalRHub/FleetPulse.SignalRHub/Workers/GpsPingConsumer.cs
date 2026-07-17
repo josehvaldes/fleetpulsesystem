@@ -48,29 +48,6 @@ namespace FleetPulse.SignalRHub.Workers
             return Task.CompletedTask;
         }
 
-        private GpsPingDto? DeserializePing(ConsumeResult<string, string> result)
-        {
-            try
-            {
-                var message = result.Message.Value;
-                var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
-                if (wrapper is not null)
-                {
-                    var ping = JsonSerializer.Deserialize<GpsPingDto>(wrapper.Payload, JsonOptions);
-                    return ping;
-                }
-                else
-                    return null;
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogWarning(ex,
-                    "Failed to deserialize message at offset {Offset} on partition {Partition}",
-                    result.Offset.Value, result.Partition.Value);
-                return null;
-            }
-        }
-
         private async Task ConsumeLoopAsync(CancellationToken stoppingToken)
         {
             try
@@ -106,6 +83,30 @@ namespace FleetPulse.SignalRHub.Workers
             {
                 _consumer.Close(); // commits final offsets, leaves group cleanly
                 _consumer.Dispose();
+            }
+        }
+
+
+        private GpsPingDto? DeserializePing(ConsumeResult<string, string> result)
+        {
+            try
+            {
+                var message = result.Message.Value;
+                var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
+                if (wrapper is not null)
+                {
+                    var ping = JsonSerializer.Deserialize<GpsPingDto>(wrapper.Payload, JsonOptions);
+                    return ping;
+                }
+                else
+                    return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex,
+                    "Failed to deserialize message at offset {Offset} on partition {Partition}",
+                    result.Offset.Value, result.Partition.Value);
+                return null;
             }
         }
     }

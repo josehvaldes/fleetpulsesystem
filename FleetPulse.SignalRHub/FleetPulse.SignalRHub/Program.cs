@@ -14,8 +14,10 @@ builder.Services.Configure<SignalRSettings>(builder.Configuration.GetSection(Sig
 builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>()
-                   .GetSection("Kafka")
+                   .GetSection(KafkaSettings.SectionName)
                    .Get<ConsumerConfig>()!;
+
+
     return new ConsumerBuilder<string, string>(config).Build();
 });
 
