@@ -1,10 +1,16 @@
 using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.Hubs;
+using FleetPulse.SignalRHub.Mapping;
+using FleetPulse.SignalRHub.Middleware;
+using FleetPulse.SignalRHub.Services;
 using FleetPulse.SignalRHub.Workers;
+using Npgsql;
 
+MappingConfig.RegisterMappings();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // --- SignalR ---
 builder.Services.AddSignalR();
@@ -21,6 +27,17 @@ builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
     return new ConsumerBuilder<string, string>(config).Build();
 });
 
+builder.Services.AddSingleton(sp =>
+{
+    var connectionString =
+        builder.Configuration.GetConnectionString("FleetPulseDb")!;
+
+    return new NpgsqlDataSourceBuilder(connectionString)
+        .Build();
+});
+
+builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
+
 // --- Background workers
 // AddHostedService guarantees single instance, start/stop with the host
 builder.Services.AddHostedService<GpsPingConsumer>(); 
@@ -34,8 +51,7 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseCors();
-
-app.MapGet("/", () => "Welcome to SignalR Hub");
-app.MapHub<FleetHub>("/fleetHub");
+app.AddApiMapping();
 app.Run();

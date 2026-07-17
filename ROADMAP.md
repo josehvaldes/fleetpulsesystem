@@ -93,16 +93,7 @@ public class FleetHub : Hub
 ```
 Deliverable: WebSocket endpoint broadcasting live GPS updates
 
-
-## Phase 6: Python AI Anomaly Worker
-** Goal: Detect and explain anomalies using LLMs
-6.1 Project Structure
-6.2 Detection Pipeline
-6.3 LangGraph Workflow
-6.4 Alert Output
-
-
-## Phase 7: Frontend SPA
+## Phase 6: Frontend SPA
 ** Goal: Interactive real-time fleet visualization
 
 7.1 Project Setup
@@ -110,6 +101,15 @@ Deliverable: WebSocket endpoint broadcasting live GPS updates
 7.3 State Management (Zustand)
 7.4 Map Implementation
 7.5 REST API Endpoints (to add to SignalR worker)
+
+
+## Phase 7: Python AI Anomaly Worker
+** Goal: Detect and explain anomalies using LLMs
+6.1 Project Structure
+6.2 Detection Pipeline
+6.3 LangGraph Workflow
+6.4 Alert Output
+
 
 
 ## Phase 8: Integration & Polish

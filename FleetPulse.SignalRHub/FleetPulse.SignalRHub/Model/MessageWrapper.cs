@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FleetPulse.SignalRHub.Models
+namespace FleetPulse.SignalRHub.Model
 {
     public class MessageWrapper
     {

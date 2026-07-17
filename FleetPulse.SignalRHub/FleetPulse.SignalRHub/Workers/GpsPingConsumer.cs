@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Hubs;
-using FleetPulse.SignalRHub.Models;
+using FleetPulse.SignalRHub.Model;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -62,12 +62,12 @@ namespace FleetPulse.SignalRHub.Workers
 
                     // Throttle per driver
                     var now = DateTimeOffset.UtcNow;
-                    if (_lastSent.TryGetValue(dto.DriverId, out var last)
+                    if (_lastSent.TryGetValue(dto.Driver_Id, out var last)
                         && now - last < MinInterval)
                     {
                         continue;
                     }
-                    _lastSent[dto.DriverId] = now;
+                    _lastSent[dto.Driver_Id] = now;
 
                     // Fan-out via SignalR group (one group per fleet, or broadcast)
                     await _hubContext.Clients.All
