@@ -52,7 +52,7 @@ class FleetHubService {
       console.error("[FleetHub] start failed", err);
       // withAutomaticReconnect won't kick in if start() itself fails,
       // so retry once after a short delay.
-      setTimeout(() => this.start(), 3000);
+      setTimeout(() => this.start(), 10000);
     }
   }
 
@@ -60,6 +60,7 @@ class FleetHubService {
     await this.connection.stop();
   }
 
+  // Subscribe to pings from the server. Returns an unsubscribe function.
   onPing(handler: PingHandler): () => void {
     this.pingHandlers.add(handler);
     return () => this.pingHandlers.delete(handler);
