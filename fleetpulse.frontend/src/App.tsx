@@ -1,6 +1,7 @@
 import './App.css'
 import { FleetMap } from "./components/FleetMap";
 import { MessageLog } from "./components/MessageLog";
+import { DriversList } from "./components/DriversList";
 function App() {
 
   return (
@@ -11,12 +12,11 @@ function App() {
         </div>
         <div className='grid grid-cols-7 gap-4 border border-blue-500 w-full'>
           <div className='col-span-1 border border-green-500'>
-            Navigation bar
+            <DriversList />
           </div>
           <div className='col-span-4' ><FleetMap /></div>
           <div className='col-span-2'><MessageLog /></div>
         </div>
-        
       </div>
     </>
   )

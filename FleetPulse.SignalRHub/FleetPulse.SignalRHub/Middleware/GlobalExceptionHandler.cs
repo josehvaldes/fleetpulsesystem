@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FleetPulse.SignalRHub.Validators;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace FleetPulse.SignalRHub.Middleware
 {
@@ -26,6 +26,13 @@ namespace FleetPulse.SignalRHub.Middleware
 
             ProblemDetails problemDetails = exception switch
             {
+                ValidationException validationException => new ValidationProblemDetails(validationException.Errors)
+                {
+                    Status = statusCode,
+                    Title = title,
+                    Detail = exception.Message,
+                    Instance = httpContext.Request.Path
+                },
                 _ => new ProblemDetails
                 {
                     Status = statusCode,

@@ -21,3 +21,5 @@ fleetpulse.frontend/.env
 fleetpulse.frontend/.github/instructions/codacy.instructions.md
 fleetpulse.frontend/.codacy/cli.sh
 fleetpulse.frontend/.codacy/codacy.yaml
+FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
+FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json

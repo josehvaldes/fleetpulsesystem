@@ -121,7 +121,7 @@ class DriverSimulator:
         curvature = self._detect_curvature(int(point_idx))
         
         # Random stop event (traffic light, delivery, etc.)
-        if self.status == "moving" and random.random() < 0.05:  # ~5% chance per tick
+        if self.status == "moving" and random.random() < 0.025:  # ~2.5% chance per tick
             self.status = "decelerating"
             self.target_speed_kmh = 0.0
             self.stop_timer = random.uniform(5.0, 30.0)  # 5-30 second stop
