@@ -1,9 +1,10 @@
-﻿using FluentValidation;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Services;
 using FleetPulse.SignalRHub.Validators;
 using FleetPulse.SignalRHub.Workers;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
@@ -27,8 +28,13 @@ namespace FleetPulse.SignalRHub
                                .GetSection(KafkaSettings.SectionName)
                                .Get<ConsumerConfig>()!;
 
+                IKafkaConsumerTracker tracker = sp.GetRequiredService<IKafkaConsumerTracker>();
 
-                return new ConsumerBuilder<string, string>(config).Build();
+                return new ConsumerBuilder<string, string>(config).SetStatisticsHandler((_, json) =>
+                {
+                    tracker.RecordHeartbeat();
+                })
+                .Build();
             });
 
             services.AddSingleton(sp =>
@@ -43,6 +49,8 @@ namespace FleetPulse.SignalRHub
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            
+            services.AddSingleton<IKafkaConsumerTracker, KafkaConsumerTracker>();
 
             services.AddValidatorsFromAssembly(typeof(LoginRequestValidator).Assembly);
 
@@ -52,6 +60,7 @@ namespace FleetPulse.SignalRHub
 
             services.AddAppAuthentication(config);
 
+            services.AddHealthChecks(config);
             return services;
         }
 
@@ -60,6 +69,16 @@ namespace FleetPulse.SignalRHub
         {
             // AddHostedService guarantees single instance, start/stop with the host
             services.AddHostedService<GpsPingConsumer>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddHealthChecks(this IServiceCollection services, ConfigurationManager config) 
+        {
+            services.AddHealthChecks()
+                .AddNpgSql(config.GetConnectionString("FleetPulseDb")!, name: "PostgreSQL");
+            services.AddHealthChecks()
+                .AddCheck<KafkaConsumerHealthCheck>("kafka_consumer_check");
 
             return services;
         }

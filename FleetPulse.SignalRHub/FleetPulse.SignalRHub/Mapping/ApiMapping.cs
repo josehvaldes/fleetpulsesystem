@@ -22,6 +22,9 @@ namespace FleetPulse.SignalRHub.Mapping
             app.MapGet("/", () => "Welcome to SignalR Hub");
             
             app.MapGet("/health", () => "Healthy");
+            
+            app.MapHealthChecks("/healthz");
+
             app.MapGet("/dbversion", async (IDatabaseService db) => await db.GetVersion(CancellationToken.None));//.RequireAuthorization(); // Update this when login page is ready
 
             var apiGroup = app.MapGroup($"/api/{version}");//.RequireAuthorization(); // Update this when login page is ready

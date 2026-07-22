@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Model;
 using Microsoft.AspNetCore.SignalR;
@@ -18,7 +19,8 @@ namespace FleetPulse.SignalRHub.Workers
         // Throttle: per ROADMAP — max 2Hz per driver
         private readonly Dictionary<string, DateTimeOffset> _lastSent = new();
         private static readonly TimeSpan MinInterval = TimeSpan.FromMilliseconds(500);
-        
+        private readonly IKafkaConsumerTracker _consumerTracker;
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
@@ -28,13 +30,15 @@ namespace FleetPulse.SignalRHub.Workers
                                 IHubContext<FleetHub> hubContext,
                                 ILogger<GpsPingConsumer> logger, 
                                 IOptions<KafkaSettings> kafkaSettings,
-                                IOptions<SignalRSettings> signalRSettings)
+                                IOptions<SignalRSettings> signalRSettings,
+                                IKafkaConsumerTracker consumerTracker)
         {
             _signalRSettings = signalRSettings.Value;
             _kafkaSettings = kafkaSettings.Value;
             _consumer = consumer;
             _hubContext = hubContext;
             _logger = logger;
+            _consumerTracker = consumerTracker;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,6 +60,9 @@ namespace FleetPulse.SignalRHub.Workers
                 {
                     // Blocks until a message arrives or cancellation is requested
                     var result = _consumer.Consume(stoppingToken);
+                    
+                    _consumerTracker.RecordHeartbeat();
+
                     var dto = DeserializePing(result);
 
                     if (dto is null) continue;
@@ -78,6 +85,10 @@ namespace FleetPulse.SignalRHub.Workers
             catch (ConsumeException ex)
             {
                 _logger.LogError(ex, "Kafka consume error");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in Kafka consumer loop");
             }
             finally
             {
