@@ -1,7 +1,6 @@
 
 import { login as loginRequest } from "../api/login";
-import type { AuthSession } from "../utils/authStorage";
-import { clearStoredAuthSession, setStoredAuthSession } from "../utils/authStorage";
+import type { AuthSession } from "../types/auth";
 
 export async function login(username: string, password: string): Promise<AuthSession> {
   const response = await loginRequest(username, password);
@@ -19,11 +18,6 @@ export async function login(username: string, password: string): Promise<AuthSes
     expiresAt: Date.now() + response.expiresIn * 1000,
   };
 
-  setStoredAuthSession(session);
-
   return session;
 }
 
-export async function logout(): Promise<void> {
-  clearStoredAuthSession();
-}

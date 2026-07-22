@@ -1,1 +1,2 @@
 VITE_FLEET_HUB_URL=https://localhost:7234/v1/fleetHub
+VITE_API_BASE_URL=https://localhost:7234/api

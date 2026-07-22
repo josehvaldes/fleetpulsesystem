@@ -6,11 +6,7 @@ import { DriversList } from "./components/DriversList";
 import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const { isAuthenticated, isHydrated, logout } = useAuth();
-
-  if (!isHydrated) {
-    return null;
-  }
+  const { isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated) {
     return <Login />;

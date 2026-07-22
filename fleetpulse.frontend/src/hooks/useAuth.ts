@@ -1,10 +1,9 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login as loginService, logout as logoutService } from "../services/loginService";
-import { clearSession, hydrateSession, setSession } from "../store/authUserSlice";
+import { login as loginService} from "../services/loginService";
+import { clearSession, setSession } from "../store/authUserSlice";
 import type { AppDispatch, RootState } from "../store/store";
-import { getStoredAuthSession } from "../utils/authStorage";
 
 export function useAuth() {
   const dispatch = useDispatch<AppDispatch>();
@@ -12,12 +11,10 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (auth.isHydrated) {
-      return;
+    if (auth.isAuthenticated && auth.expiresAt && auth.expiresAt <= Date.now()) {
+      dispatch(clearSession());
     }
-
-    dispatch(hydrateSession(getStoredAuthSession()));
-  }, [auth.isHydrated, dispatch]);
+  }, [auth.isAuthenticated, auth.expiresAt, dispatch]);
 
   const login = async (username: string, password: string) => {
     setIsLoading(true);
@@ -35,7 +32,6 @@ export function useAuth() {
     setIsLoading(true);
 
     try {
-      await logoutService();
       dispatch(clearSession());
     } finally {
       setIsLoading(false);
