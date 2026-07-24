@@ -1,0 +1,10 @@
+[
+    {
+        "driver_id": "driver_001",
+        "zone": "zone_1_south"
+    },
+    {
+        "driver_id": "driver_002",
+        "zone": "zone_2_north"
+    }
+]

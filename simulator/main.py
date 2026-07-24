@@ -1,5 +1,6 @@
 import asyncio
 import json
+import signal
 from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
@@ -12,16 +13,10 @@ class FleetPulseSimulator:
         self.broker = "localhost"
         self.port = 1883
 
-    async def run(self, path:str, route_id:str):
+
+    async def run(self, path:str, route_id:str, driver_config: DriverConfig):
         print("Starting FleetPulse Simulator...")
 
-        driver_config = DriverConfig(
-            driver_id="driver_001", 
-            vehicle_type="motorcycle",
-            name="John Doe",
-            route_id=route_id,
-            start_offset_seconds=0.0
-            )
         route = resample_geojson(path, route_id)
         print(f"Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
         
@@ -44,5 +39,13 @@ class FleetPulseSimulator:
 if __name__ == '__main__':
     print(" * Running FleetPulse Simulator...")
     path = "data/routes/raw/recoleta_route_sample.geojson"
+    driver_config = DriverConfig(
+            driver_id="driver_002",
+            vehicle_type="motorcycle",
+            name="John Doe",
+            route_id="recoleta_route_sample",
+            start_offset_seconds=0.0
+            )
+
     simulator = FleetPulseSimulator()
-    asyncio.run(simulator.run(path, route_id="recoleta_route_sample"))    
+    asyncio.run(simulator.run(path, route_id="recoleta_route_sample", driver_config=driver_config))

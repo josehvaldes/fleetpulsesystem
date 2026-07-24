@@ -2,6 +2,7 @@ import asyncio
 import math
 import random
 from datetime import datetime, timezone
+import signal
 from fleetpulse.mqtt_publisher import MQTTPublisherInterface
 from fleetpulse.drivers import DriverConfig
 from utils.processed_route import ProcessedRoute
@@ -39,6 +40,13 @@ class DriverSimulator:
         self.stop_timer = 0.0
         self.running = False
 
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
+
+    def _signal_handler(self, signum, frame):
+        print(f"Received signal {signum}, shutting down...")
+        self.running = False
+        exit(0)
   
     def _get_point_at_distance(self, distance: float) -> tuple[float, float, float, int]:
         """
