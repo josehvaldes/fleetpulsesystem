@@ -9,15 +9,5 @@
         "driver_id": "QWE-1234",
         "status": "MOVING",
         "behavior_profile": "NORMAL"
-    },
-    {
-        "driver_id": "ASD-9876",
-        "status": "STOPPED",
-        "behavior_profile": "agressive"
-    },
-    {
-        "driver_id": "ZXC-4321",
-        "status": "IDLE",
-        "behavior_profile": "cautious"
     }
 ]

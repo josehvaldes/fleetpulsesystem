@@ -146,10 +146,10 @@ def resample_geojson(
 
 def preprocess_and_save(geojson_path: Path, output_path: Path, route_id: str):
     """Convenience function to preprocess and save"""
-    route = resample_geojson_delta(geojson_path, route_id, interval_meters=10.0)
+    route = resample_geojson(geojson_path, route_id, interval_meters=10.0)
     
     with open(output_path, 'w') as f:
-        json.dump(route.to_dict(), f, indent=2)
+        f.write(route.to_json())
     
     print(f"Processed: {geojson_path.name}")
     print(f"  Raw distance: {route.total_distance:.0f}m")
@@ -162,8 +162,9 @@ if __name__ == "__main__":
     routes_dir = (script_dir / "data/routes/raw").resolve()
     output_dir = (script_dir / "data/routes/processed").resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-        
+    print(f"Processing routes from {routes_dir} to {output_dir}")
+
     for geojson_file in routes_dir.glob("*.geojson"):
         route_id = geojson_file.stem
-        output_path = output_dir / f"{route_id}_delta.json"
+        output_path = output_dir / f"{route_id}_output.json"
         preprocess_and_save(geojson_file, output_path, route_id)

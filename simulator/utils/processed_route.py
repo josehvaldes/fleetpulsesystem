@@ -1,4 +1,4 @@
-
+import json
 from dataclasses import dataclass
 
 @dataclass
@@ -20,4 +20,7 @@ class ProcessedRoute:
                 for (lat, lng), dist, delta in zip(self.points, self.distances, self.delta_distances)
             ]
         }
+
+    def to_json(self) -> str:
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=2)
     

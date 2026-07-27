@@ -1,4 +1,8 @@
 
+from dataclasses import dataclass
+
+
+@dataclass
 class GpsPing:
     """Represents a GPS ping from a vehicle."""
     

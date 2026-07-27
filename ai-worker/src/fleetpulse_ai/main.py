@@ -2,9 +2,10 @@ import logging
 import asyncio
 
 from envs.cvenv.Lib import json
-from shapely.geometry import shape
+from shapely.geometry import Polygon, shape
 
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
+from fleetpulse_ai.events.violation_event import ViolationEvent
 from fleetpulse_ai.kafka_consumer import KafkaConsumer
 from fleetpulse_ai.models.gps_ping import GpsPing
 
@@ -26,7 +27,6 @@ async def ai_worker_handler(message: dict) -> None:
         timestamp=message['timestamp']
     )
 
-    print (f" * GpsPing: {point.latitude}, {point.longitude}, {point.speed_kmh}, {point.timestamp}, {point.heading_degrees}")
     driver_id = message['driver_id']
     if driver_id not in driver_history:
         driver_history[driver_id] = []
@@ -38,21 +38,15 @@ async def ai_worker_handler(message: dict) -> None:
     driver_history[driver_id].append(point)
 
     if working_zone_detector:
-        if len(driver_history[driver_id]) >= 5:  # Ensure we have enough data points to analyze
-
-            if driver_id in driver_history.keys():
-                violation_event = await working_zone_detector.analyze(driver_id, driver_history[driver_id])
-                if violation_event:
-                    print(f"Violation detected for driver {driver_id}: {violation_event}")
-                else:
-                    print(f"No violation detected for driver {driver_id}.")
-            else:
-                print(f"No history found for driver {driver_id}.")
+        history = driver_history[driver_id]
+        if len(history) >= 2:  # Ensure we have enough data points to analyze
+            violation_event = await working_zone_detector.analyze(driver_id, history)
+            if violation_event:
+                print(f"Violation detected for driver {driver_id}: {violation_event.to_dict()}")
         else:
-            print(f"Not enough data to analyze for driver {driver_id}. Current history length: {len(driver_history[driver_id])}")
-
-
-def load_driver_zones() -> dict[str, object]:
+            print(f"Not enough data to analyze for driver {driver_id}. Current history length: {len(history)}")
+        
+def load_driver_zones() -> dict[str, tuple[str, Polygon]]:
     """
     Load driver zones from a JSON file or database.
     For this example, we'll return a hardcoded dictionary.
@@ -79,10 +73,10 @@ def load_driver_zones() -> dict[str, object]:
             driver_id = mapping["driver_id"]
             zone_name = mapping["zone"]
             if zone_name in polygons:
-                driving_zones[driver_id] = polygons[zone_name]
+                driving_zones[driver_id] = (zone_name, polygons[zone_name])
             else:
                 print(f"Warning: Zone '{zone_name}' for driver '{driver_id}' not found in polygons.")
-                driving_zones[driver_id] = None  # or handle as needed
+                driving_zones[driver_id] = (None, None)  # or handle as needed
 
 
     return driving_zones
@@ -96,7 +90,7 @@ if __name__ == "__main__":
 
     driving_zones = load_driver_zones()
     for driver_id, zone in driving_zones.items():
-        if zone is not None:
+        if zone[0] is not None:
             print(f"Loaded zone for driver {driver_id}: {zone}")
         else:
             print(f"No valid zone loaded for driver {driver_id}.")

@@ -77,7 +77,7 @@ class KafkaConsumer(IKafkaConsumer):
     async def consume(
         self,
         message_handler: Callable[[dict], Awaitable[None]],  # Should be async
-        poll_timeout: float = 2.0,
+        poll_timeout: float = 5.0, 
         deserialize_json: bool = True,
     ) -> None:
         """

@@ -1,0 +1,12 @@
+
+# Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+# This automatically installs production dependencies too
+
+-r requirements.txt  # Include all production dependencies
+
+# ============================================================================
+# Testing Framework
+# ============================================================================
+pytest==9.0.1
+pytest-asyncio==1.3.0
