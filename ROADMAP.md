@@ -96,37 +96,148 @@ Deliverable: WebSocket endpoint broadcasting live GPS updates
 ## Phase 6: Frontend SPA
 ** Goal: Interactive real-time fleet visualization
 
-7.1 Project Setup
-7.2 Structure
-7.3 State Management (Zustand)
-7.4 Map Implementation
-7.5 REST API Endpoints (to add to SignalR worker)
+6.1 Project Setup
+6.2 Structure
+6.3 State Management (Zustand)
+6.4 Map Implementation
+6.5 REST API Endpoints (to add to SignalR worker)
 
 
 ## Phase 7: Python AI Anomaly Worker
 ** Goal: Detect and explain anomalies using LLMs
-6.1 Project Structure
-6.2 Detection Pipeline
-6.3 LangGraph Workflow
-6.4 Alert Output
+7.1 Project Structure
+```text
+ai-worker/
+├── pyproject.toml
+├── src/
+│   └── fleetpulse_ai/
+│       ├── __init__.py
+│       ├── main.py
+│       ├── kafka_consumer.py      # aiokafka consumer for gps-pings
+│       ├── kafka_producer.py      # Producer for ai-alerts topic
+│       ├── detectors/
+│       │   ├── __init__.py
+│       │   ├── base.py            # Abstract detector
+│       │   ├── speed_anomaly.py   # Rule-based: speeding, sudden stops
+│       │   ├── geofence.py        # Geofence violations
+│       │   └── route_deviation.py # Off-route detection
+│       ├── analyzers/
+│       │   └── llm_explainer.py   # LangGraph workflow for context
+│       └── config.py
+└── data/
+    └── geofences.json             # Danger zones, restricted areas
+```
+
+7.2 Detection Pipeline
+
+```python
+
+# detectors/base.py
+class BaseDetector(ABC):
+    @abstractmethod
+    async def analyze(self, driver_id: str, history: list[GpsPing]) -> Anomaly | None:
+        pass
+
+# Example: Speed anomaly
+class SpeedAnomalyDetector(BaseDetector):
+    async def analyze(self, driver_id, history) -> Anomaly | None:
+        # Compare current speed to speed limit for road type
+        # Detect sudden deceleration (hard braking)
+        # Return Anomaly if detected
+```
 
 
+7.3 LangGraph Workflow
 
-## Phase 8: Integration & Polish
+```Python
+# analyzers/llm_explainer.py
+from langgraph.graph import StateGraph, END
+
+def build_explainer_graph():
+    workflow = StateGraph(AlertState)
+    
+    workflow.add_node("gather_context", gather_driver_context)
+    workflow.add_node("llm_analyze", call_llm_for_explanation)
+    workflow.add_node("format_alert", format_final_alert)
+    
+    workflow.set_entry_point("gather_context")
+    workflow.add_edge("gather_context", "llm_analyze")
+    workflow.add_edge("llm_analyze", "format_alert")
+    workflow.add_edge("format_alert", END)
+    
+    return workflow.compile()
+```
+7.4 Alert Output
+
+```Python
+# Published to ai-alerts topic
+{
+    "driver_id": "DRV-042",
+    "alert_type": "geofence_violation",
+    "severity": "high",
+    "description": "Driver entered restricted industrial zone",
+    "context": {
+        "zone_name": "Port Warehouse Restricted Area",
+        "duration_seconds": 45,
+        "llm_explanation": "Driver may be taking unauthorized shortcut through restricted port area. This zone has had 3 theft incidents this month. Recommend immediate contact."
+    },
+    "location": {"lat": 40.7128, "lng": -74.0060}
+}
+```
+
+
+## Phase 8: Prometeus + Grafana implementation
+
+8.1 Define Architecture Overview
+
+8.2 Phase 1: Infrastructure (Docker Compose)
+
+8.2 Phase 2: Prometheus Configuration
+
+8.4 Phase 3: Instrument Each Service
+- [] NET Services (SignalR + DB Writer)
+- [] Python AI Worker
+- [] Redpanda (Built-in)
+- [] EMQX (Built-in)
+- [] TimescaleDB (via postgres_exporter)
+
+8.5 Phase 4: Grafana Dashboards
+- [] Dashboard Provisioning
+- [] Dashboard Panels to Build
+
+8.6 Phase 5: Alerting Rules (Optional)
+
+8.7 Phase 6: Update README Documentation
+
+```markdown
+## Observability Stack
+FleetPulse includes a lightweight Prometheus + Grafana observability stack for local development and production pattern demonstration.
+### Quick Start
+
+```bash
+# Infrastructure is included in docker-compose.yml
+docker compose up -d prometheus grafana postgres-exporter
+
+# Access
+# Prometheus: http://localhost:9090
+# Grafana:    http://localhost:3000  (admin / fleetpulse)
+```
+
+## Phase 9: Integration & Polish
 ** Goal: Production-ready system
 
-8.1 Docker Compose Finalization
-8.2 Repository Structure (Final)
-8.3 Health Checks & Monitoring
-8.4 Error Handling & Resilience
+9.1 Docker Compose Finalization
+9.2 Repository Structure (Final)
+9.3 Health Checks & Monitoring
+9.4 Error Handling & Resilience
 
 
-## Phase 9: Deployment Preparation (Optional)
+## Phase 10: Deployment Preparation (Optional)
 ** Goal: Cloud deployment readiness
 
-9.1 Frontend → Cloudflare Pages
-9.2 Backend → Container Service
-9.2 Backend → Container Service
+10.1 Frontend → Cloudflare Pages
+10.2 Backend → Container Service
+10.2 Backend → Container Service
 
 ## Development Timeline Estimate
 

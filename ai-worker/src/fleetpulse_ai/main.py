@@ -8,7 +8,7 @@ from shapely.geometry import Polygon, shape
 
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
-from fleetpulse_ai.kafka_consumer import KafkaConsumer
+from fleetpulse_ai.managers.kafka_consumer import KafkaConsumer
 from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.models.alert_event import AlertEvent
 from fleetpulse_ai.models.gps_ping import GpsPing
