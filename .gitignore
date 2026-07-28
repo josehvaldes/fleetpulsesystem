@@ -26,3 +26,4 @@ FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
 ai-worker/.codacy/cli.sh
 ai-worker/.codacy/codacy.yaml
 ai-worker/.github/instructions/codacy.instructions.md
+ai-worker/src/.env
