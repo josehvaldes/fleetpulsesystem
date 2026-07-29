@@ -1,0 +1,53 @@
+name: redpanda-fleetpulse
+networks:
+  redpanda_network:
+    external: true
+    name: redpanda_network
+volumes:
+  prometheus-data:
+  grafana-data:
+  
+services:
+  # --- Observability Stack ---
+  prometheus:
+    image: prom/prometheus:v3.6.0
+    container_name: fleetpulse-prometheus
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      #- ./observability/prometheus-alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    networks:
+      - redpanda_network
+
+  grafana:
+    image: grafana/grafana:13.1.1
+    container_name: fleetpulse-grafana
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=fleetpulse
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    networks:
+      - redpanda_network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: fleetpulse-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://fleetpulse:fleetpulse_dev@timescaledb:5432/fleetpulse?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - redpanda_network

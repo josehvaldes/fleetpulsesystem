@@ -1,0 +1,37 @@
+groups:
+  - name: fleetpulse
+    rules:
+      - alert: HighConsumerLag
+        expr: redpanda_kafka_consumer_group_lag > 1000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag is high"
+          description: "Group {{ $labels.group }} has {{ $value }} messages lagging"
+
+      - alert: NoGpsPingsReceived
+        expr: rate(fleetpulse_gps_pings_received_total[5m]) == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No GPS pings received"
+          description: "The GPS stream has stopped"
+
+      - alert: HighDbFlushLatency
+        expr: histogram_quantile(0.99, rate(fleetpulse_db_flush_duration_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DB flush latency is high"
+          description: "P99 flush time is {{ $value }}s"
+
+      - alert: SignalRNoClients
+        expr: fleetpulse_signalr_connected_clients == 0
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "No frontend clients connected"

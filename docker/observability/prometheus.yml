@@ -1,0 +1,48 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # 1. Redpanda (Kafka metrics)
+  - job_name: 'redpanda'
+    static_configs:
+      - targets: ['redpanda-0:9644']
+    metrics_path: /public_metrics
+
+  # 2. EMQX (MQTT broker metrics)
+  - job_name: 'emqx'
+    static_configs:
+      - targets: ['emqx:18083']
+    metrics_path: /api/v5/prometheus/stats
+
+  # 3. TimescaleDB (via postgres_exporter)
+  - job_name: 'timescaledb'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # 4. .NET SignalR Worker
+  - job_name: 'signalr-worker'
+    static_configs:
+      - targets: ['signalr-worker:8080']
+    metrics_path: /metrics
+
+  # 5. .NET DB Writer
+  - job_name: 'db-writer'
+    static_configs:
+      - targets: ['db-writer:8080']
+    metrics_path: /metrics
+
+  # 6. Python AI Worker
+  - job_name: 'ai-worker'
+    static_configs:
+      - targets: ['ai-worker:8000']
+    metrics_path: /metrics
+
+  # 7. Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+# Alerting rules   
+# rule_files:
+#   - '/etc/prometheus/alerts.yml'
