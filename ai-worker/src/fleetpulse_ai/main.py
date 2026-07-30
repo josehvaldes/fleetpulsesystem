@@ -2,67 +2,19 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Awaitable, Callable
 
 from shapely.geometry import Polygon, shape
+from fleetpulse_ai.prometheus import setup_prometheus
+from fleetpulse_ai.settings import settings
+from fleetpulse_ai.handlers import create_ai_worker_handler
 
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
+from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
 from fleetpulse_ai.managers.kafka_consumer import KafkaConsumer
-from fleetpulse_ai.managers.alert_manager import AlertManager
-from fleetpulse_ai.models.alert_event import AlertEvent
-from fleetpulse_ai.models.gps_ping import GpsPing
-from fleetpulse_ai.settings import settings
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data"
-
-MAX_HISTORY_LENGTH = 10
-
-
-def create_ai_worker_handler(
-    detector: WorkingZoneViolationDetector,
-    manager: AlertManager,
-    agent: AlarmAnalyzerAgent
-) -> Callable[[dict], Awaitable[None]]:
-    driver_history: dict[str, list[GpsPing]] = {}
-
-    async def ai_worker_handler(message: dict) -> None:
-        """
-        Process a GPS ping message with the detector and alert manager bound for the worker lifetime.
-        """
-
-        point = GpsPing(
-            latitude=float(message["latitude"]),
-            longitude=float(message["longitude"]),
-            speed_kmh=float(message["speed_kmh"]),
-            heading_degrees=float(message["heading_degrees"]),
-            timestamp=message["timestamp"],
-        )
-
-        driver_id = message["driver_id"]
-        history = driver_history.setdefault(driver_id, [])
-
-        if len(history) >= MAX_HISTORY_LENGTH:
-            history.pop(0)
-
-        history.append(point)
-
-        if len(history) < 2:
-            print(f"Not enough data to analyze for driver {driver_id}. Current history length: {len(history)}")
-            return
-
-        violation_event = await detector.analyze(driver_id, history)
-        if violation_event:
-            print(f"Violation detected for driver {driver_id}: {violation_event.to_dict()}")
-            agent_response = await agent.analyze(driver_id, history)
-            alert = AlertEvent()
-            alert.update_alert_event(agent_response, violation_event)
-            await manager.handle_alert(alert)
-            
-
-    return ai_worker_handler
-
 
 def load_driver_zones(data_dir: Path | None = None) -> dict[str, tuple[str | None, Polygon | None]]:
     """
@@ -118,6 +70,8 @@ async def main():
         group_id=group_id,
         topics=topics,
     )
+
+    setup_prometheus(settings.prometheus_metrics_port)
 
     alarm_analyzer_agent = AlarmAnalyzerAgent(model_deployment=settings.azure_openai_model_deployment)
 

@@ -2,6 +2,7 @@
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
+using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
@@ -63,6 +64,9 @@ namespace FleetPulse.SignalRHub.Workers
                     
                     _consumerTracker.RecordHeartbeat();
 
+                    // Count every message consumed from Kafka, regardless of throttle
+                    FleetMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.Topic).Inc();
+
                     var dto = DeserializePing(result);
 
                     if (dto is null) continue;
@@ -75,6 +79,12 @@ namespace FleetPulse.SignalRHub.Workers
                         continue;
                     }
                     _lastSent[dto.Driver_Id] = now;
+
+                    // Purge drivers not seen in the last 5 minutes, then update gauge
+                    var cutoff = now - TimeSpan.FromMinutes(5);
+                    foreach (var stale in _lastSent.Where(kv => kv.Value < cutoff).Select(kv => kv.Key).ToList())
+                        _lastSent.Remove(stale);
+                    FleetMetrics.ActiveDrivers.Set(_lastSent.Count);
 
                     // Fan-out via SignalR group (one group per fleet, or broadcast)
                     await _hubContext.Clients.All

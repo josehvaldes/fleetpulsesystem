@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     kafka_group_id: str = "ai-worker-group"
     kafka_topics: str = "gps-pings"
     kafka_alert_topic: str = "alerts"
+    prometheus_metrics_port: int = 8000
 
     model_config = ConfigDict(
         str_max_length=200,

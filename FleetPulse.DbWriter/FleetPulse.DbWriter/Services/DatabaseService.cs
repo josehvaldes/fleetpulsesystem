@@ -1,13 +1,9 @@
-﻿using Confluent.Kafka;
-using Dapper;
+﻿using Dapper;
+using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
 using Npgsql;
-using Npgsql.Internal;
 using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Text;
+using Prometheus;
 
 namespace FleetPulse.DbWriter.Services
 {
@@ -27,26 +23,30 @@ namespace FleetPulse.DbWriter.Services
             FROM STDIN (FORMAT BINARY)
             """;
 
-
-            await using (var writer = await conn.BeginBinaryImportAsync(copySql, cancellationToken))
+            // Time the DB round-trip so the histogram reflects real query latency.
+            // Replace this block with the actual batch-flush call when that feature is added.
+            using (FleetMetrics.DbFlushDuration.NewTimer())
             {
-                foreach (var p in pings)
+                await using (var writer = await conn.BeginBinaryImportAsync(copySql, cancellationToken))
                 {
-                    await writer.StartRowAsync(cancellationToken);
-                    writer.Write(p.DriverId, NpgsqlDbType.Varchar);
-                    writer.Write(p.Timestamp,NpgsqlDbType.TimestampTz);
-                    writer.Write(p.Latitude, NpgsqlDbType.Double);
-                    writer.Write(p.Longitude, NpgsqlDbType.Double);
-                    writer.Write(p.Speed, NpgsqlDbType.Double);
-                    writer.Write(p.Heading, NpgsqlDbType.Integer);
-                    writer.Write(p.Accuracy, NpgsqlDbType.Double);
-                    writer.Write(p.RawPayloadJson ?? "{}", NpgsqlDbType.Jsonb);
+                    foreach (var p in pings)
+                    {
+                        await writer.StartRowAsync(cancellationToken);
+                        writer.Write(p.DriverId, NpgsqlDbType.Varchar);
+                        writer.Write(p.Timestamp, NpgsqlDbType.TimestampTz);
+                        writer.Write(p.Latitude, NpgsqlDbType.Double);
+                        writer.Write(p.Longitude, NpgsqlDbType.Double);
+                        writer.Write(p.Speed, NpgsqlDbType.Double);
+                        writer.Write(p.Heading, NpgsqlDbType.Integer);
+                        writer.Write(p.Accuracy, NpgsqlDbType.Double);
+                        writer.Write(p.RawPayloadJson ?? "{}", NpgsqlDbType.Jsonb);
+                    }
+
+                    await writer.CompleteAsync(cancellationToken);   // commits the COPY stream
                 }
 
-                await writer.CompleteAsync(cancellationToken);   // commits the COPY stream
+                await tx.CommitAsync(cancellationToken);
             }
-
-            await tx.CommitAsync(cancellationToken);
             _logger.LogInformation("Inserted {Count} pings into gps_history", pings.Count);
         }
 

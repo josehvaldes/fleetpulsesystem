@@ -9,8 +9,8 @@ namespace FleetPulse.SignalRHub.Services
         public async Task<string> GetVersion(CancellationToken cancellationToken)
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-
             var version = await connection.ExecuteScalarAsync<string>("SELECT version();");
+            _logger.LogInformation("Database version: {Version}", version);
             return version ?? "Not Available";
         }
 

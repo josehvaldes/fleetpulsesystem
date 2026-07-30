@@ -1,5 +1,6 @@
 ﻿using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Contracts.Response;
+using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using Microsoft.Extensions.Options;
 
@@ -29,6 +30,7 @@ namespace FleetPulse.SignalRHub.Services
             }
             else
             {
+                FleetMetrics.AuthenticationErrors.Inc();
                 throw new UnauthorizedAccessException("Invalid username or password.");
             }
         }

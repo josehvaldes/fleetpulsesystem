@@ -3,7 +3,9 @@ from pathlib import Path
 import pytest
 
 from fleetpulse_ai.events.violation_event import ViolationEvent
-from fleetpulse_ai.main import create_ai_worker_handler, load_driver_zones
+from fleetpulse_ai.main import load_driver_zones
+from fleetpulse_ai.handlers import create_ai_worker_handler
+from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
 
 
 def test_load_driver_zones_reads_repo_data() -> None:
@@ -43,9 +45,14 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
         async def handle_alert(self, event: ViolationEvent) -> None:
             self.handled_events.append(event)
 
+    class FakeAgent:
+        async def analyze_alert(self, event: ViolationEvent, context: dict) -> AgentAlertResponse:
+            return AgentAlertResponse(risk_level="high", recommended_action="review", assessment="violation detected", auto_escalate=True)
+        
     detector = FakeDetector()
     manager = FakeManager()
-    handler = create_ai_worker_handler(detector, manager)
+    agent = FakeAgent()
+    handler = create_ai_worker_handler(detector, manager, agent)
 
     base_message = {
         "driver_id": "driver_001",

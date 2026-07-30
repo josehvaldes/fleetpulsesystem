@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.DbWriter.Configuration;
+using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
@@ -93,6 +94,8 @@ namespace FleetPulse.DbWriter.Services
                             consumeResult.Partition);
                         continue;
                     }
+                    
+                    FleetMetrics.GpsPingsReceived.WithLabels(_settings.Topic).Inc();
 
                     var ping = DeserializePing(consumeResult);
                     if (ping is not null)

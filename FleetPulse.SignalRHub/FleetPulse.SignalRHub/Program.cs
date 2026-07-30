@@ -18,4 +18,5 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.UseCors();
 app.AddApiMapping();
+app.AddPrometheusMapping();
 app.Run();

@@ -5,6 +5,7 @@ import signal
 
 from typing import Callable, Awaitable
 from confluent_kafka import Consumer, KafkaError, KafkaException
+from fleetpulse_ai.prometheus import PINGS_RECEIVED
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +105,7 @@ class KafkaConsumer(IKafkaConsumer):
                     self._handle_error(msg)
                     continue
 
-                
+                PINGS_RECEIVED.inc()
                 # Extract metadata
                 payload = {
                     "topic": msg.topic(),

@@ -1,11 +1,24 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using FleetPulse.SignalRHub.MetricsConfig;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FleetPulse.SignalRHub.Hubs
 {
-    public class FleetHub: Hub
+    public class FleetHub : Hub
     {
         public FleetHub() { }
-        
+
+        public override Task OnConnectedAsync()
+        {
+            FleetMetrics.SignalRClients.Inc();
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            FleetMetrics.SignalRClients.Dec();
+            return base.OnDisconnectedAsync(exception);
+        }
+
         // Called by the CLIENT (browser) to join a specific fleet's updates
         public async Task SubscribeFleet(string fleetId)
         {
