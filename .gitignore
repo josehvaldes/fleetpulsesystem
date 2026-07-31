@@ -27,3 +27,7 @@ ai-worker/.codacy/cli.sh
 ai-worker/.codacy/codacy.yaml
 ai-worker/.github/instructions/codacy.instructions.md
 ai-worker/src/.env
+FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
+.codacy/codacy.config.baseline.json
+.codacy/codacy.config.json
+docker/.env

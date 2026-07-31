@@ -1,0 +1,27 @@
+# Default database connection settings for the FleetPulse system. Update these values as needed for your environment.
+DB_HOST=timescaledb
+DB_PORT=5432
+DB_NAME=fleetpulse
+DB_USER=db_username
+DB_PASSWORD=db_password
+
+# FleetPulse.SignalRHub Web settings:
+AuthSettings__DefaultUserId=default_user_id
+AuthSettings__DefaultUsername=default_user_name
+AuthSettings__DefaultPassword=default_password
+
+JwtSettings__Secret=your_jwt_secret_key
+JwtSettings__Issuer=your_jwt_issuer
+JwtSettings__Audience=your_jwt_audience
+
+
+# Environment variables for Azure OpenAI configuration
+AZURE_OPENAI_ENDPOINT=https://oai-petshop-test.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+AZURE_OPENAI_MODEL_DEPLOYMENT=gpt-4.1-mini_shopassist
+
+# Environment variables for Kafka configuration for python ai-worker
+KAFKA_BOOTSTRAP_SERVERS=redpanda-0:9092
+KAFKA_GROUP_ID=ai-worker-group
+KAFKA_TOPICS=gps-pings
+KAFKA_ALERT_TOPIC=ai-alerts

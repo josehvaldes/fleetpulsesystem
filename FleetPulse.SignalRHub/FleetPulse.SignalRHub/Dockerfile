@@ -26,6 +26,5 @@ RUN dotnet publish "./FleetPulse.SignalRHub.csproj" -c $BUILD_CONFIGURATION -o /
 FROM base AS final
 WORKDIR /app
 ENV ASPNETCORE_HTTP_PORTS=8080
-ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "FleetPulse.SignalRHub.dll"]

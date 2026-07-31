@@ -1,0 +1,17 @@
+
+# Environment variables for Kafka configuration
+KAFKA_BOOTSTRAP_SERVERS=redpanda-0:9092
+KAFKA_GROUP_ID=ai-worker-group
+KAFKA_TOPICS=gps-pings
+KAFKA_ALERT_TOPIC=ai-alerts
+
+# Environment variables for Azure OpenAI configuration
+AZURE_OPENAI_ENDPOINT=https://<yourendpoint>.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+AZURE_OPENAI_MODEL_DEPLOYMENT=<yourendpoint>
+
+
+# Additional environment variables can be added here as needed for other configurations.
+DEBUG=True
+TITLE=FleetPulse AI Worker.
+DESCRIPTION=AI Worker for FleetPulse System

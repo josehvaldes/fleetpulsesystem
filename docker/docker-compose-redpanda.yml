@@ -80,20 +80,4 @@ services:
       - ./bootstrap.sh:/bootstrap.sh 
     # Execute the script
     command: ["/bin/sh", "/bootstrap.sh"]
-  
-  # Add to docker-compose.yml
-  timescaledb:
-    image: timescale/timescaledb:latest-pg18
-    environment:
-      POSTGRES_USER: fleetpulse
-      POSTGRES_PASSWORD: fleetpulse_dev
-      POSTGRES_DB: fleetpulse
-    ports:
-      - "5432:5432"
-    volumes:
-      - psgdata:/var/lib/postgresql/
-      - ../db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
-    networks:
-      - redpanda_network
-
-
+ 

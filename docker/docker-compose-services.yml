@@ -1,0 +1,45 @@
+name: redpanda-fleetpulse
+networks:
+  redpanda_network:
+    external: true
+    name: redpanda_network
+
+services:
+  # Add to docker-compose.yml
+  db-writer:
+    image: fleetpulse-dbwriter:1.0
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ConnectionStrings__FleetPulseDb=Host=${DB_HOST:-timescaledb};Port=${DB_PORT:-5432};Database=${DB_NAME:-fleetpulse};Username=${DB_USER};Password=${DB_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "8180:8080"
+    networks:
+      - redpanda_network
+
+  signalr-hub:
+    image: fleetpulse-signalrhub:1.0
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ConnectionStrings__FleetPulseDb=Host=${DB_HOST:-timescaledb};Port=${DB_PORT:-5432};Database=${DB_NAME:-fleetpulse};Username=${DB_USER};Password=${DB_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "8280:8080"
+    networks:
+      - redpanda_network
+
+  ai-worker:
+    image: fleetpulse-ai-worker:1.0
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - redpanda_network
