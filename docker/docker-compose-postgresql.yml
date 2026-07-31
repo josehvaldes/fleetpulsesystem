@@ -9,12 +9,14 @@ services:
   # Add to docker-compose.yml
   timescaledb:
     image: timescale/timescaledb:latest-pg18
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: fleetpulse
-      POSTGRES_PASSWORD: fleetpulse_dev
-      POSTGRES_DB: fleetpulse
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:${DB_PORT:-5432}"
     volumes:
       - psgdata:/var/lib/postgresql/
       - ../db/init.sql:/docker-entrypoint-initdb.d/01-init.sql

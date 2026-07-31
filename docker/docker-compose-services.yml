@@ -8,10 +8,6 @@ services:
   # Add to docker-compose.yml
   db-writer:
     image: fleetpulse-dbwriter:1.0
-    environment:
-      - DOTNET_ENVIRONMENT=Production
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
-      - ConnectionStrings__FleetPulseDb=Host=${DB_HOST:-timescaledb};Port=${DB_PORT:-5432};Database=${DB_NAME:-fleetpulse};Username=${DB_USER};Password=${DB_PASSWORD}
     env_file:
       - .env
     ports:
@@ -21,10 +17,6 @@ services:
 
   signalr-hub:
     image: fleetpulse-signalrhub:1.0
-    environment:
-      - DOTNET_ENVIRONMENT=Production
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
-      - ConnectionStrings__FleetPulseDb=Host=${DB_HOST:-timescaledb};Port=${DB_PORT:-5432};Database=${DB_NAME:-fleetpulse};Username=${DB_USER};Password=${DB_PASSWORD}
     env_file:
       - .env
     ports:
@@ -34,9 +26,6 @@ services:
 
   ai-worker:
     image: fleetpulse-ai-worker:1.0
-    environment:
-      - DOTNET_ENVIRONMENT=Production
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
     env_file:
       - .env
     ports:

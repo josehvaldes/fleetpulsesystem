@@ -86,12 +86,14 @@ services:
   # Add to docker-compose.yml
   timescaledb:
     image: timescale/timescaledb:latest-pg18
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: fleetpulse
-      POSTGRES_PASSWORD: fleetpulse_dev
-      POSTGRES_DB: fleetpulse
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:${DB_PORT:-5432}"
     volumes:
       - psgdata:/var/lib/postgresql/
       - ../db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -123,9 +125,11 @@ services:
       - grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=fleetpulse
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_USERS_DEFAULT_THEME=dark
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     networks:
@@ -134,10 +138,37 @@ services:
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.17.1
     container_name: fleetpulse-postgres-exporter
-    environment:
-      DATA_SOURCE_NAME: "postgresql://fleetpulse_user:fleetpulse_pass@timescaledb-1:5432/fleetpulse?sslmode=disable"
+    env_file:
+      - .env   
     ports:
       - "9187:9187"
     networks:
       - fleetpulse_network
 
+  db-writer:
+    image: fleetpulse-dbwriter:1.0
+    env_file:
+      - .env
+    ports:
+      - "8180:8080"
+    networks:
+      - fleetpulse_network
+
+# FleetPulse Services:
+  signalr-hub:
+    image: fleetpulse-signalrhub:1.0
+    env_file:
+      - .env
+    ports:
+      - "8280:8080"
+    networks:
+      - fleetpulse_network
+
+  ai-worker:
+    image: fleetpulse-ai-worker:1.0
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - fleetpulse_network

@@ -1,0 +1,14 @@
+name: redpanda-fleetpulse
+networks:
+  redpanda_network:
+    external: true
+    name: redpanda_network
+
+services:
+  # React+Vite frontend
+  fleetpulse-frontend:
+    image: fleetpulse-frontend:1.0
+    ports:
+      - "5173:80"
+    networks:
+      - redpanda_network
