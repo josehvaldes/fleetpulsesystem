@@ -1,10 +1,10 @@
 [
     {
-        "driver_id": "driver_001",
+        "driver_id": "WSX-6548",
         "zone": "zone_1_south"
     },
     {
-        "driver_id": "driver_002",
+        "driver_id": "QWE-1234",
         "zone": "zone_2_north"
     }
 ]

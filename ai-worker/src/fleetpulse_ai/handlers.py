@@ -7,6 +7,7 @@ from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.models.gps_ping import GpsPing
 from fleetpulse_ai.models.alert_event import AlertEvent
 from fleetpulse_ai.prometheus import PINGS_PROCESSED, ALERTS_PUBLISHED, ANOMALY_DETECTION_DURATION
+from fleetpulse_ai.mock_data import MOCK_DATA_CONTEXT  # Assuming this is defined somewhere in your codebase
 
 MAX_HISTORY_LENGTH = 10
 
@@ -44,11 +45,13 @@ def create_ai_worker_handler(
 
         violation_event = await detector.analyze(driver_id, history)
         if violation_event:
-            print(f"Violation detected for driver {driver_id}: {violation_event.to_dict()}")
-            # Add more context to the violation event for the agent later
-            
+            print(f" - Violation detected for driver {driver_id}: {violation_event.to_dict()}")
+
+            # Retrieve driver context from MOCK_DRIVER_CONTEXT. Data will come from database later, but for now we can use a mock.
+            driver_context = MOCK_DATA_CONTEXT.get(driver_id, {})
+
             with ANOMALY_DETECTION_DURATION.labels(anomaly_type="working_zone_violation").time():
-                agent_response = await agent.analyze_alert(violation_event, context={"driver_id": driver_id})
+                agent_response = await agent.analyze_alert(violation_event, context=driver_context)
 
             alert = AlertEvent(
                 driver_id=violation_event.driver_id,
@@ -66,6 +69,7 @@ def create_ai_worker_handler(
 
             PINGS_PROCESSED.labels(anomaly_detected="true").inc()
             ALERTS_PUBLISHED.labels(severity=alert.agent_risk_level).inc()
+            print(f" - Publishing alert for driver {driver_id}: {alert.to_dict()}")
             await manager.handle_alert(alert)
             
 

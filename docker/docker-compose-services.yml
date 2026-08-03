@@ -28,6 +28,8 @@ services:
     image: fleetpulse-ai-worker:1.0
     env_file:
       - .env
+    volumes:
+      - ../ai-worker/data:/app/data
     ports:
       - "8000:8000"
     networks:

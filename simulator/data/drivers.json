@@ -1,13 +1,14 @@
 [
     {
         "driver_id": "WSX-6548",
-        "speed_factor": 1.0,
-        "status": "MOVING",
+        "name": "John Doe",
+        "vehicle_type": "car",
         "behavior_profile": "normal"
     },
     {
         "driver_id": "QWE-1234",
-        "status": "MOVING",
-        "behavior_profile": "NORMAL"
+        "name": "Jane Smith",
+        "vehicle_type": "motorcycle",
+        "behavior_profile": "aggressive"
     }
 ]

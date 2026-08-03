@@ -101,7 +101,7 @@ services:
       - fleetpulse_network
 
   prometheus:
-    image: prom/prometheus:v3.2.0
+    image: prom/prometheus:v3.6.0
     container_name: fleetpulse-prometheus
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -118,7 +118,7 @@ services:
       - fleetpulse_network
 
   grafana:
-    image: grafana/grafana:11.5.0
+    image: grafana/grafana:13.1.1
     container_name: fleetpulse-grafana
     volumes:
       - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -168,7 +168,18 @@ services:
     image: fleetpulse-ai-worker:1.0
     env_file:
       - .env
+    volumes:
+      - ../ai-worker/data:/app/data
     ports:
       - "8000:8000"
+    networks:
+      - fleetpulse_network
+
+  fleetpulse-frontend:
+    image: fleetpulse-frontend:1.0
+    env_file:
+      - .env
+    ports:
+      - "5173:80"
     networks:
       - fleetpulse_network

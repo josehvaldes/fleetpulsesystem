@@ -1,0 +1,12 @@
+[
+    {
+        "driver_id": "WSX-6548",
+        "route_id": "recoleta_route_sample",
+        "start_offset_seconds": 0.0
+    },
+    {
+        "driver_id": "QWE-1234",
+        "route_id": "route_cross_zone",
+        "start_offset_seconds": 5.0
+    }
+]

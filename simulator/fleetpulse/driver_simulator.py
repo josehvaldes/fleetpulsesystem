@@ -190,7 +190,7 @@ class DriverSimulator:
         ping_interval = self.sim_config.get("base_ping_interval_seconds", 1.0)
         jitter = self.sim_config.get("ping_interval_jitter_seconds", 0.2)
 
-        print(f"Driver {self.config.driver_id} starting simulation with base speed {self.base_speed_kmh:.1f} km/h.")        
+        print(f"  - Driver {self.config.driver_id} starting simulation with base speed {self.base_speed_kmh:.1f} km/h.")        
 
         while self.running:
             # Calculate actual ping interval with jitter
@@ -211,14 +211,14 @@ class DriverSimulator:
             # Handle route end
             
             if self.distance_along_route >= self.route.total_distance:
-                print(f"Driver {self.config.driver_id} reached end of route. Stop")
+                print(f"  - Driver {self.config.driver_id} reached end of route. Stop")
                 self.running = False
             
             # Get new position
             lat, lng, heading, _ = self._get_point_at_distance(self.distance_along_route)
             lat, lng = self._add_gps_noise(lat, lng)
             self.heading = heading
-            print(f"Driver {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}")
+            print(f"  - Driver {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}")
 
             # Build and publish message
             message = {
@@ -238,8 +238,8 @@ class DriverSimulator:
             # Sleep for real-time interval
             await asyncio.sleep(actual_interval)
         
-        print(f"Driver {self.config.driver_id} simulation stopped.")
+        print(f"  - Driver {self.config.driver_id} simulation stopped.")
     
     def stop(self):
         self.running = False
-        print(f"Driver {self.config.driver_id} simulation stopping...")    
+        print(f"  - Driver {self.config.driver_id} simulation stopping...")

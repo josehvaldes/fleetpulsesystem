@@ -22,8 +22,11 @@ class Driver:
 
 @dataclass
 class DriverConfig:
+
     driver_id: str
     name: str
     vehicle_type: str
-    route_id: str
-    start_offset_seconds: float
+    behavior_profile: str
+    
+    route_id: str = ""
+    start_offset_seconds: float = 0.0

@@ -69,6 +69,7 @@ async def main():
         bootstrap_servers=bootstrap_servers,
         group_id=group_id,
         topics=topics,
+        auto_offset_reset="earliest",
     )
 
     setup_prometheus(settings.prometheus_metrics_port)
@@ -86,4 +87,5 @@ if __name__ == "__main__":
            level=logging.INFO,
            format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
        )   
+
    asyncio.run(main())
