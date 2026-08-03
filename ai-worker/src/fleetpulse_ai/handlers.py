@@ -1,4 +1,5 @@
 
+from datetime import datetime, timezone
 from typing import Awaitable, Callable
 
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
@@ -64,7 +65,8 @@ def create_ai_worker_handler(
                 agent_risk_level=agent_response.risk_level,
                 agent_assessment=agent_response.assessment,
                 agent_recommendation=agent_response.recommended_action,
-                agent_auto_escalate=agent_response.auto_escalate
+                agent_auto_escalate=agent_response.auto_escalate,
+                created_at= datetime.now(timezone.utc).isoformat()
             )
 
             PINGS_PROCESSED.labels(anomaly_detected="true").inc()

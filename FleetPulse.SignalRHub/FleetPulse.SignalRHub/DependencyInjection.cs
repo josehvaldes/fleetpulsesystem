@@ -22,7 +22,7 @@ namespace FleetPulse.SignalRHub
             services.Configure<JwtSettings>(config.GetSection(JwtSettings.SectionName));
             services.Configure<AuthSettings>(config.GetSection(AuthSettings.SectionName));
 
-            services.AddSingleton<IConsumer<string, string>>(sp =>
+            services.AddKeyedSingleton<IConsumer<string, string>>("gps-pings", (sp, _) =>
             {
                 var config = sp.GetRequiredService<IConfiguration>()
                                .GetSection(KafkaSettings.SectionName)
@@ -35,6 +35,15 @@ namespace FleetPulse.SignalRHub
                     tracker.RecordHeartbeat();
                 })
                 .Build();
+            });
+
+            services.AddKeyedSingleton<IConsumer<string, string>>("alerts", (sp, _) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>()
+                               .GetSection(KafkaSettings.SectionName)
+                               .Get<ConsumerConfig>()!;
+
+                return new ConsumerBuilder<string, string>(config).Build();
             });
 
             services.AddSingleton(sp =>
@@ -69,6 +78,7 @@ namespace FleetPulse.SignalRHub
         {
             // AddHostedService guarantees single instance, start/stop with the host
             services.AddHostedService<GpsPingConsumer>();
+            services.AddHostedService<AiAlertConsumer>();
 
             return services;
         }

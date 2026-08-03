@@ -19,8 +19,8 @@ namespace FleetPulse.SignalRHub.Mapping
                 .Map(dest => dest.DriverId, src => src.Driver_Id);
             TypeAdapterConfig<AlertDto, AlertResponse>
                 .NewConfig()
-                .Map(dest => dest.CreatedAt, src => src.Created_at.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.Driver_id);
+                .Map(dest => dest.CreatedAt, src => src.CreatedAt.ToString("o"))
+                .Map(dest => dest.DriverId, src => src.DriverId);
         }
     }
 }

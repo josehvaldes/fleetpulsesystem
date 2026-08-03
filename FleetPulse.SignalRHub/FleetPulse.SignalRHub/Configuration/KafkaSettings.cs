@@ -5,7 +5,10 @@
         public const string SectionName = "Kafka";
         public string BootstrapServers { get; init; } = string.Empty;
         public string GroupId { get; init; } = string.Empty;
-        public string Topic { get; init; } = string.Empty;
+        public string GpsPingsTopic { get; init; } = string.Empty;
+
+        public string AlertsTopic { get; init; } = string.Empty;
+
 
     }
 }

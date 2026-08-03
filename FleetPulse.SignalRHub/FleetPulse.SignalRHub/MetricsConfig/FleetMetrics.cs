@@ -15,6 +15,11 @@ namespace FleetPulse.SignalRHub.MetricsConfig
             "Total GPS pings consumed from Kafka",
             new CounterConfiguration { LabelNames = ["topic"] });
 
+        public static readonly Counter AlertsReceived = Metrics.CreateCounter(
+            "fleetpulse_signalrhub_alerts_received_total",
+            "Total alerts consumed from Kafka",
+            new CounterConfiguration { LabelNames = ["topic"] });
+
         /// <summary>Number of unique drivers seen in the last 5 minutes (sliding window in GpsPingConsumer).</summary>
         public static readonly Gauge ActiveDrivers = Metrics.CreateGauge(
             "fleetpulse_signalrhub_active_drivers",

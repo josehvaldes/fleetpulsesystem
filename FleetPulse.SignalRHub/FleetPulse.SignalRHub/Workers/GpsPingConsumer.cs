@@ -27,7 +27,7 @@ namespace FleetPulse.SignalRHub.Workers
             PropertyNameCaseInsensitive = true
         };
 
-        public GpsPingConsumer(IConsumer<string, string> consumer,
+        public GpsPingConsumer([FromKeyedServices("gps-pings")] IConsumer<string, string> consumer,
                                 IHubContext<FleetHub> hubContext,
                                 ILogger<GpsPingConsumer> logger, 
                                 IOptions<KafkaSettings> kafkaSettings,
@@ -45,7 +45,7 @@ namespace FleetPulse.SignalRHub.Workers
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Subscribe BEFORE entering the loop
-            _consumer.Subscribe(_kafkaSettings.Topic);
+            _consumer.Subscribe(_kafkaSettings.GpsPingsTopic);
 
             // Run on a thread-pool thread so we don't block app startup
             _ = Task.Run(() => ConsumeLoopAsync(stoppingToken), stoppingToken);
@@ -65,11 +65,15 @@ namespace FleetPulse.SignalRHub.Workers
                     _consumerTracker.RecordHeartbeat();
 
                     // Count every message consumed from Kafka, regardless of throttle
-                    FleetMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.Topic).Inc();
+                    FleetMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.GpsPingsTopic).Inc();
 
                     var dto = DeserializePing(result);
 
-                    if (dto is null) continue;
+                    if (dto is null) 
+                    {
+                        _logger.LogWarning($"Received null or invalid GPS ping message from Kafka, skipping. [{result.Message.Value}]");
+                        continue;
+                    } 
 
                     // Throttle per driver
                     var now = DateTimeOffset.UtcNow;
@@ -88,7 +92,7 @@ namespace FleetPulse.SignalRHub.Workers
 
                     // Fan-out via SignalR group (one group per fleet, or broadcast)
                     await _hubContext.Clients.All
-                        .SendAsync(_signalRSettings.CallbackMethod, dto, stoppingToken);
+                        .SendAsync(_signalRSettings.GpsPingCallbackMethod, dto, stoppingToken);
                 }
             }
             catch (OperationCanceledException) { /* graceful shutdown */ }

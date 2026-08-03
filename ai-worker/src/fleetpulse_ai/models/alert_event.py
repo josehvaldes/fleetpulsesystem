@@ -20,21 +20,7 @@ class AlertEvent:
     agent_recommendation: str | None = None
     agent_auto_escalate: bool | None = None
 
-    def update_alert_event(self, agent_response: AgentAlertResponse, event: ViolationEvent) -> None:
-        """Update the alert event with the agent's response."""
-
-        self.driver_id = event.driver_id
-        self.exit_location = event.exit_location
-        self.exit_speed = event.exit_speed
-        self.exit_heading = event.exit_heading
-        self.exit_time = event.exit_time
-        self.zone_name = event.zone_name
-        self.zone_type = event.zone_type
-
-        self.agent_risk_level = agent_response.risk_level
-        self.agent_assessment = agent_response.assessment
-        self.agent_recommendation = agent_response.recommendation
-        self.agent_auto_escalate = agent_response.auto_escalate
+    created_at: str | None = None
 
     def to_dict(self) -> dict:
         """Convert the event to a dictionary."""
@@ -49,7 +35,8 @@ class AlertEvent:
             "agent_risk_level": self.agent_risk_level,
             "agent_assessment": self.agent_assessment,
             "agent_recommendation": self.agent_recommendation,
-            "agent_auto_escalate": self.agent_auto_escalate
+            "agent_auto_escalate": self.agent_auto_escalate,
+            "created_at": self.created_at
         }
 
     def to_json(self) -> str:
