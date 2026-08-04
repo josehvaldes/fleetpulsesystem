@@ -36,7 +36,7 @@ export function useGpsPings() {
         true
       );
       console.log("Setting connection state:", true);
-    }, 5000);
+    }, 10000);
 
     return () => {
       unsubscribe();

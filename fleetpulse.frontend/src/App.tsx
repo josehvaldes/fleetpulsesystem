@@ -4,15 +4,13 @@ import { FleetMap } from "./components/FleetMap";
 import { MessageLog } from "./components/MessageLog";
 import { DriversList } from "./components/DriversList";
 import { useAuth } from "./hooks/useAuth";
-
+import { AlertsBox } from './components/AlertsBox';
 function App() {
   const { isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated) {
     return <Login />;
   }
-
-
 
   return (
     <>
@@ -25,11 +23,12 @@ function App() {
 
           <h1>GPS Ping Monitor </h1>
         </div>
-        <div className='grid grid-cols-7 gap-4 border border-blue-500 w-full'>
-          <div className='col-span-1 border border-green-500'>
+        <div className='grid grid-cols-10 gap-4 border border-blue-500 w-full'>
+          <div className='col-span-2 border border-green-500'>
+            <AlertsBox />
             <DriversList />
           </div>
-          <div className='col-span-4' ><FleetMap /></div>
+          <div className='col-span-6' ><FleetMap /></div>
           <div className='col-span-2'><MessageLog /></div>
         </div>
       </div>

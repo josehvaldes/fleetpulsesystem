@@ -32,5 +32,5 @@ FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
 .codacy/codacy.config.json
 docker/.env
 ai-worker/.codacy/*
-
 simulator/.codacy/*
+fleetpulse.frontend/.codacy/*

@@ -5,17 +5,24 @@ import {
   type HubConnection,
 } from "@microsoft/signalr";
 import type { GpsPing } from "../types/gps";
+import type { AlertDto } from "../types/alert_dto";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.
 // const HUB_URL = "https://localhost:7234/v1/fleetHub";
 const HUB_URL = import.meta.env.VITE_FLEET_HUB_URL;
 
+const RECEIVE_GPS_PING = "ReceiveGpsPing";
+const RECEIVE_ALERT = "ReceiveAlert";
+
 export type PingHandler = (ping: GpsPing) => void;
+
+export type AlertHandler = (alert: AlertDto) => void;
 
 class FleetHubService {
   private connection: HubConnection;
   private pingHandlers = new Set<PingHandler>();
+  private alertHandlers = new Set<AlertHandler>();
 
   constructor() {
     this.connection = new HubConnectionBuilder()
@@ -28,8 +35,12 @@ class FleetHubService {
       .build();
 
     // The single server→client callback. We fan out to local subscribers.
-    this.connection.on("ReceiveGpsPing", (ping: GpsPing) => {
+    this.connection.on(RECEIVE_GPS_PING, (ping: GpsPing) => {
       this.pingHandlers.forEach((h) => h(ping));
+    });
+
+    this.connection.on(RECEIVE_ALERT, (alert: AlertDto) => {
+      this.alertHandlers.forEach((h) => h(alert));
     });
 
     this.connection.onreconnecting(() =>
@@ -69,6 +80,12 @@ class FleetHubService {
   // Optional: subscribe to a fleet group on the server
   async subscribeFleet(fleetId: string) {
     await this.connection.invoke("SubscribeFleet", fleetId);
+  }
+
+  // Subscribe to alerts from the server. Returns an unsubscribe function.
+  onAlerts(handler: AlertHandler): () => void {
+    this.alertHandlers.add(handler);
+    return () => this.alertHandlers.delete(handler);
   }
 }
 
