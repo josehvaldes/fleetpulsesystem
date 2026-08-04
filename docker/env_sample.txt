@@ -20,6 +20,11 @@ AZURE_OPENAI_ENDPOINT=https://oai-petshop-test.openai.azure.com/
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 AZURE_OPENAI_MODEL_DEPLOYMENT=gpt-4.1-mini_shopassist
 
+#Azure Credentials for OpenAI
+AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
 # Environment variables for Kafka configuration for python ai-worker
 KAFKA_BOOTSTRAP_SERVERS=redpanda-0:9092
 KAFKA_GROUP_ID=ai-worker-group

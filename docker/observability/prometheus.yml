@@ -23,7 +23,7 @@ scrape_configs:
   # 4. .NET SignalR Worker
   - job_name: 'signalr-worker'
     static_configs:
-      - targets: ['signalr-worker:8080']
+      - targets: ['signalr-hub:8080']
     metrics_path: /metrics
 
   # 5. .NET DB Writer
