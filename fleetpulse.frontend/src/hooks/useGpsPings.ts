@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fleetHub } from "../services/fleetHub";
 import type { GpsPing } from "../types/gps";
+import type { FleetHubConnectionStatus } from "../services/fleetHub";
 
 // Keep at most N most-recent pings in memory for the textarea view.
 const MAX_PINGS = 200;
@@ -10,12 +11,14 @@ export type DriverLocations = Record<string, GpsPing>;
 export function useGpsPings() {
   const [pings, setPings] = useState<GpsPing[]>([]);
   const [drivers, setDrivers] = useState<DriverLocations>({});
-  const [connected, setConnected] = useState(false);
+  const [status, setStatus] = useState<FleetHubConnectionStatus>(
+    fleetHub.getConnectionStatus()
+  );
 
   useEffect(() => {
-    fleetHub.start();
+    void fleetHub.start();
 
-    const unsubscribe = fleetHub.onPing((ping) => {
+    const unsubscribePing = fleetHub.onPing((ping) => {
       setDrivers((prev) => ({
         ...prev,
         [ping.driver_id]: ping,
@@ -26,23 +29,15 @@ export function useGpsPings() {
       });
     });
 
-
-    // Polling connection state is the simplest; for production you'd
-    // expose an event from fleetHub instead.
-    const t = setInterval(() => {
-      setConnected(
-        // signalr doesn't expose a reactivity API; reading state is fine.
-        // We assume connected after start() resolves; refine later.
-        true
-      );
-      console.log("Setting connection state:", true);
-    }, 10000);
+    const unsubscribeConnection = fleetHub.onConnectionState(setStatus);
 
     return () => {
-      unsubscribe();
-      clearInterval(t);
+      unsubscribePing();
+      unsubscribeConnection();
     };
   }, []);
 
-  return { drivers, pings, connected };
+  const connected = status === "connected";
+
+  return { drivers, pings, status, connected };
 }

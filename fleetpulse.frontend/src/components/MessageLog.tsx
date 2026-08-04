@@ -1,7 +1,9 @@
 import { useGpsPings } from "../hooks/useGpsPings";
+import { statusStyle } from "../utils/fleethub_utils";
 
 export function MessageLog() {
-  const { pings, connected } = useGpsPings();
+  const { pings, status } = useGpsPings();
+  const statusUi = statusStyle(status);
 
   // One line per ping, formatted for didactic readability.
   const text = pings
@@ -13,11 +15,11 @@ export function MessageLog() {
     .join("\n");
 
   return (
-    <div className="">
+    <div className="border border-blue-500 p-2">
       <h2>
         Live GPS Pings{" "}
-        <span style={{ color: connected ? "green" : "red" }}>
-          {connected ? "● connected" : "○ connecting…"}
+        <span style={{ color: statusUi.color }}>
+          {statusUi.label}
         </span>
       </h2>
       <div className="">
@@ -28,7 +30,7 @@ export function MessageLog() {
             placeholder="Waiting for messages from /v1/fleetHub…"
             style={{
             width: "100%",
-            height: "60vh",
+            height: "20vh",
             fontFamily: "monospace",
             fontSize: 12,
             background: "#0b0f14",
