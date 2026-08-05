@@ -1,4 +1,4 @@
-
+import time
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from fleetpulse_ai.prompts.templates import AlertTemplate
@@ -6,7 +6,8 @@ from fleetpulse_ai.agents.azure_credentials_manager import get_credential_manage
 from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
 from fleetpulse_ai.events.violation_event import ViolationEvent
 from fleetpulse_ai.settings import settings
-
+from fleetpulse_ai.logging_config import get_logger
+logger = get_logger(__name__)
 class AlarmAnalyzerAgent:
     def __init__(self, model_deployment: str):
 
@@ -39,10 +40,14 @@ class AlarmAnalyzerAgent:
             self._initialize_llm()
 
         query = f"Analyze the following alert: {alert}"
-        print(f" * Analyzing alert for driver {alert.driver_id} with context: {context}")
+        logger.info("alert_analysis_started", driver_id=alert.driver_id)
         messages = self.prompt.format_messages(query=query, context=context)
+
+        start_time = time.perf_counter()
         decision = await self.llm.ainvoke(messages)
-        
+        duration_ms = (time.perf_counter() - start_time) * 1000
+        logger.info("alert_analysis_completed", driver_id=alert.driver_id, duration_ms=duration_ms)
+
         return AgentAlertResponse(
             risk_level=decision.risk_level,
             assessment=decision.assessment,

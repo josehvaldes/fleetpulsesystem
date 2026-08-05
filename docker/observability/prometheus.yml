@@ -20,8 +20,8 @@ scrape_configs:
     static_configs:
       - targets: ['postgres-exporter:9187']
 
-  # 4. .NET SignalR Worker
-  - job_name: 'signalr-worker'
+  # 4. .NET SignalR hub
+  - job_name: 'signalr-hub'
     static_configs:
       - targets: ['signalr-hub:8080']
     metrics_path: /metrics
@@ -42,6 +42,18 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+  
+  # 8. Grafana self-monitoring
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+    metrics_path: /metrics
+
+  # 9. Loki self-monitoring
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+    metrics_path: /metrics
 
 # Alerting rules   
 rule_files:

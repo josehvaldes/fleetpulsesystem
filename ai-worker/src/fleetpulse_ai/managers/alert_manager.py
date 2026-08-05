@@ -1,16 +1,16 @@
-from fleetpulse_ai.events.violation_event import ViolationEvent
 from confluent_kafka import Producer
 import sys
 from fleetpulse_ai.models.alert_event import AlertEvent
 from fleetpulse_ai.settings import settings
-
+from fleetpulse_ai.logging_config import get_logger
+logger = get_logger(__name__)
 
 def delivery_report(err, msg):
     """Delivery report callback called (from a separate thread) on successful or failed delivery of the message."""
     if err is not None:
-        print(f"Message delivery failed: {err}", file=sys.stderr)
+        logger.error("kafka_delivery_failed", error=str(err))
     else:
-        print(f"Message delivered to {msg.topic()} [{msg.partition()}] at offset {msg.offset()}")
+        logger.info("kafka_delivery_success", topic=msg.topic(), partition=msg.partition(), offset=msg.offset())
 
 class AlertManager:
 
@@ -23,7 +23,7 @@ class AlertManager:
             self.producer = Producer(config)
             return self
         except Exception as e:
-            print(f"Failed to initialize Kafka producer: {e}", file=sys.stderr)
+            logger.error("kafka_producer_init_failed", error=str(e))
             sys.exit(1)
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):

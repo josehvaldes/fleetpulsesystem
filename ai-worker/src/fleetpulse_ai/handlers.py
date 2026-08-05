@@ -2,6 +2,8 @@
 from datetime import datetime, timezone
 from typing import Awaitable, Callable
 
+import structlog
+from fleetpulse_ai.logging_config import get_logger
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
 from fleetpulse_ai.managers.alert_manager import AlertManager
@@ -11,6 +13,7 @@ from fleetpulse_ai.prometheus import PINGS_PROCESSED, ALERTS_PUBLISHED, ANOMALY_
 from fleetpulse_ai.mock_data import MOCK_DATA_CONTEXT  # Assuming this is defined somewhere in your codebase
 
 MAX_HISTORY_LENGTH = 10
+logger = get_logger(__name__)
 
 def create_ai_worker_handler(
     detector: WorkingZoneViolationDetector,
@@ -40,39 +43,41 @@ def create_ai_worker_handler(
 
         history.append(point)
         PINGS_PROCESSED.labels(anomaly_detected="false").inc()  # Default to false; will update if anomaly detected
-        if len(history) < 2:
-            print(f"Not enough data to analyze for driver {driver_id}. Current history length: {len(history)}")
-            return
 
-        violation_event = await detector.analyze(driver_id, history)
-        if violation_event:
-            print(f" - Violation detected for driver {driver_id}: {violation_event.to_dict()}")
+        with structlog.contextvars.bound_contextvars(driver_id=driver_id):
 
-            # Retrieve driver context from MOCK_DRIVER_CONTEXT. Data will come from database later, but for now we can use a mock.
-            driver_context = MOCK_DATA_CONTEXT.get(driver_id, {})
+            if len(history) < 2:
+                return
 
-            with ANOMALY_DETECTION_DURATION.labels(anomaly_type="working_zone_violation").time():
-                agent_response = await agent.analyze_alert(violation_event, context=driver_context)
+            violation_event = await detector.analyze(driver_id, history)
+            if violation_event:
+                logger.info("violation_detected", violation_zone=violation_event.zone_name, violation_type=violation_event.zone_type, exit_time=violation_event.exit_time)
 
-            alert = AlertEvent(
-                driver_id=violation_event.driver_id,
-                exit_location=violation_event.exit_location,
-                exit_speed=violation_event.exit_speed,
-                exit_heading=violation_event.exit_heading,
-                exit_time=violation_event.exit_time,
-                zone_name=violation_event.zone_name,
-                zone_type=violation_event.zone_type,
-                agent_risk_level=agent_response.risk_level,
-                agent_assessment=agent_response.assessment,
-                agent_recommendation=agent_response.recommended_action,
-                agent_auto_escalate=agent_response.auto_escalate,
-                created_at= datetime.now(timezone.utc).isoformat()
-            )
+                # Retrieve driver context from MOCK_DRIVER_CONTEXT. Data will come from database later, but for now we can use a mock.
+                driver_context = MOCK_DATA_CONTEXT.get(driver_id, {})
 
-            PINGS_PROCESSED.labels(anomaly_detected="true").inc()
-            ALERTS_PUBLISHED.labels(severity=alert.agent_risk_level).inc()
-            print(f" - Publishing alert for driver {driver_id}: {alert.to_dict()}")
-            await manager.handle_alert(alert)
-            
+                with ANOMALY_DETECTION_DURATION.labels(anomaly_type="working_zone_violation").time():
+                    agent_response = await agent.analyze_alert(violation_event, context=driver_context)
+
+                alert = AlertEvent(
+                    driver_id=violation_event.driver_id,
+                    exit_location=violation_event.exit_location,
+                    exit_speed=violation_event.exit_speed,
+                    exit_heading=violation_event.exit_heading,
+                    exit_time=violation_event.exit_time,
+                    zone_name=violation_event.zone_name,
+                    zone_type=violation_event.zone_type,
+                    agent_risk_level=agent_response.risk_level,
+                    agent_assessment=agent_response.assessment,
+                    agent_recommendation=agent_response.recommended_action,
+                    agent_auto_escalate=agent_response.auto_escalate,
+                    created_at= datetime.now(timezone.utc).isoformat()
+                )
+
+                PINGS_PROCESSED.labels(anomaly_detected="true").inc()
+                ALERTS_PUBLISHED.labels(severity=alert.agent_risk_level).inc()
+                logger.info("alert_published", agent_risk_level=alert.agent_risk_level)
+                await manager.handle_alert(alert)
+                
 
     return ai_worker_handler

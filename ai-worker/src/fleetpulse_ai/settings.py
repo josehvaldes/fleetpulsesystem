@@ -2,7 +2,7 @@ from functools import lru_cache
 from dotenv import find_dotenv
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
-
+from typing import Optional
 
 ENV_FILE = find_dotenv(usecwd=True) or ".env"
 
@@ -11,6 +11,18 @@ class Settings(BaseSettings):
     title: str = "FleetPulse AI Worker"
     description: str = "AI-Powered Worker for FleetPulse System"
     debug: bool = False
+
+
+    #Logging Configuration
+    log_level: str = "INFO"
+    log_file: Optional[str] = None # Path to log file. If None, only console logging is used
+    log_to_console: bool = True
+
+    # Additional Logging outputs
+    service_name: str = "ai-worker"  # Optional service name to bind to all logs (e.g., 'ai-worker')
+    version: str = "1.0.0"  # Application version for logging and monitoring
+
+    # Azure OpenAI Configuration
     
     azure_openai_endpoint: str = "https://oai-petshop-test.openai.azure.com/"
     azure_openai_api_version: str = "2024-08-01-preview"

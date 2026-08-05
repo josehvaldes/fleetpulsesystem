@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 import json
-import logging
 import signal
 
 from typing import Callable, Awaitable
 from confluent_kafka import Consumer, KafkaError, KafkaException
+from fleetpulse_ai.logging_config import get_logger
 from fleetpulse_ai.prometheus import PINGS_RECEIVED
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class IKafkaConsumer (ABC):
 
@@ -63,16 +63,16 @@ class KafkaConsumer(IKafkaConsumer):
         signal.signal(signal.SIGTERM, self._signal_handler)
 
         logger.info(
-            "RedpandaConsumer initialized | brokers=%s | group=%s | topics=%s",
-            bootstrap_servers,
-            group_id,
-            topics,
+            "kafka_consumer_initialized",
+            brokers=bootstrap_servers,
+            group_id=group_id,
+            topics=topics,
         )
 
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals gracefully."""
 
-        logger.info("Shutdown signal received (%s). Stopping consumer...", signum)
+        logger.info("shutdown_signal_received", signal_number=signum)
         self._running = False
 
     async def consume(
@@ -90,18 +90,17 @@ class KafkaConsumer(IKafkaConsumer):
             deserialize_json: If True, attempts to parse message value as JSON.
         """
         self._running = True
-        logger.info("Consumer loop started. Listening on topics: %s", self.topics)
+        logger.info("consumer_loop_started", topics=self.topics)
 
         try:
             while self._running:
                 msg = self.consumer.poll(timeout=poll_timeout)
 
                 if msg is None:
-                    print("No message received. Continuing...")
                     continue
 
                 if msg.error():
-                    print(f"Error in message: {msg.error()}. Handling error...")
+                    logger.error("kafka_message_error", error=str(msg.error()))
                     self._handle_error(msg)
                     continue
 
@@ -123,17 +122,17 @@ class KafkaConsumer(IKafkaConsumer):
                         value = value_wrapper.get("payload") if isinstance(value_wrapper, dict) else value_wrapper
                         payload["value"] = json.loads(value) if isinstance(value, str) else value
                     except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                        logger.warning("Failed to decode JSON message: %s", e)
+                        logger.warning("json_decode_failed", error=str(e))
                         payload["value"] = msg.value().decode("utf-8", errors="replace")
 
                 # Hand off to the AI worker
                 try:
                     await message_handler(payload["value"]) # Pass only the deserialized value to the handler
                 except Exception as e:
-                    logger.exception("Message handler failed: %s", e)
+                    logger.exception("message_handler_failed", error=str(e))
 
         except KafkaException as e:
-            logger.error("Kafka exception: %s", e)
+            logger.error("kafka_exception", error=str(e))
         finally:
             self.close()
 
@@ -142,20 +141,20 @@ class KafkaConsumer(IKafkaConsumer):
         error = msg.error()
         if error.code() == KafkaError._PARTITION_EOF:
             logger.debug(
-                "End of partition reached: %s [%d] at offset %d",
-                msg.topic(),
-                msg.partition(),
-                msg.offset(),
+                "kafka_partition_eof",
+                topic=msg.topic(),
+                partition=msg.partition(),
+                offset=msg.offset(),
             )
         elif error.code() == KafkaError._ALL_BROKERS_DOWN:
-            logger.critical("All Redpanda brokers are down!")
+            logger.critical("kafka_brokers_down")
             self._running = False
         else:
-            logger.error("Consumer error: %s", error)
+            logger.error("kafka_consumer_error", error=str(error))
 
     def close(self) -> None:
         """Cleanly close the consumer and release resources."""
-        logger.info("Closing Redpanda consumer...")
+        logger.info("kafka_consumer_closing")
         self.consumer.close()
-        logger.info("Consumer closed.")
+        logger.info("kafka_consumer_closed")
 

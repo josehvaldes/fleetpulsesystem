@@ -21,8 +21,7 @@ namespace FleetPulse.DbWriter.Workers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
-            logger.LogInformation("DbBatchWriterWorker starting...");
-            logger.LogInformation("Database Version: {Version}", await databaseService.GetVersion(stoppingToken));
+            logger.LogInformation("DbBatchWriterWorker starting. Database Version: {Version}", await databaseService.GetVersion(stoppingToken));
 
             // Start Kafka consumption in background
             var consumeTask = consumerService.StartConsumingAsync(stoppingToken);
@@ -60,19 +59,15 @@ namespace FleetPulse.DbWriter.Workers
             try
             {
                 logger.LogInformation("Flushing {Count} pings to database...", pings.Count);
-                foreach (var p in pings) 
-                {
-                    logger.LogInformation("DriverId: {DriverId}, Timestamp: {Timestamp}, Lat: {Latitude}, Lon: {Longitude}, Speed: {SpeedKmh}, Heading: {HeadingDegrees}, Accuracy: {AccuracyMeters}, Status: {Status}, VehicleType: {VehicleType}",
-                        p.DriverId, p.Timestamp, p.Latitude, p.Longitude, p.Speed, p.Heading, p.Accuracy, p.Status, p.VehicleType);
-                }
-                    // TODO: Phase 4.3 - Add compression logic here
-                    var compressedPings = await compressionService.ApplyTemporalCompression(pings);
-                    
-                    await databaseService.BulkInsertPingsAsync(compressedPings, cancellationToken);
 
-                    FleetMetrics.GpsPingsCompressedToDb.Inc(compressedPings.Count);
+                // TODO: Phase 4.3 - Add compression logic here
+                var compressedPings = await compressionService.ApplyTemporalCompression(pings);
+                
+                await databaseService.BulkInsertPingsAsync(compressedPings, cancellationToken);
 
-                    await databaseService.UpsertLatestStateAsync(compressedPings, cancellationToken);
+                FleetMetrics.GpsPingsCompressedToDb.Inc(compressedPings.Count);
+
+                await databaseService.UpsertLatestStateAsync(compressedPings, cancellationToken);
 
                 logger.LogInformation(
                     "Flushed {Count} pings in {ElapsedMs}ms",

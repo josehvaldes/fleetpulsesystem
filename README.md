@@ -710,3 +710,56 @@ For implementation details, scrape configuration, and example metric definitions
 | Grafana | `http://localhost:3000` | View dashboards and alert status. |
 
 Prometheus is wired through Docker Compose using the observability files under `docker/observability/`. The stack is intended for local visibility, but it also mirrors the shape of a production monitoring setup.
+
+
+### Log Management: LOKI + PromTail
+
+| Component | Route | Purpose |
+| :--- | :--- | :--- |
+| promtail  | none | Agent to collect logs from containers |
+| Loki  | `http://localhost:3100` | Logs storage and data source for grafana |
+
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                  Docker Compose Network                 │
+│                                                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐ │
+│  │  EMQX       │  │ .NET SignalR│  │ Python AI Worker │ │
+│  │             │  │   Worker    │  │                  │ │
+│  └──────┬──────┘  └─────┬───────┘  └────────┬─────────┘ │
+│         │               │                   │           │
+│         │ stdout        │ stdout            │ stdout    │
+│         ▼               ▼                   ▼           │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              Promtail (agent)                    │   │
+│  │  Discovers containers via Docker socket          │   │
+│  └──────────────────────┬───────────────────────────┘   │
+│                         │ HTTP push                     │
+│                         ▼                                │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              Loki (port 3100)                    │   │
+│  └──────────────────────┬───────────────────────────┘   │
+│                         │ data source                   │
+│                         ▼                                │
+│                  ┌──────────────┐                       │
+│                  │   Grafana    │                       │
+│                  │  (existing)  │                       │
+│                  └──────────────┘                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+Log Schema for ai-worker service:
+```json
+{
+  "timestamp": "2026-07-10T12:34:56.789Z",
+  "level": "INFO",
+  "logger": "fleetpulse_ai.managers.kafka_consumer",
+  "service": "db-writer",
+  "version": "1.0.0",
+  "message": "Flushed batch to TimescaleDB",
+  "driver_id": "DRV-042", 
+  "duration_ms": 38,
+  "other_properties": "add other properties here as needed"
+}
+```

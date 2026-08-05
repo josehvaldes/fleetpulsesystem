@@ -1,17 +1,26 @@
 import asyncio
 import json
-import logging
 from pathlib import Path
 
 from shapely.geometry import Polygon, shape
 from fleetpulse_ai.prometheus import setup_prometheus
 from fleetpulse_ai.settings import settings
+from fleetpulse_ai.logging_config import get_logger, setup_logging
 from fleetpulse_ai.handlers import create_ai_worker_handler
 
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
 from fleetpulse_ai.managers.kafka_consumer import KafkaConsumer
+
+setup_logging(
+    log_level=settings.log_level,
+    log_file=settings.log_file,
+    log_to_console=settings.log_to_console,
+    service_name=settings.service_name
+)
+
+logger = get_logger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data"
@@ -49,14 +58,17 @@ def load_driver_zones(data_dir: Path | None = None) -> dict[str, tuple[str | Non
             if zone_name in polygons:
                 driving_zones[driver_id] = (zone_name, polygons[zone_name])
             else:
-                print(f"Warning: Zone '{zone_name}' for driver '{driver_id}' not found in polygons.")
+                logger.warning(
+                    "driver_zone_polygon_not_found",
+                    zone_name=zone_name,
+                    driver_id=driver_id,
+                )
                 driving_zones[driver_id] = (None, None)  # or handle as needed
 
     return driving_zones
 
 async def main():
-    print("Starting FleetPulse AI...")
-    print("Settings:", settings.title)
+    logger.info("fleetpulse_ai_starting", app_title=settings.title)
     
     driving_zones = load_driver_zones()
     working_zone_detector = WorkingZoneViolationDetector(driver_zones=driving_zones)
@@ -64,6 +76,7 @@ async def main():
     bootstrap_servers = settings.kafka_bootstrap_servers
     group_id = settings.kafka_group_id
     topics = [topic.strip() for topic in settings.kafka_topics.split(",") if topic.strip()]
+    logger.info("kafka_topics_resolved", topics=topics, group_id=group_id)
 
     consumer = KafkaConsumer(
         bootstrap_servers=bootstrap_servers,
@@ -78,14 +91,9 @@ async def main():
 
     async with AlertManager() as manager:
         message_handler = create_ai_worker_handler(working_zone_detector, manager, alarm_analyzer_agent)
-        print("Starting consumer loop. Press Ctrl+C to exit.")
+        logger.info("consumer_loop_starting")
         await consumer.consume(message_handler=message_handler)
 
 
 if __name__ == "__main__":
-   logging.basicConfig(
-           level=logging.INFO,
-           format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
-       )   
-
-   asyncio.run(main())
+    asyncio.run(main())
