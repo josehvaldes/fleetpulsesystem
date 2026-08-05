@@ -11,7 +11,7 @@ groups:
           description: "Group {{ $labels.group }} has {{ $value }} messages lagging"
 
       - alert: NoGpsPingsReceived
-        expr: rate(fleetpulse_gps_pings_received_total[5m]) == 0
+        expr: rate(fleetpulse_signalrhub_gps_pings_received_total[5m]) == 0
         for: 2m
         labels:
           severity: critical
@@ -20,7 +20,7 @@ groups:
           description: "The GPS stream has stopped"
 
       - alert: HighDbFlushLatency
-        expr: histogram_quantile(0.99, rate(fleetpulse_db_flush_duration_seconds_bucket[5m])) > 0.5
+        expr: histogram_quantile(0.99, rate(fleetpulse_dbwriter_db_flush_duration_seconds[5m])) > 0.5
         for: 5m
         labels:
           severity: warning
@@ -29,7 +29,7 @@ groups:
           description: "P99 flush time is {{ $value }}s"
 
       - alert: SignalRNoClients
-        expr: fleetpulse_signalr_connected_clients == 0
+        expr: fleetpulse_signalrhub_connected_clients == 0
         for: 1m
         labels:
           severity: info
