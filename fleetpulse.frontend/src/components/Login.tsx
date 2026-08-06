@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
 export function Login() {
@@ -18,6 +18,10 @@ export function Login() {
         }
     };
 
+    useEffect(() => {
+        console.log("env.mode: ",import.meta.env.MODE);
+        console.log("env.VITE_API_BASE_URL: ",import.meta.env.VITE_API_BASE_URL);
+    }, []);
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">

@@ -1,13 +1,5 @@
-﻿using Confluent.Kafka;
-using FleetPulse.DbWriter.MetricsConfig;
+﻿using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Services;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FleetPulse.DbWriter.Workers
 {
@@ -58,8 +50,6 @@ namespace FleetPulse.DbWriter.Workers
 
             try
             {
-                logger.LogInformation("Flushing {Count} pings to database...", pings.Count);
-
                 // TODO: Phase 4.3 - Add compression logic here
                 var compressedPings = await compressionService.ApplyTemporalCompression(pings);
                 
@@ -68,11 +58,6 @@ namespace FleetPulse.DbWriter.Workers
                 FleetMetrics.GpsPingsCompressedToDb.Inc(compressedPings.Count);
 
                 await databaseService.UpsertLatestStateAsync(compressedPings, cancellationToken);
-
-                logger.LogInformation(
-                    "Flushed {Count} pings in {ElapsedMs}ms",
-                    pings.Count, stopwatch.ElapsedMilliseconds);
-
                 consumerService.ClearBatch();
             }
             catch (Exception ex)

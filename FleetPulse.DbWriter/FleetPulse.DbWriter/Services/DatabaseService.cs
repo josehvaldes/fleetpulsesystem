@@ -47,7 +47,6 @@ namespace FleetPulse.DbWriter.Services
 
                 await tx.CommitAsync(cancellationToken);
             }
-            _logger.LogInformation("Inserted {Count} pings into gps_history", pings.Count);
         }
 
         public async Task DeletePingsForDriverAsync(string driverId, CancellationToken cancellationToken)
@@ -102,7 +101,6 @@ namespace FleetPulse.DbWriter.Services
                     Status = p.Status
                 })
                 .ToList();
-            _logger.LogInformation("Upserting latest state for {Count} drivers", latestPerDriver.Count);
             const string sql = """
                         INSERT INTO driver_latest_state
                             (driver_id, latitude, longitude, speed, heading, last_seen, status)
