@@ -1,11 +1,27 @@
 using FleetPulse.DbWriter.Configuration;
+using FleetPulse.DbWriter.Logging;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Services;
 using FleetPulse.DbWriter.Workers;
 using Npgsql;
 using Prometheus;
+using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+var appSettings = builder.Configuration.GetSection(AppSettings.SectionName)
+                                    .Get<AppSettings>() ?? new AppSettings();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("version", appSettings.AppVersion)
+    .Enrich.WithProperty("service", appSettings.AppName)
+    .WriteTo.Console(new PythonCompatibleJsonFormatter(appSettings.AppName, appSettings.AppVersion))
+    .CreateLogger();
+
+builder.Services.AddSerilog();
+
 
 builder.Services.AddSingleton(sp =>
 {

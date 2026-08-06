@@ -1,4 +1,6 @@
-﻿using FleetPulse.SignalRHub.Contracts.Requests;
+﻿using Confluent.Kafka;
+using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.Contracts.Requests;
 using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Model;
@@ -12,10 +14,15 @@ namespace FleetPulse.SignalRHub.Mapping
 {
     public static class ApiMapping
     {
-        private static readonly string version = "v1";
+        
 
         public static void AddApiMapping(this WebApplication app) 
         {
+            var appSettings = app.Configuration.GetSection(AppSettings.SectionName)
+                                    .Get<AppSettings>() ?? new AppSettings();
+
+            var version = appSettings.ApiVersion;
+
             // Map the SignalR hub endpoint
             app.MapHub<FleetHub>($"/{version}/fleetHub");//.RequireAuthorization(); to protect the hub with authentication. // Update this when login page is ready
 

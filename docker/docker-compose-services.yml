@@ -26,6 +26,8 @@ services:
 
   ai-worker:
     image: fleetpulse-ai-worker:1.0
+    environment:
+      - PYTHONUNBUFFERED=1   # Ensures that Python output is sent straight to the terminal (e.g., your container log) without being buffered
     env_file:
       - .env
     volumes:

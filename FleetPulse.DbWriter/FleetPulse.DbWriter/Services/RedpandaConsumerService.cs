@@ -62,9 +62,7 @@ namespace FleetPulse.DbWriter.Services
                 .Build();
 
             _consumer.Subscribe(_settings.Topic);
-            _logger.LogInformation(
-                "Subscribed to topic '{Topic}' with group '{GroupId}'",
-                _settings.Topic, _settings.GroupId);
+            _logger.LogInformation("Subscribed to topic '{Topic}' with group '{GroupId}'",_settings.Topic, _settings.GroupId);
 
             try
             {

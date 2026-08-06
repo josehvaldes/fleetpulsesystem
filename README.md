@@ -763,3 +763,9 @@ Log Schema for ai-worker service:
   "other_properties": "add other properties here as needed"
 }
 ```
+
+* Python logging library: structlog
+
+* .Net logging library: Serilog, Serilog.Sinks.Console
+ 
+

@@ -95,7 +95,7 @@ namespace FleetPulse.SignalRHub
 
         public static IServiceCollection AddCors(this IServiceCollection services, ConfigurationManager config)
         {
-            var corsSettings = config.GetSection("Cors")
+            var corsSettings = config.GetSection(CorsSettings.SectionName)
                      .Get<CorsSettings>() ?? new CorsSettings();
 
             // --- CORS for the Vite SPA ---
@@ -110,7 +110,7 @@ namespace FleetPulse.SignalRHub
 
         public static IServiceCollection AddAppAuthentication(this IServiceCollection services, ConfigurationManager config) 
         {
-            var jwt = config.GetSection("JwtSettings").Get<JwtSettings>()
+            var jwt = config.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
                             ?? throw new InvalidOperationException("JwtSettings section is missing from configuration.");
 
 

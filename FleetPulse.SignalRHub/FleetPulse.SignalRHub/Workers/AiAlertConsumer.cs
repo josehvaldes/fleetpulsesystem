@@ -38,6 +38,7 @@ namespace FleetPulse.SignalRHub.Workers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Starting AI alert consumer for topic '{Topic}'", _kafkaSettings.AlertsTopic);
             // Subscribe BEFORE entering the loop
             _consumer.Subscribe(_kafkaSettings.AlertsTopic);
 
@@ -93,7 +94,7 @@ namespace FleetPulse.SignalRHub.Workers
             try 
             { 
                 var message = result.Message.Value;
-                _logger.LogInformation("Received message from Kafka: [{Message}]", message);
+                _logger.LogInformation("Received alert from Kafka: [{Message}]", message);
                 return JsonSerializer.Deserialize<AlertDto>(message, JsonOptions);
             }
             catch (JsonException) 

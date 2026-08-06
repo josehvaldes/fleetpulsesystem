@@ -44,6 +44,7 @@ namespace FleetPulse.SignalRHub.Workers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("Starting GPS ping consumer for topic '{Topic}'", _kafkaSettings.GpsPingsTopic);
             // Subscribe BEFORE entering the loop
             _consumer.Subscribe(_kafkaSettings.GpsPingsTopic);
 
