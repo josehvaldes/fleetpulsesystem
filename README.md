@@ -769,3 +769,34 @@ Log Schema for ai-worker service:
 * .Net logging library: Serilog, Serilog.Sinks.Console
  
 
+### Tracing + OpenTelemetry
+
+```text
+┌───────────────────────────────────────────────────────────────┐
+│                  Docker Compose Network                       │
+│                                                               │
+│  Simulator  SignalRHub  DbWriter  AiWorker  (React SPA)       │
+│      │          │          │         │           │            │
+│      └──────────┴──────────┴─────────┴───────────┘            │
+│                         │ OTLP/gRPC (4317) or HTTP (4318)     │
+│                         ▼                                     │
+│              ┌──────────────────────┐                         │
+│              │  OTel Collector      │  ← tail sampling,       │
+│              │  (port 4317/4318)    │    batching, retries    │
+│              └─────┬──────────┬─────┘                         │
+│                    │          │                               │
+│          OTLP      │          │  Loki exporter (trace_id)     │
+│                    ▼          ▼                               │
+│              ┌─────────┐  ┌─────────┐                         │
+│              │ Tempo   │  │  Loki   │  (already running)      │
+│              │  :3200  │  │  :3100  │                         │
+│              └────┬────┘  └────┬────┘                         │
+│                   │           │                               │
+│                   └─────┬─────┘                               │
+│                         ▼                                     │
+│                   ┌───────────┐                               │
+│                   │  Grafana  │  (already running)            │
+│                   │  :3000    │                               │
+│                   └───────────┘                               │
+└───────────────────────────────────────────────────────────────┘
+```

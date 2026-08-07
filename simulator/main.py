@@ -1,13 +1,21 @@
 import asyncio
 import json
-import os
-import signal
-from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher
+from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher, MQTTPublisherInterface
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
+from utils.logging_config import get_logger, setup_logging
 from utils.processed_route import ProcessedRoute
 from utils.route_preprocessor import resample_geojson
 
+setup_logging(
+    log_level="INFO",
+    log_file=None,
+    log_to_console=True,
+    service_name="fleetpulse-simulator",
+)
+
+logger = get_logger(__name__)
+MOCK_MODE = True
 
 class FleetPulseSimulator:
 
@@ -17,11 +25,11 @@ class FleetPulseSimulator:
 
     async def load_and_run(self, path:str, route_id:str, driver_config: DriverConfig):
 
-        print("Starting FleetPulse Simulator...")
+        logger.info("Starting FleetPulse Simulator...")
         with open(path) as f:
             route = json.load(f, object_hook=lambda d: ProcessedRoute(**d))
 
-            print(f"Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
+            logger.info(f"Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
             async with MQTTMockPublisher() as publisher:
                 simulator = DriverSimulator(
                     config=driver_config,
@@ -31,17 +39,19 @@ class FleetPulseSimulator:
                 )
     
                 task = asyncio.create_task(simulator.run(), name="DriverSimulatorTask")
-                print("FleetPulse Simulator is running. Press Ctrl+C to stop.")
+                logger.info("FleetPulse Simulator is running. Press Ctrl+C to stop.")
                 # wait for the simulation to complete
                 await task
             json.dump(publisher.published_messages, open("data/recoleta_route_sample_output.json", "w"), indent=2)
 
-    async def run(self, path:str, route_id:str, driver_config: DriverConfig):
-        print(f"Starting FleetPulse Simulator for driver {driver_config.driver_id} on route {route_id}...")
+
+
+    async def run_org(self, path:str, route_id:str, driver_config: DriverConfig):
+        logger.info(f"Starting FleetPulse Simulator for driver {driver_config.driver_id} on route {route_id}...")
 
         #regenerate the processed route from the raw geojson
         route = resample_geojson(path, route_id)
-        print(f" - Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
+        logger.info(f" - Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
         
         async with MQTTPublisher(self.broker, self.port) as publisher:
             simulator = DriverSimulator(
@@ -57,8 +67,37 @@ class FleetPulseSimulator:
             # wait for the simulation to complete
             #await task
 
+    async def run (self, driver_configs: dict[str, DriverConfig], publisher: MQTTPublisherInterface):
+        driver_route_file = "data/drivers_routes.json"
+        tasks = []
+        with open(driver_route_file) as f:
+            driver_routes_data = json.load(f)
+            for data in driver_routes_data:
+                if data.get("driver_id") in driver_configs:
+                    driver_config = driver_configs[data.get("driver_id")]
+                    route_path = f"data/routes/raw/{data.get('route_id')}.geojson"
+
+                    route_id = data.get('route_id')
+                    logger.info(f"Starting FleetPulse Simulator for driver {driver_config.driver_id} on route {route_id}...")
+                    
+                    #regenerate the processed route from the raw geojson
+                    route = resample_geojson(route_path, route_id)
+                    logger.info(f" - Loaded route {route_id} with {len(route.points)} points, total distance: {route.total_distance:.2f} meters.")
+                    
+                    simulator = DriverSimulator(
+                            config=driver_config,
+                            route=route,
+                            publisher=publisher,
+                            sim_config={"update_interval": 1.0}
+                        )
+                    tasks.append(simulator.run())
+
+                else:
+                    logger.warning(f"Driver ID {data.get('driver_id')} not found in drivers.json. Skipping.")
+        return tasks
+
     async def exec(self):
-        print("Starting FleetPulse Simulator...")
+        logger.info("Starting FleetPulse Simulator...")
         drivers_file = "data/drivers.json"
         driver_configs = dict[str, DriverConfig]()
 
@@ -68,22 +107,18 @@ class FleetPulseSimulator:
                 driver_config = DriverConfig(**driver_data)
                 driver_configs[driver_config.driver_id] = driver_config
 
-        driver_route_file = "data/drivers_routes.json"
         tasks = []
-        with open(driver_route_file) as f:
-            driver_routes_data = json.load(f)
-            for data in driver_routes_data:
-                if data.get("driver_id") in driver_configs:
-                    driver_config = driver_configs[data.get("driver_id")]
-                    route_path = f"data/routes/raw/{data.get('route_id')}.geojson"
-                    tasks.append(self.run(route_path, data.get('route_id'), driver_config))
-                else:
-                    print(f"Driver ID {data.get('driver_id')} not found in drivers.json. Skipping.")
+        if MOCK_MODE:
+            async with MQTTMockPublisher() as publisher:
+                tasks = await self.run(driver_configs, publisher)
+        else:
+            async with MQTTPublisher(self.broker, self.port) as publisher:
+                tasks = await self.run(driver_configs, publisher)
 
         await asyncio.gather(*tasks)
 
 if __name__ == '__main__':
-    print(" * Running FleetPulse Simulator...")
+    logger.info(" * Running FleetPulse Simulator...")
     
     simulator = FleetPulseSimulator()
     asyncio.run(simulator.exec())

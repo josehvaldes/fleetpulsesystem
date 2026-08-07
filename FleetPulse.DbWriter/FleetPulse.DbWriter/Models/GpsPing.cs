@@ -8,6 +8,7 @@ namespace FleetPulse.DbWriter.Models
     /// <summary>
     /// Message format for the GPS ping data received from Kafka:
     ///   message = {
+    ///     "event_id": "string"
 	///     "driver_id": "string"
 	///     "timestamp": "datetime - isoformat",
 	///     "latitude": "float",
@@ -21,6 +22,9 @@ namespace FleetPulse.DbWriter.Models
     /// </summary>
     public class GpsPing
     {
+        [JsonPropertyName("event_id")]
+        public Guid EventId { get; init; }
+
         public int Id { get; set; }
 
         [JsonPropertyName("driver_id")]

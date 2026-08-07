@@ -1,2 +1,5 @@
 ﻿paho-mqtt==2.1.0
 confluent_kafka==2.15.0
+structlog==26.1.0
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0

@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 import paho.mqtt.client as mqtt
 import json
+from utils.logging_config import get_logger    
+logger = get_logger(__name__)
 
 from fleetpulse.drivers import Driver
 
@@ -49,7 +51,7 @@ class MQTTPublisher(MQTTPublisherInterface):
         try :
             self.client.publish(topic, json.dumps(message), qos=1)
         except Exception as e:
-            print(f"Error publishing message: {e}")
+            logger.error("Error publishing message", e)
 
 
 class MQTTMockPublisher(MQTTPublisherInterface):

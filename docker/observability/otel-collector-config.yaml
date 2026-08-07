@@ -1,0 +1,39 @@
+# docker/observability/otel-collector-config.yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1000
+  
+  # Uncomment this later when filter traces before they hit Tempo
+  # tail_sampling:
+  #   decision_wait: 5s
+  #   policies:
+  #     - name: errors
+  #       type: status_code
+  #       status_code:
+  #         status_codes: [ERROR]
+  #     - name: sample-10-percent
+  #       type: probabilistic
+  #       probabilistic:
+  #         sampling_percentage: 10
+
+exporters:
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch] # Add tail_sampling here later: processors: [batch, tail_sampling]
+      exporters: [otlp/tempo]

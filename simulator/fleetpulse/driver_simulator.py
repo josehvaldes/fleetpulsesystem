@@ -1,12 +1,17 @@
 import asyncio
 import math
+
 import random
 from datetime import datetime, timezone
 import signal
+import uuid
+from utils.logging_config import get_logger
 from fleetpulse.mqtt_publisher import MQTTPublisherInterface
 from fleetpulse.drivers import DriverConfig
 from utils.processed_route import ProcessedRoute
-
+from opentelemetry import trace
+tracer = trace.get_tracer(__name__)
+logger = get_logger(__name__)
 
 class DriverSimulator:
     # Base speed ranges for motorcycle delivery (km/h)
@@ -44,7 +49,7 @@ class DriverSimulator:
         signal.signal(signal.SIGTERM, self._signal_handler)
 
     def _signal_handler(self, signum, frame):
-        print(f"Received signal {signum}, shutting down...")
+        logger.info(f"Received signal {signum}, shutting down...")
         self.running = False
         exit(0)
   
@@ -190,7 +195,7 @@ class DriverSimulator:
         ping_interval = self.sim_config.get("base_ping_interval_seconds", 1.0)
         jitter = self.sim_config.get("ping_interval_jitter_seconds", 0.2)
 
-        print(f"  - Driver {self.config.driver_id} starting simulation with base speed {self.base_speed_kmh:.1f} km/h.")        
+        logger.info(f"  - {self.config.driver_id} starting simulation with base speed {self.base_speed_kmh:.1f} km/h.", driver_id=self.config.driver_id)
 
         while self.running:
             # Calculate actual ping interval with jitter
@@ -211,35 +216,41 @@ class DriverSimulator:
             # Handle route end
             
             if self.distance_along_route >= self.route.total_distance:
-                print(f"  - Driver {self.config.driver_id} reached end of route. Stop")
+                logger.info(f"  - Driver {self.config.driver_id} reached end of route. Stop")
                 self.running = False
             
             # Get new position
             lat, lng, heading, _ = self._get_point_at_distance(self.distance_along_route)
             lat, lng = self._add_gps_noise(lat, lng)
             self.heading = heading
-            print(f"  - Driver {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}")
+            event_id = str(uuid.uuid7())
+            with tracer.start_as_current_span("publish_gps_ping") as span:
+                span.set_attribute("driver_id", self.config.driver_id)
+                span.set_attribute("event_id", event_id)
 
-            # Build and publish message
-            message = {
-                "driver_id": self.config.driver_id,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "latitude": round(lat, 6),
-                "longitude": round(lng, 6),
-                "speed_kmh": round(self.current_speed_kmh, 1),
-                "heading_degrees": round(self.heading, 1),
-                "accuracy_meters": round(abs(random.gauss(4.0, 1.5)), 1),
-                "status": self.status if self.status != "decelerating" else "moving",
-                "vehicle_type": self.config.vehicle_type,
-            }
-            
-            await self.publisher.publish(message)
+                logger.info(f"  - {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}", driver_id=self.config.driver_id, )
+                            
+                # Build and publish message
+                message = {
+                    "event_id" : event_id,
+                    "driver_id": self.config.driver_id,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "latitude": round(lat, 6),
+                    "longitude": round(lng, 6),
+                    "speed_kmh": round(self.current_speed_kmh, 1),
+                    "heading_degrees": round(self.heading, 1),
+                    "accuracy_meters": round(abs(random.gauss(4.0, 1.5)), 1),
+                    "status": self.status if self.status != "decelerating" else "moving",
+                    "vehicle_type": self.config.vehicle_type,
+                }
+                
+                await self.publisher.publish(message)
             
             # Sleep for real-time interval
             await asyncio.sleep(actual_interval)
         
-        print(f"  - Driver {self.config.driver_id} simulation stopped.")
+        logger.info("  - simulation stopped.", driver_id = self.config.driver_id)
     
     def stop(self):
         self.running = False
-        print(f"  - Driver {self.config.driver_id} simulation stopping...")
+        logger.info("  - Simulation stopping for driver ", driver_id = self.config.driver_id)

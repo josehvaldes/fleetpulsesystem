@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 -- Hypertable for historical GPS data
 CREATE TABLE gps_history (
+    event_id       UUID NOT NULL DEFAULT uuidv7(),
     driver_id      VARCHAR(50) NOT NULL,
     timestamp      TIMESTAMPTZ NOT NULL,
     latitude       DOUBLE PRECISION NOT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE gps_history (
 );
 
 SELECT create_hypertable('gps_history', 'timestamp');
+
 
 -- Compression policy (older than 7 days)
 ALTER TABLE gps_history SET (
@@ -36,7 +38,7 @@ CREATE TABLE driver_latest_state (
 
 -- AI Alerts table
 CREATE TABLE ai_alerts (
-    id             BIGSERIAL PRIMARY KEY,
+    id             UUID PRIMARY KEY DEFAULT uuidv7(),
     driver_id      VARCHAR(50) NOT NULL,
     alert_type     VARCHAR(50) NOT NULL,
     severity       VARCHAR(20) NOT NULL,  -- low, medium, high, critical
@@ -46,6 +48,7 @@ CREATE TABLE ai_alerts (
 );
 
 -- Indexes for common queries
+CREATE INDEX idx_gps_history_event_id ON gps_history (event_id);
 CREATE INDEX idx_gps_history_driver_time ON gps_history (driver_id, timestamp DESC);
 CREATE INDEX idx_ai_alerts_driver ON ai_alerts (driver_id, created_at DESC);
 CREATE INDEX idx_ai_alerts_severity ON ai_alerts (severity, created_at DESC);
