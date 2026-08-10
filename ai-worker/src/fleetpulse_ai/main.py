@@ -12,13 +12,16 @@ from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
 from fleetpulse_ai.managers.kafka_consumer import KafkaConsumer
+from fleetpulse_ai.tracing import setup_tracing
 
 setup_logging(
     log_level=settings.log_level,
     log_file=settings.log_file,
     log_to_console=settings.log_to_console,
     service_name=settings.service_name
-)
+) # Initialize logging configuration
+
+setup_tracing()  # Initialize OpenTelemetry tracing
 
 logger = get_logger(__name__)
 

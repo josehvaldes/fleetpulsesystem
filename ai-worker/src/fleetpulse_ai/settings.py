@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     kafka_alert_topic: str = "alerts"
     prometheus_metrics_port: int = 8000
 
+    # OpenTelemetry Configuration
+    otel_exporter_endpoint: str = "http://localhost:4317"  # OTLP gRPC endpoint for OpenTelemetry Collector
+    console_exporter_enabled: bool = False  # Enable console logging for OpenTelemetry
+    otel_exporter_enabled: bool = True  # Enable OTLP exporter for OpenTelemetry
+    otel_environment: str = "development"  # Environment name for OpenTelemetry resource attributes (e.g., 'development', 'production')
+
     model_config = ConfigDict(
         str_max_length=200,
         env_file=ENV_FILE,

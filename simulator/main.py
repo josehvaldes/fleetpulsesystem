@@ -1,11 +1,26 @@
 import asyncio
 import json
+import os
 from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher, MQTTPublisherInterface
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
 from utils.logging_config import get_logger, setup_logging
 from utils.processed_route import ProcessedRoute
 from utils.route_preprocessor import resample_geojson
+
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.trace.sampling import TraceIdRatioBased, ALWAYS_ON
+
+MOCK_MODE = os.getenv("MOCK_MODE", "true").lower() == "true"
+OTEL_SERVER = os.getenv("OTEL_SERVER", "http://localhost:4317")  # Default to localhost if not set
+CONSOLE_TRACE_EXPORTER = os.getenv("CONSOLE_TRACE_EXPORTER", "false").lower() == "true"
+OTLP_EXPORTER = os.getenv("OTLP_EXPORTER", "true").lower() == "true"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 
 setup_logging(
     log_level="INFO",
@@ -15,7 +30,31 @@ setup_logging(
 )
 
 logger = get_logger(__name__)
-MOCK_MODE = True
+
+def setup_tracing() -> None:
+    resource = Resource.create({
+        "service.name": "fleetpulse-simulator",
+        "service.version": "0.1.0",
+        "deployment.environment": ENVIRONMENT,
+    })
+
+    if ENVIRONMENT == "development":
+        sampler= ALWAYS_ON  # Sample all traces in development
+    else:
+        sampler = TraceIdRatioBased(1.0)  # Sample all traces
+
+    provider = TracerProvider(resource=resource, sampler=sampler)  # Sample all traces
+
+    if CONSOLE_TRACE_EXPORTER:
+        provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+
+    if OTLP_EXPORTER:
+        provider.add_span_processor(BatchSpanProcessor(
+            OTLPSpanExporter(endpoint=OTEL_SERVER, insecure=True)
+        ))
+    trace.set_tracer_provider(provider)
+
+setup_tracing()
 
 class FleetPulseSimulator:
 

@@ -5,6 +5,16 @@ from logging.handlers import RotatingFileHandler
 from typing import Optional
 import structlog
 
+from opentelemetry import trace
+
+def inject_trace_context(_, __, event_dict):
+    """Add trace_id and span_id to structlog logs if a span is active."""
+    span = trace.get_current_span()
+    if span and span.is_recording():
+        ctx = span.get_span_context()
+        event_dict["trace_id"] = f"{ctx.trace_id:032x}"
+        event_dict["span_id"] = f"{ctx.span_id:016x}"
+    return event_dict
 
 def _shared_processors() -> list:
     return [
@@ -19,6 +29,7 @@ def _shared_processors() -> list:
         structlog.stdlib.ExtraAdder(),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
+        inject_trace_context, # Add trace_id and span_id to logs
     ]
 
 def setup_logging(

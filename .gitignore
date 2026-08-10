@@ -34,3 +34,4 @@ docker/.env
 ai-worker/.codacy/*
 simulator/.codacy/*
 fleetpulse.frontend/.codacy/*
+simulator/.env

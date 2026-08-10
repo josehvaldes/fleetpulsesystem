@@ -10,6 +10,9 @@ from fleetpulse.mqtt_publisher import MQTTPublisherInterface
 from fleetpulse.drivers import DriverConfig
 from utils.processed_route import ProcessedRoute
 from opentelemetry import trace
+from opentelemetry import propagate
+from opentelemetry.trace import SpanKind
+
 tracer = trace.get_tracer(__name__)
 logger = get_logger(__name__)
 
@@ -224,11 +227,17 @@ class DriverSimulator:
             lat, lng = self._add_gps_noise(lat, lng)
             self.heading = heading
             event_id = str(uuid.uuid7())
-            with tracer.start_as_current_span("publish_gps_ping") as span:
-                span.set_attribute("driver_id", self.config.driver_id)
-                span.set_attribute("event_id", event_id)
 
-                logger.info(f"  - {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}", driver_id=self.config.driver_id, )
+            with tracer.start_as_current_span("publish_gps_ping", kind=SpanKind.PRODUCER) as span:
+                carrier = {}
+                propagate.inject(carrier)
+
+                # Add driver_id as an attribute to the span for better traceability
+                # add other attributes for traceability later if needed
+                span.set_attribute("driver_id", self.config.driver_id)
+                #span.set_attribute("event_id", event_id) # remove later after testing
+
+                logger.info(f"  - {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}", event_id=event_id, driver_id=self.config.driver_id)
                             
                 # Build and publish message
                 message = {
@@ -242,6 +251,8 @@ class DriverSimulator:
                     "accuracy_meters": round(abs(random.gauss(4.0, 1.5)), 1),
                     "status": self.status if self.status != "decelerating" else "moving",
                     "vehicle_type": self.config.vehicle_type,
+                    "traceparent": carrier.get("traceparent"),
+                    "tracestate": carrier.get("tracestate"),
                 }
                 
                 await self.publisher.publish(message)
