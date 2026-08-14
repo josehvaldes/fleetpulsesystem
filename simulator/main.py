@@ -1,6 +1,11 @@
 import asyncio
 import json
 import os
+
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher, MQTTPublisherInterface
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
@@ -146,18 +151,20 @@ class FleetPulseSimulator:
                 driver_config = DriverConfig(**driver_data)
                 driver_configs[driver_config.driver_id] = driver_config
 
-        tasks = []
+
         if MOCK_MODE:
             async with MQTTMockPublisher() as publisher:
-                tasks = await self.run(driver_configs, publisher)
+                task = await self.run(driver_configs, publisher)
+                await asyncio.gather(*task)
         else:
             async with MQTTPublisher(self.broker, self.port) as publisher:
-                tasks = await self.run(driver_configs, publisher)
+                task = await self.run(driver_configs, publisher)
+                await asyncio.gather(*task)
 
-        await asyncio.gather(*tasks)
+
 
 if __name__ == '__main__':
-    logger.info(" * Running FleetPulse Simulator...")
+    logger.info(f" * Running FleetPulse Simulator. Mockup Mode: {MOCK_MODE}...")
     
     simulator = FleetPulseSimulator()
     asyncio.run(simulator.exec())

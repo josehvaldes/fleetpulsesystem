@@ -38,13 +38,13 @@ echo "Connector created. "
 curl -s -X POST 'http://emqx:18083/api/v5/actions' \
 -H "Authorization: Bearer $TOKEN" \
 -H 'Content-Type: application/json' \
--d "{  \"name\": \"to_gps_pings\",  \"type\": \"kafka_producer\",  \"enable\": true,  \"connector\": \"to_redpanda\", \"description\": \"Action to send messages to Redpanda\", \"parameters\": { \"topic\": \"$REDPANDA_TOPIC\", \"partition_strategy\": \"key_dispatch\", \"message\":{\"key\":\"${kafka_key}\", \"value\": \"${.}\" }   } }"
+-d "{  \"name\": \"to_gps_pings\",  \"type\": \"kafka_producer\",  \"enable\": true,  \"connector\": \"to_redpanda\", \"description\": \"Action to send messages to Redpanda\",  \"parameters\": { \"topic\": \"$REDPANDA_TOPIC\", \"partition_strategy\": \"key_dispatch\",  \"kafka_ext_headers\": [ { \"kafka_ext_header_key\": \"traceparent\",   \"kafka_ext_header_value\": \"\${traceparent}\"}, { \"kafka_ext_header_key\": \"tracestate\", \"kafka_ext_header_value\": \"\${tracestate}\" } ], \"message\":{\"key\":\"\${kafka_key}\", \"value\": \"\${payload}\"  }  } }" 
 
 echo "Action created. Creating Rule..."
 # 4. Create the Rule
 curl -s -X POST 'http://emqx:18083/api/v5/rules' \
 -H "Authorization: Bearer $TOKEN" \
 -H 'Content-Type: application/json' \
--d "{  \"id\": \"fleet_pulse_to_kafka_rule\",  \"name\": \"fleet_pulse_to_kafka_rule\",  \"enable\": true,  \"sql\": \"SELECT clientid, payload.driver_id as kafka_key, payload FROM \\\"$EMQX_TOPIC/#\\\"\",  \"actions\": [\"kafka_producer:to_gps_pings\"]}"
+-d "{  \"id\": \"fleet_pulse_to_kafka_rule\",  \"name\": \"fleet_pulse_to_kafka_rule\",  \"enable\": true,  \"sql\": \"SELECT payload.driver_id as kafka_key, payload, pub_props.'User-Property'.traceparent as traceparent, pub_props.'User-Property'.tracestate as tracestate FROM \\\"$EMQX_TOPIC/#\\\"\",  \"actions\": [\"kafka_producer:to_gps_pings\"]}"
 
 echo -e "\nDeployment complete."

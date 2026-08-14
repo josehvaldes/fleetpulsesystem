@@ -237,7 +237,6 @@ class DriverSimulator:
                 span.set_attribute("driver_id", self.config.driver_id)
                 #span.set_attribute("event_id", event_id) # remove later after testing
 
-                logger.info(f"  - {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status}", event_id=event_id, driver_id=self.config.driver_id)
                             
                 # Build and publish message
                 message = {
@@ -251,11 +250,17 @@ class DriverSimulator:
                     "accuracy_meters": round(abs(random.gauss(4.0, 1.5)), 1),
                     "status": self.status if self.status != "decelerating" else "moving",
                     "vehicle_type": self.config.vehicle_type,
+                    
+                }
+
+                metadata = {
                     "traceparent": carrier.get("traceparent"),
-                    "tracestate": carrier.get("tracestate"),
+                    "tracestate": carrier.get("tracestate")
                 }
                 
-                await self.publisher.publish(message)
+                logger.info(f"  - {self.config.driver_id} distance along route: {self.distance_along_route:.2f} meters | Pos: ({lat:.6f}, {lng:.6f}) | Speed: {self.current_speed_kmh:.1f} km/h | Status: {self.status} | metadata: {metadata}", event_id=event_id, driver_id=self.config.driver_id)
+
+                await self.publisher.publish(message=message, metadata=metadata)
             
             # Sleep for real-time interval
             await asyncio.sleep(actual_interval)
