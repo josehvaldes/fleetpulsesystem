@@ -1,5 +1,7 @@
 ﻿using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Trace;
+using System.Diagnostics;
 
 namespace FleetPulse.DbWriter.Workers
 {
@@ -46,22 +48,28 @@ namespace FleetPulse.DbWriter.Workers
             if (pings.Count == 0)
                 return;
 
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            using var activity = Telemetry.ActivitySource.StartActivity(
+                "dbwriter.flush_batch", ActivityKind.Internal);
+            activity?.SetTag("batch.size.before_compression", pings.Count);
+
+            var stopwatch = Stopwatch.StartNew();
 
             try
             {
                 // TODO: Phase 4.3 - Add compression logic here
                 var compressedPings = await compressionService.ApplyTemporalCompression(pings);
-                
+
                 await databaseService.BulkInsertPingsAsync(compressedPings, cancellationToken);
 
                 FleetMetrics.GpsPingsCompressedToDb.Inc(compressedPings.Count);
+                activity?.SetTag("batch.size.after_compression", compressedPings.Count);
 
                 await databaseService.UpsertLatestStateAsync(compressedPings, cancellationToken);
                 consumerService.ClearBatch();
             }
             catch (Exception ex)
             {
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 logger.LogError(ex, "Failed to flush batch of {Count} pings", pings.Count);
                 // Don't clear buffer on failure - will retry next flush
             }

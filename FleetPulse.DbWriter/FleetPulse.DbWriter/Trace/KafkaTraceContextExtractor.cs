@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using System.Diagnostics;
 using System.Text;
@@ -35,6 +36,10 @@ namespace FleetPulse.DbWriter.Trace
             if (headers is null) return default;
 
             var ctx = Propagator.Extract(default, headers, ReadHeader);
+
+            // Restore baggage propagated from the producer
+            Baggage.Current = ctx.Baggage;
+
             return ctx.ActivityContext;
 
             static IEnumerable<string> ReadHeader(Headers h, string name)

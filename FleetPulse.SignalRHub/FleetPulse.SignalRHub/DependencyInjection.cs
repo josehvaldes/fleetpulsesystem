@@ -183,12 +183,16 @@ namespace FleetPulse.SignalRHub
             var openTelemetrySettings = config.GetSection(OpenTelemetrySettings.SectionName)
                 .Get<OpenTelemetrySettings>()?? new OpenTelemetrySettings();
 
+            var appSettings = config.GetSection(AppSettings.SectionName)
+                                    .Get<AppSettings>() ?? new AppSettings();
+
+
             services.AddOpenTelemetry()
                 .ConfigureResource(r => r
-                    .AddService(serviceName: "FleetPulse.SignalRHub",
-                                serviceVersion: "1.0.0"))
+                    .AddService(serviceName: appSettings.AppName,
+                                serviceVersion: appSettings.AppVersion))
                 .WithTracing(tp => tp
-                    .AddSource("FleetPulse.SignalRHub")
+                    .AddSource(Telemetry.ActivitySourceName)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddOtlpExporter(o => o.Endpoint =

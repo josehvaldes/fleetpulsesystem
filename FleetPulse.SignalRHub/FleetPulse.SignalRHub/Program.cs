@@ -18,6 +18,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .Enrich.WithProperty("version", appSettings.AppVersion)
     .Enrich.WithProperty("service", appSettings.AppName)
+    .Enrich.With<OpenTelemetryEnricher>()
     .WriteTo.Console(new PythonCompatibleJsonFormatter(appSettings.AppName, appSettings.AppVersion))
     .CreateLogger();
 

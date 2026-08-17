@@ -21,6 +21,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .Enrich.WithProperty("version", appSettings.AppVersion)
     .Enrich.WithProperty("service", appSettings.AppName)
+    .Enrich.With<OpenTelemetryEnricher>()
     .WriteTo.Console(new PythonCompatibleJsonFormatter(appSettings.AppName, appSettings.AppVersion))
     .CreateLogger();
 
@@ -63,10 +64,10 @@ var openTelemetrySettings = openTelemetrySection.Get<OpenTelemetrySettings>()?? 
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r
-        .AddService(serviceName: "FleetPulse.DbWriter",
-                    serviceVersion: "1.0.0"))
+        .AddService(serviceName: appSettings.AppName,
+                    serviceVersion: appSettings.AppVersion))
     .WithTracing(tp => tp
-        .AddSource("FleetPulse.DbWriter")          // DbWriter only
+        .AddSource(Telemetry.ActivitySourceName)          // DbWriter only
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddNpgsql()                               // DbWriter only — traces SQL
