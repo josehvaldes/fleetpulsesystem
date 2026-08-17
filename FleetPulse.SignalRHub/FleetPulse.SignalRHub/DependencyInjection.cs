@@ -2,13 +2,19 @@
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Services;
+using FleetPulse.SignalRHub.Trace;
 using FleetPulse.SignalRHub.Validators;
 using FleetPulse.SignalRHub.Workers;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using OpenTelemetry.Context.Propagation;
 using System.Text;
+using OpenTelemetry.Context.Propagation;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 
 namespace FleetPulse.SignalRHub
 {
@@ -21,6 +27,8 @@ namespace FleetPulse.SignalRHub
             services.Configure<SignalRSettings>(config.GetSection(SignalRSettings.SectionName));
             services.Configure<JwtSettings>(config.GetSection(JwtSettings.SectionName));
             services.Configure<AuthSettings>(config.GetSection(AuthSettings.SectionName));
+            services.Configure<OpenTelemetrySettings>(config.GetSection(OpenTelemetrySettings.SectionName));
+
 
             services.AddKeyedSingleton<IConsumer<string, string>>("gps-pings", (sp, _) =>
             {
@@ -70,6 +78,9 @@ namespace FleetPulse.SignalRHub
             services.AddAppAuthentication(config);
 
             services.AddHealthChecks(config);
+
+            services.AddOpenTelemetry(config);
+
             return services;
         }
 
@@ -167,5 +178,24 @@ namespace FleetPulse.SignalRHub
             return services;
         }
 
+        public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, ConfigurationManager config) 
+        {
+            var openTelemetrySettings = config.GetSection(OpenTelemetrySettings.SectionName)
+                .Get<OpenTelemetrySettings>()?? new OpenTelemetrySettings();
+
+            services.AddOpenTelemetry()
+                .ConfigureResource(r => r
+                    .AddService(serviceName: "FleetPulse.SignalRHub",
+                                serviceVersion: "1.0.0"))
+                .WithTracing(tp => tp
+                    .AddSource("FleetPulse.SignalRHub")
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter(o => o.Endpoint =
+                        new Uri(openTelemetrySettings.OtlpEndpoint)));
+
+            services.AddSingleton<TextMapPropagator>(new TraceContextPropagator());
+            return services;
+        }
     }
 }

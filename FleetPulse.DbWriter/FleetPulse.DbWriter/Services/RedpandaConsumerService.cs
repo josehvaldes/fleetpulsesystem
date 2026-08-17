@@ -2,8 +2,11 @@
 using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
+using FleetPulse.DbWriter.Trace;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace FleetPulse.DbWriter.Services
@@ -14,7 +17,6 @@ namespace FleetPulse.DbWriter.Services
         private readonly ILogger<RedpandaConsumerService> _logger;
         private readonly ConcurrentBag<GpsPing> _buffer = new();
         private IConsumer<string, string> _consumer = null!;
-        
         private const int MaxBufferSize = 1000;
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -94,6 +96,10 @@ namespace FleetPulse.DbWriter.Services
                     }
                     
                     FleetMetrics.GpsPingsReceived.WithLabels(_settings.Topic).Inc();
+                    var parentCtx = KafkaTraceContextExtractor.Extract(consumeResult.Message.Headers);
+
+                    using var activity = Telemetry.ActivitySource.StartActivity("dbwriter.process_gps_ping", ActivityKind.Consumer, parentCtx);
+                   
 
                     var ping = DeserializePing(consumeResult);
                     if (ping is not null)
@@ -124,19 +130,13 @@ namespace FleetPulse.DbWriter.Services
             try
             {
                 var message = result.Message.Value;
-                var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
-                if (wrapper is not null) 
+                var ping = JsonSerializer.Deserialize<GpsPing>(message, JsonOptions);
+                if (ping is not null)
                 {
-                    var ping = JsonSerializer.Deserialize<GpsPing>(wrapper.Payload, JsonOptions);
-                    if (ping is not null)
-                    {
-                        ping.RawPayloadJson = wrapper.Payload;
-                    }
+                    ping.RawPayloadJson = message;
+                }
 
-                    return ping;
-                }                    
-                else
-                    return null;                    
+                return ping;
             }
             catch (JsonException ex)
             {

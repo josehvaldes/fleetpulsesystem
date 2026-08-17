@@ -25,17 +25,18 @@ def create_ai_worker_handler(
     detector: WorkingZoneViolationDetector,
     manager: AlertManager,
     agent: AlarmAnalyzerAgent
-) -> Callable[[dict], Awaitable[None]]:
+) -> Callable[[dict, dict], Awaitable[None]]:
     driver_history: dict[str, list[GpsPing]] = {}
 
-    async def ai_worker_handler(message: dict) -> None:
+    async def ai_worker_handler(message: dict, metadata: dict) -> None:
         """
         Process a GPS ping message with the detector and alert manager bound for the worker lifetime.
         """
+        print(f" - Message {message}") 
 
         carrier = {
-            "traceparent": message.get("traceparent", ""),
-            "tracestate": message.get("tracestate", ""),
+            "traceparent": metadata.get("traceparent", ""),
+            "tracestate": metadata.get("tracestate", ""),
         }
         context = propagate.extract(carrier)
 

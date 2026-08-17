@@ -3,6 +3,7 @@ using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Logging;
 using FleetPulse.SignalRHub.Mapping;
 using FleetPulse.SignalRHub.Middleware;
+using OpenTelemetry.Context.Propagation;
 using Serilog;
 
 MappingConfig.RegisterMappings();
@@ -30,6 +31,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSignalR();
 
 builder.Services.AddDependencies(builder.Configuration);
+
+
 
 var app = builder.Build();
 

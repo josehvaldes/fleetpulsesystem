@@ -4,8 +4,11 @@ using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
+using FleetPulse.SignalRHub.Trace;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 
 namespace FleetPulse.SignalRHub.Workers
@@ -68,6 +71,9 @@ namespace FleetPulse.SignalRHub.Workers
                     // Count every message consumed from Kafka, regardless of throttle
                     FleetMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.GpsPingsTopic).Inc();
 
+                    var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
+                    using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_gps_ping", ActivityKind.Consumer, parentCtx);
+
                     var dto = DeserializePing(result);
 
                     if (dto is null) 
@@ -118,14 +124,8 @@ namespace FleetPulse.SignalRHub.Workers
             try
             {
                 var message = result.Message.Value;
-                var wrapper = JsonSerializer.Deserialize<MessageWrapper>(message, JsonOptions);
-                if (wrapper is not null)
-                {
-                    var ping = JsonSerializer.Deserialize<GpsPingDto>(wrapper.Payload, JsonOptions);
-                    return ping;
-                }
-                else
-                    return null;
+                var ping = JsonSerializer.Deserialize<GpsPingDto>(message, JsonOptions);
+                return ping;
             }
             catch (JsonException ex)
             {

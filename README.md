@@ -800,3 +800,58 @@ Log Schema for ai-worker service:
 │                   └───────────┘                               │
 └───────────────────────────────────────────────────────────────┘
 ```
+
+* Tracing Headers
+ 1. Simulator sets traceparent and tracestate headers in MQTT user properties.
+ 2. EMQX maps user properties into kafka_ext_header_value values.
+ 3. AI Worker sets traceparent and tracestate into Kafka headers for generated alerts.
+ 4. .NET services recover traceparent / tracestate from Kafka headers and linka new Activity to the upstream trace.
+ 
+ 
+#### .NET context propagation
+Both .NET services use the W3C TraceContextPropagator (default in .NET 8+) toextract an ActivityContext from Kafka headers, then start a Consumer spanparented to it. This is what keeps the trace continuous across the Python → Kafka→ .NET boundary.
+
+Packages (added to both FleetPulse.SignalRHub and FleetPulse.DbWriter):
+
+OpenTelemetry
+OpenTelemetry.Extensions.Hosting
+OpenTelemetry.Exporter.OpenTelemetryProtocol
+OpenTelemetry.Instrumentation.AspNetCore
+OpenTelemetry.Instrumentation.Http
+Npgsql.OpenTelemetry (DbWriter only — instruments the bulk UPSERTs)
+Registration (Program.cs):
+
+builder.Services.AddOpenTelemetry()    .ConfigureResource(r => r.AddService("FleetPulse.SignalRHub", "1.0.0"))    .WithTracing(tp => tp        .AddSource("FleetPulse.SignalRHub.GpsPingConsumer")        .AddAspNetCoreInstrumentation()        .AddHttpClientInstrumentation()        .AddOtlpExporter(o => o.Endpoint = new Uri("http://otel-collector:4317")));
+Header extraction (Confluent.Kafka Headers):
+
+```csharp
+private static readonly TextMapPropagator Propagator = new TraceContextPropagator();
+
+private static ActivityContext Extract(Headers? headers)
+{
+    if (headers is null) return default;
+    return Propagator.Extract(default, headers, (h, name) =>
+        h.TryGetLastBytes(name, out var b)
+            ? new[] { Encoding.UTF8.GetString(b) }
+            : Array.Empty<string>()).ActivityContext;
+}
+```
+Consumer span (linked to the upstream Python trace):
+
+```csharp
+var parentCtx = Extract(consumeResult.Message.Headers);
+
+using var activity = ActivitySource.StartActivity(
+    "kafka.consume", ActivityKind.Consumer, parentCtx.ActivityContext);
+
+activity?.SetTag("messaging.system",         "kafka");
+activity?.SetTag("messaging.destination",    "gps-pings");
+activity?.SetTag("messaging.kafka.partition", consumeResult.Partition.Value);
+activity?.SetTag("messaging.kafka.offset",   consumeResult.Offset.Value);
+activity?.SetTag("messaging.operation",       "process");
+activity?.SetTag("fleetpulse.driver_id",      ping.DriverId);
+```
+
+Result in Tempo/Grafana: the trace starts in the Python simulator, hops through
+EMQX → Redpanda, and continues inside the .NET SignalRHub and DbWriter spans,
+sharing the same trace-id.

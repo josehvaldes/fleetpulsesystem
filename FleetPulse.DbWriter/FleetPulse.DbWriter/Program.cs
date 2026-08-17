@@ -2,8 +2,12 @@ using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Logging;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Trace;
 using FleetPulse.DbWriter.Workers;
 using Npgsql;
+using OpenTelemetry.Context.Propagation;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Prometheus;
 using Serilog;
 
@@ -41,14 +45,35 @@ builder.Services.AddHostedService<DbBatchWriterWorker>();
 
 var prometheusSection = builder.Configuration.GetSection(PrometheusSettings.SectionName);
 builder.Services.Configure<PrometheusSettings>(prometheusSection);
-var prometheusConfig = prometheusSection.Get<PrometheusSettings>();
+var prometheusConfig = prometheusSection.Get<PrometheusSettings>()??new PrometheusSettings();
 
 // Expose /metrics on port 8080 as a standalone Kestrel endpoint.
-builder.Services.AddMetricServer(options => options.Port = prometheusConfig?.Port ?? 8080);
+builder.Services.AddMetricServer(options => options.Port = prometheusConfig.Port);
 
 // Accessing FleetMetrics here ensures all custom metrics are registered
 // with the Prometheus registry on startup, before the first scrape.
 _ = FleetMetrics.GpsPingsReceived;
+
+
+// OpenTelemetry configuration
+var openTelemetrySection = builder.Configuration.GetSection(OpenTelemetrySettings.SectionName);
+builder.Services.Configure<OpenTelemetrySettings>(openTelemetrySection);
+var openTelemetrySettings = openTelemetrySection.Get<OpenTelemetrySettings>()?? new OpenTelemetrySettings();
+
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r
+        .AddService(serviceName: "FleetPulse.DbWriter",
+                    serviceVersion: "1.0.0"))
+    .WithTracing(tp => tp
+        .AddSource("FleetPulse.DbWriter")          // DbWriter only
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddNpgsql()                               // DbWriter only — traces SQL
+        .AddOtlpExporter(o => o.Endpoint =
+            new Uri(openTelemetrySettings.OtlpEndpoint)));
+
+builder.Services.AddSingleton<TextMapPropagator>(new TraceContextPropagator());
 
 var host = builder.Build();
 

@@ -77,7 +77,7 @@ class KafkaConsumer(IKafkaConsumer):
 
     async def consume(
         self,
-        message_handler: Callable[[dict], Awaitable[None]],  # Should be async
+        message_handler: Callable[[dict, dict], Awaitable[None]],  # Should be async
         poll_timeout: float = 5.0, 
         deserialize_json: bool = True,
     ) -> None:
@@ -106,7 +106,7 @@ class KafkaConsumer(IKafkaConsumer):
 
                 PINGS_RECEIVED.inc()
                 # Extract metadata
-                payload = {
+                message = {
                     "topic": msg.topic(),
                     "partition": msg.partition(),
                     "offset": msg.offset(),
@@ -115,19 +115,26 @@ class KafkaConsumer(IKafkaConsumer):
                     "timestamp": msg.timestamp()[1] if msg.timestamp()[0] != 0 else None,
                 }
 
+                body = {}
+                metadata = {}
                 # Deserialize payload value
                 if deserialize_json:
                     try:
-                        value_wrapper = json.loads(msg.value().decode("utf-8"))
-                        value = value_wrapper.get("payload") if isinstance(value_wrapper, dict) else value_wrapper
-                        payload["value"] = json.loads(value) if isinstance(value, str) else value
+                        headers = msg.headers()
+                        for header in headers or []:
+                            if header[0] == "traceparent":
+                                metadata["traceparent"] = header[1].decode("utf-8")
+                            elif header[0] == "tracestate":
+                                metadata["tracestate"] = header[1].decode("utf-8")
+                        body:dict = json.loads(msg.value().decode("utf-8"))
                     except (json.JSONDecodeError, UnicodeDecodeError) as e:
                         logger.warning("json_decode_failed", error=str(e))
-                        payload["value"] = msg.value().decode("utf-8", errors="replace")
-
+                        body = msg.value().decode("utf-8", errors="replace")
+                else:
+                    body = msg.value().decode("utf-8", errors="replace")
                 # Hand off to the AI worker
                 try:
-                    await message_handler(payload["value"]) # Pass only the deserialized value to the handler
+                    await message_handler(body, metadata) # Pass only the deserialized value to the handler
                 except Exception as e:
                     logger.exception("message_handler_failed", error=str(e))
 

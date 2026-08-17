@@ -8,6 +8,6 @@ namespace FleetPulse.DbWriter.Configuration
     {
         public const string SectionName = "Prometheus";
         public ushort Port { get; init; } = 8080;
-        public bool Enabled { get; init; } = true;
+        public bool Enabled { get; init; } = false;
     }
 }
