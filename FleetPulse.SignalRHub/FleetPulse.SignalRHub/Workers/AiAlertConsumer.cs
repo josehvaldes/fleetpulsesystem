@@ -4,8 +4,10 @@ using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
+using FleetPulse.SignalRHub.Trace;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace FleetPulse.SignalRHub.Workers
@@ -56,10 +58,13 @@ namespace FleetPulse.SignalRHub.Workers
                 {
                     // Blocks until a message arrives or cancellation is requested
                     var result = _consumer.Consume(stoppingToken);
-
+                    _logger.LogInformation("Consumed Alert from Kafka topic '{Topic}': {Message}", _kafkaSettings.AlertsTopic, result.Message.Value);
                     // Count every message consumed from Kafka, regardless of throttle
                     FleetMetrics.AlertsReceived.WithLabels(_kafkaSettings.AlertsTopic).Inc();
-
+                    
+                    var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
+                    using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_alert", ActivityKind.Consumer, parentCtx);
+                    
                     var dto = DeserializeAlert(result);
 
                     if (dto is null)
@@ -94,7 +99,6 @@ namespace FleetPulse.SignalRHub.Workers
             try 
             { 
                 var message = result.Message.Value;
-                _logger.LogInformation("Received alert from Kafka: [{Message}]", message);
                 return JsonSerializer.Deserialize<AlertDto>(message, JsonOptions);
             }
             catch (JsonException) 

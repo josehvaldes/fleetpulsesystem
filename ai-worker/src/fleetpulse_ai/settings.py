@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     prometheus_metrics_port: int = 8000
 
     # OpenTelemetry Configuration
-    otel_exporter_endpoint: str = "http://localhost:4317"  # OTLP gRPC endpoint for OpenTelemetry Collector
+    otel_exporter_endpoint: str = "http://otel-collector:4317"  # OTLP gRPC endpoint for OpenTelemetry Collector
     console_exporter_enabled: bool = False  # Enable console logging for OpenTelemetry
     otel_exporter_enabled: bool = True  # Enable OTLP exporter for OpenTelemetry
     otel_environment: str = "development"  # Environment name for OpenTelemetry resource attributes (e.g., 'development', 'production')

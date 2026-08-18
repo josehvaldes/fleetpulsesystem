@@ -32,8 +32,6 @@ def create_ai_worker_handler(
         """
         Process a GPS ping message with the detector and alert manager bound for the worker lifetime.
         """
-        print(f" - Message {message}") 
-
         carrier = {
             "traceparent": metadata.get("traceparent", ""),
             "tracestate": metadata.get("tracestate", ""),

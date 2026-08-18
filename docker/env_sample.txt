@@ -31,5 +31,8 @@ KAFKA_GROUP_ID=ai-worker-group
 KAFKA_TOPICS=gps-pings
 KAFKA_ALERT_TOPIC=ai-alerts
 
+# OpenTelemetry for ai-worker
+otel_exporter_endpoint=http://otel-collector:4317
+
 
 DOTNET_ENVIRONMENT=Production
