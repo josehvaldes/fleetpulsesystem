@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     log_to_console: bool = True
 
     # Additional Logging outputs
-    service_name: str = "ai-worker"  # Optional service name to bind to all logs (e.g., 'ai-worker')
+    service_name: str = "ai.worker"  # Optional service name to bind to all logs (e.g., 'ai-worker')
     version: str = "1.0.0"  # Application version for logging and monitoring
 
     # Azure OpenAI Configuration

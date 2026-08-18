@@ -1,3 +1,5 @@
+import atexit
+
 from fleetpulse_ai.settings import settings
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
@@ -30,3 +32,4 @@ def setup_tracing() -> None:
             OTLPSpanExporter(endpoint=settings.otel_exporter_endpoint, insecure=True)
         ))
     trace.set_tracer_provider(provider)
+    atexit.register(provider.shutdown)  # flush any spans buffered in the BatchSpanProcessor on exit

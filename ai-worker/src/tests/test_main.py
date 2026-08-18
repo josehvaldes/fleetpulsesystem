@@ -63,8 +63,11 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
         "heading_degrees": 0.0,
         "timestamp": "2026-07-27T19:46:20.843397+00:00",
     }
+    metadata = {
+        "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+    }
 
-    await handler(base_message)
+    await handler(base_message, metadata)
     await handler({
         **base_message,
         "latitude": -17.373154,
@@ -72,7 +75,7 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
         "speed_kmh": 43.6,
         "heading_degrees": 60.5,
         "timestamp": "2026-07-27T19:46:22.769488+00:00",
-    })
+    }, metadata)
 
     assert detector.calls == 1
     assert len(manager.handled_events) == 1

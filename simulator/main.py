@@ -38,7 +38,7 @@ logger = get_logger(__name__)
 
 def setup_tracing() -> None:
     resource = Resource.create({
-        "service.name": "fleetpulse-simulator",
+        "service.name": "fleetpulse.simulator",
         "service.version": "0.1.0",
         "deployment.environment": ENVIRONMENT,
     })
