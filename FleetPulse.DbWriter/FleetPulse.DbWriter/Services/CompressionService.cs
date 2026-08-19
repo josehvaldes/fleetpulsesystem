@@ -1,5 +1,6 @@
 ﻿using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Models;
+using FleetPulse.DbWriter.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace FleetPulse.DbWriter.Services
             _kafkaSettings = settings.Value;
         }
 
-        public async Task<List<GpsPing>> ApplyTemporalCompression(IReadOnlyList<GpsPing> pings)
+        public async Task<List<GpsPingDto>> ApplyTemporalCompression(IReadOnlyList<GpsPingDto> pings)
         {
             var dropped = await DropIntermediateStoppedPings(pings.ToList());
             var result = await ApplyHighSpeedCompression(dropped);
@@ -31,7 +32,7 @@ namespace FleetPulse.DbWriter.Services
         /// For example: [N,N,H1,H1,H1,H2,H2,H2,N,N] -> [N,N,H1,H2,N,N]
         /// where H1/H2 are high-speed pings in different time buckets (e.g. 15s windows).
         /// </summary>
-        public async Task<List<GpsPing>> ApplyHighSpeedCompression(List<GpsPing> pings)
+        public async Task<List<GpsPingDto>> ApplyHighSpeedCompression(List<GpsPingDto> pings)
         {
             var seenBuckets = new HashSet<long>();
             var size = pings.Count;
@@ -52,18 +53,18 @@ namespace FleetPulse.DbWriter.Services
                 .ToList();
             return compressed;
         }
-        public async Task<List<GpsPing>> DropIntermediateStoppedPings(IReadOnlyList<GpsPing> pings)
+        public async Task<List<GpsPingDto>> DropIntermediateStoppedPings(IReadOnlyList<GpsPingDto> pings)
         {
             if (pings.Count == 0 || pings.Count <= 2)
             {
                 return pings.ToList();
             }
 
-            var response = new List<GpsPing>();
-            GpsPing? firstStopped = null;
-            GpsPing? lastStopped = null;
+            var response = new List<GpsPingDto>();
+            GpsPingDto? firstStopped = null;
+            GpsPingDto? lastStopped = null;
 
-            foreach (GpsPing ping in pings)
+            foreach (GpsPingDto ping in pings)
             {
                 if (StoppedConditional(ping))
                 {
@@ -102,7 +103,7 @@ namespace FleetPulse.DbWriter.Services
         /// </summary>
         /// <param name="pings"></param>
         /// <returns></returns>
-        public async Task<List<GpsPing>> DropIntermediateStoppedPingsLinq(List<GpsPing> pings)
+        public async Task<List<GpsPingDto>> DropIntermediateStoppedPingsLinq(List<GpsPingDto> pings)
         {
 
             if (pings.Count <= 2)
@@ -120,7 +121,7 @@ namespace FleetPulse.DbWriter.Services
 
         }
 
-        public bool StoppedConditional(GpsPing ping)
+        public bool StoppedConditional(GpsPingDto ping)
         {
             return ping.Status == "stopped" || ping.Status == "idle" || ping.Status == "parked" || ping.Speed < 1;
         }

@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Interfaces
 {
     public interface ICompressionService
     {
-        Task<List<GpsPing>> ApplyTemporalCompression(IReadOnlyList<GpsPing> pings);
+        Task<List<GpsPingDto>> ApplyTemporalCompression(IReadOnlyList<GpsPingDto> pings);
     }
 }

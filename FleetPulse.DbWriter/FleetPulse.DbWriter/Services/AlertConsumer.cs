@@ -2,46 +2,30 @@
 using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
+using FleetPulse.DbWriter.Services.Interfaces;
 using FleetPulse.DbWriter.Trace;
 using Microsoft.Extensions.Options;
-using OpenTelemetry;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
+using Mapster;
+using FleetPulse.DbWriter.Models.DB;
 
 namespace FleetPulse.DbWriter.Services
 {
-    internal class RedpandaConsumerService : IRedpandaConsumerService
+    public class AlertConsumer(ILogger<AlertConsumer> _logger,
+        IAlertDatabaseService _alertDatabaseService,
+        IOptions<KafkaSettings> kafkaSettings) : IAlertConsumer
     {
-        private readonly KafkaSettings _settings;
-        private readonly ILogger<RedpandaConsumerService> _logger;
-        private readonly ConcurrentBag<GpsPing> _buffer = new();
         private IConsumer<string, string> _consumer = null!;
-        private const int MaxBufferSize = 1000;
+        private readonly KafkaSettings _settings = kafkaSettings.Value;
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public RedpandaConsumerService(IOptions<KafkaSettings> settings, 
-            ILogger<RedpandaConsumerService> logger)
-        {
-            _settings = settings.Value;
-            _logger = logger;
-        }
 
-        public void Dispose()
-        {
-            _consumer?.Dispose();
-        }
-
-        public void ClearBatch() => _buffer.Clear();
-
-        
-
-        public IReadOnlyList<GpsPing> GetBatchedPings() => _buffer.ToArray();
-
-        public async Task StartConsumingAsync(CancellationToken cancellationToken)
+        public async Task StartConsumingAsync(CancellationToken stoppingToken)
         {
             var config = new ConsumerConfig
             {
@@ -63,12 +47,12 @@ namespace FleetPulse.DbWriter.Services
                 })
                 .Build();
 
-            _consumer.Subscribe(_settings.Topic);
-            _logger.LogInformation("Subscribed to topic '{Topic}' with group '{GroupId}'",_settings.Topic, _settings.GroupId);
+            _consumer.Subscribe(_settings.AlertTopic);
+            _logger.LogInformation("Subscribed to Kafka topic: {Topic} with group: {GroupId}", _settings.AlertTopic, _settings.GroupId);
 
             try
             {
-                await ConsumeLoopAsync(cancellationToken);
+                await ConsumeLoopAsync(stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -79,7 +63,6 @@ namespace FleetPulse.DbWriter.Services
                 _consumer.Close();
             }
         }
-
         private async Task ConsumeLoopAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -94,29 +77,20 @@ namespace FleetPulse.DbWriter.Services
                             consumeResult.Partition);
                         continue;
                     }
-                    
-                    FleetMetrics.GpsPingsReceived.WithLabels(_settings.Topic).Inc();
+                    FleetMetrics.AlertsReceived.WithLabels(_settings.AlertTopic).Inc();
+
                     var parentCtx = KafkaTraceContextExtractor.Extract(consumeResult.Message.Headers);
+                    using var activity = Telemetry.ActivitySource.StartActivity("dbwriter.process_alert", ActivityKind.Consumer, parentCtx);
 
-                    using var activity = Telemetry.ActivitySource.StartActivity("dbwriter.process_gps_ping", ActivityKind.Consumer, parentCtx);
-                   
-
-                    var ping = DeserializePing(consumeResult);
-                    if (ping is not null)
+                    var alert = DeserializeAlert(consumeResult);
+                    if ( alert != null)
                     {
-                        _buffer.Add(ping);
-                        _logger.LogTrace(
-                            "Buffered ping from {Driver} at ({Lat}, {Lon}) - Buffer: {Count}",
-                            ping.DriverId, ping.Latitude, ping.Longitude, _buffer.Count);
+                        var alertdb = alert.Adapt<AlertDb>();
+                        // don't wait for the database operation to complete, just fire and forget
+                        var task = _alertDatabaseService.AddAlert(alertdb);
                     }
-
-                    // Commit offset after successful processing
-                    _consumer.Commit(consumeResult);
-
-                    // Yield control periodically
-                    await Task.Yield();
                 }
-                catch (ConsumeException ex)
+                catch (ConsumeException ex) 
                 {
                     _logger.LogError(ex, "Consume error on partition {Partition}",
                         ex.ConsumerRecord?.Partition);
@@ -125,27 +99,18 @@ namespace FleetPulse.DbWriter.Services
             }
         }
 
-        private GpsPing? DeserializePing(ConsumeResult<string, string> result)
+        private AlertDto? DeserializeAlert(ConsumeResult<string, string> result) 
         {
             try
             {
                 var message = result.Message.Value;
-                var ping = JsonSerializer.Deserialize<GpsPing>(message, JsonOptions);
-                if (ping is not null)
-                {
-                    ping.RawPayloadJson = message;
-                }
-
-                return ping;
+                return JsonSerializer.Deserialize<AlertDto>(message, JsonOptions);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
-                _logger.LogWarning(ex,
-                    "Failed to deserialize message at offset {Offset} on partition {Partition}",
-                    result.Offset.Value, result.Partition.Value);
+                _logger.LogWarning("Failed to deserialize message from Kafka: {Message}", result.Message.Value);
                 return null;
             }
         }
-
     }
 }

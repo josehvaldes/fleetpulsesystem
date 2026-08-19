@@ -16,13 +16,13 @@ namespace FleetPulse.Tests.IntegrationTests
 
         public DatabaseIntegrationTests() { }
 
-        private static DatabaseService CreateDatabaseServiceInstance()
+        private static GpsPingDatabaseService CreateDatabaseServiceInstance()
         {
             // Here you would typically set up your database connection string and any other required settings.
             var connectionString = "Host=localhost;Port=5432;Database=fleetpulse;Username=fleetpulse;Password=fleetpulse_dev";
             var datasource = new NpgsqlDataSourceBuilder(connectionString).Build();
-            ILogger<DatabaseService> logger = new LoggerFactory().CreateLogger<DatabaseService>();
-            return new DatabaseService(datasource, logger);
+            ILogger<GpsPingDatabaseService> logger = new LoggerFactory().CreateLogger<GpsPingDatabaseService>();
+            return new GpsPingDatabaseService(datasource, logger);
         }
 
         private static CompressionService CreateCompressorServiceInstance(KafkaSettings? settings = null)

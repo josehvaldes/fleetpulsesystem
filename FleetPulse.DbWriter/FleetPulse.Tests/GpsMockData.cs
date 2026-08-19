@@ -4,10 +4,10 @@ namespace FleetPulse.Tests
 {
     public static class GpsMockData
     {
-        public static List<GpsPing> GetMockGpsPings() 
+        public static List<GpsPingDto> GetMockGpsPings() 
         {
             var json = File.ReadAllText("./data/recoleta_route_sample_output.json");
-            return JsonSerializer.Deserialize<List<GpsPing>>(json) ?? new List<GpsPing>();
+            return JsonSerializer.Deserialize<List<GpsPingDto>>(json) ?? new List<GpsPingDto>();
         }
     }
 }

@@ -12,10 +12,10 @@ using System.Text.Json;
 
 namespace FleetPulse.SignalRHub.Workers
 {
-    public class AiAlertConsumer : BackgroundService
+    public class AlertConsumer : BackgroundService
     {
         private readonly IConsumer<string, string> _consumer;
-        private readonly ILogger<AiAlertConsumer> _logger;
+        private readonly ILogger<AlertConsumer> _logger;
         private readonly KafkaSettings _kafkaSettings;
         private readonly IHubContext<FleetHub> _hubContext;
         private readonly SignalRSettings _signalRSettings;
@@ -25,8 +25,8 @@ namespace FleetPulse.SignalRHub.Workers
             PropertyNameCaseInsensitive = true
         };
 
-        public AiAlertConsumer([FromKeyedServices("alerts")] IConsumer<string, string> consumer,
-                                ILogger<AiAlertConsumer> logger,
+        public AlertConsumer([FromKeyedServices("alerts")] IConsumer<string, string> consumer,
+                                ILogger<AlertConsumer> logger,
                                IOptions<KafkaSettings> kafkaSettings,
                                IHubContext<FleetHub> hubContext,
                                IOptions<SignalRSettings> signalRSettings)

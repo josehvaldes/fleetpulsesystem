@@ -10,7 +10,8 @@ namespace FleetPulse.DbWriter.Configuration
 
         public string BootstrapServers { get; init; } = string.Empty;
         public string GroupId { get; init; } = string.Empty;
-        public string Topic { get; init; } = string.Empty;
+        public string AlertTopic { get; init; } = string.Empty;
+        public string GpspingTopic { get; init; } = string.Empty;
 
         public int HighSpeedCompressionThreshold { get; init; } = 40;
         public int HighSpeedCompressionBucketKey { get; init; } = 15;

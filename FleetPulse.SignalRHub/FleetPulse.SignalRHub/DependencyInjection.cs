@@ -88,7 +88,7 @@ namespace FleetPulse.SignalRHub
         {
             // AddHostedService guarantees single instance, start/stop with the host
             services.AddHostedService<GpsPingConsumer>();
-            services.AddHostedService<AiAlertConsumer>();
+            services.AddHostedService<AlertConsumer>();
 
             return services;
         }

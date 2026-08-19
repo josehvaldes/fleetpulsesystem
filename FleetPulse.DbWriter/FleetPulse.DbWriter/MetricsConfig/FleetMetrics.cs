@@ -20,6 +20,9 @@ namespace FleetPulse.DbWriter.MetricsConfig
             "Time spent flushing batch to TimescaleDB",
             new HistogramConfiguration { Buckets = [.001, .005, .01, .025, .05, .1, .25, .5, 1] });
 
-
+        public static readonly Counter AlertsReceived = Metrics.CreateCounter(
+            "fleetpulse_dbwriter_alerts_received_total",
+            "Total alerts consumed from Kafka",
+            new CounterConfiguration { LabelNames = ["topic"] });
     }
 }

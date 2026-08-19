@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Interfaces
 {
-    public interface IRedpandaConsumerService : IDisposable
+    public interface IGpsPingConsumerService : IDisposable
     {
         Task StartConsumingAsync(CancellationToken cancellationToken);
-        IReadOnlyList<GpsPing> GetBatchedPings();
+        IReadOnlyList<GpsPingDto> GetBatchedPings();
         void ClearBatch();
     }
 }

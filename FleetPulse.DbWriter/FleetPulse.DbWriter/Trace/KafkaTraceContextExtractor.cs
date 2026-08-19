@@ -26,7 +26,7 @@ namespace FleetPulse.DbWriter.Trace
 
             return new TraceContextValues
             {
-                Traceparent = traceparent, //do something
+                Traceparent = traceparent?? string.Empty,
                 Tracestate = tracestate
             };
         }

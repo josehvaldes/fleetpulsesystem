@@ -20,7 +20,7 @@ namespace FleetPulse.DbWriter.Models
 	///     "vehicle_type": "string",
 	///  }
     /// </summary>
-    public class GpsPing
+    public class GpsPingDto
     {
         [JsonPropertyName("event_id")]
         public Guid EventId { get; init; }

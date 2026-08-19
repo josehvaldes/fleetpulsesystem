@@ -855,3 +855,14 @@ activity?.SetTag("fleetpulse.driver_id",      ping.DriverId);
 Result in Tempo/Grafana: the trace starts in the Python simulator, hops through
 EMQX → Redpanda, and continues inside the .NET SignalRHub and DbWriter spans,
 sharing the same trace-id.
+
+
+## Alert Management
+
+### Postgresql persistance
+ * 
+
+### Post-persistance work with Hangfire
+ * Hangfire for background jobs and alert scalation
+    - EscaleteAlerts
+    - CleanupAlerts

@@ -1,15 +1,16 @@
 ﻿using Dapper;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
+using FleetPulse.DbWriter.Services.Interfaces;
 using Npgsql;
 using NpgsqlTypes;
 using Prometheus;
 
 namespace FleetPulse.DbWriter.Services
 {
-    public class DatabaseService(NpgsqlDataSource _dataSource, ILogger<DatabaseService> _logger) : IDatabaseService
+    public class GpsPingDatabaseService(NpgsqlDataSource _dataSource, ILogger<GpsPingDatabaseService> _logger) : IGpsPingDatabaseService
     {
-        public async Task BulkInsertPingsAsync(List<GpsPing> pings, CancellationToken cancellationToken)
+        public async Task BulkInsertPingsAsync(List<GpsPingDto> pings, CancellationToken cancellationToken)
         {
             if (pings == null || pings.Count == 0)
                 return;
@@ -67,11 +68,11 @@ namespace FleetPulse.DbWriter.Services
             return lastState;
         }
 
-        public async Task<List<GpsPing>> GetGpsPingsForDriverAsync(string driverId, CancellationToken cancellationToken)
+        public async Task<List<GpsPingDto>> GetGpsPingsForDriverAsync(string driverId, CancellationToken cancellationToken)
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
             var selectSql = "SELECT * FROM gps_history WHERE driver_id = @DriverId";
-            var pings = await connection.QueryAsync<GpsPing>(selectSql, new { DriverId = driverId });
+            var pings = await connection.QueryAsync<GpsPingDto>(selectSql, new { DriverId = driverId });
             return pings.ToList();
         }
 
@@ -83,7 +84,7 @@ namespace FleetPulse.DbWriter.Services
             return version ?? "Not Available";
         }
 
-        public async Task UpsertLatestStateAsync(IReadOnlyList<GpsPing> pings,CancellationToken ct = default)
+        public async Task UpsertLatestStateAsync(IReadOnlyList<GpsPingDto> pings,CancellationToken ct = default)
         {
             if (pings.Count == 0) return;
 

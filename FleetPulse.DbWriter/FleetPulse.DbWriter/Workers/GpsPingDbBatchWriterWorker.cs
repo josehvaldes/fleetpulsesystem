@@ -1,14 +1,14 @@
 ﻿using FleetPulse.DbWriter.MetricsConfig;
-using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Services.Interfaces;
 using FleetPulse.DbWriter.Trace;
 using System.Diagnostics;
 
 namespace FleetPulse.DbWriter.Workers
 {
-    internal class DbBatchWriterWorker(ILogger<DbBatchWriterWorker> logger, 
-        IRedpandaConsumerService consumerService,
+    internal class GpsPingDbBatchWriterWorker(ILogger<GpsPingDbBatchWriterWorker> logger, 
+        IGpsPingConsumerService consumerService,
         ICompressionService compressionService,
-        IDatabaseService databaseService) : BackgroundService
+        IGpsPingDatabaseService databaseService) : BackgroundService
     {
         private const int FlushIntervalSeconds = 5;
         private const int MaxBatchSize = 1000;
