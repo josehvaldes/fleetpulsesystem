@@ -87,7 +87,7 @@ namespace FleetPulse.DbWriter.Services
                 """;
 
             await using var connection = await _dataSource.OpenConnectionAsync();
-            var rows = await connection.QueryAsync<AlertDb>(sql, new { Status = status.ToString(), StartDate = startDate, EndDate = endDate });
+            var rows = await connection.QueryAsync<AlertDb>(sql, new { Status = status, StartDate = startDate, EndDate = endDate });
             return rows;
         }
     }

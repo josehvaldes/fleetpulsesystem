@@ -70,6 +70,7 @@ namespace FleetPulse.DbWriter
             });
 
             services.AddHangfireServer();
+            
             return services;
         }
     }

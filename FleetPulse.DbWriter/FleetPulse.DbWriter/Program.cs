@@ -2,6 +2,7 @@ using Dapper;
 using FleetPulse.DbWriter;
 using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Infrastructure;
+using FleetPulse.DbWriter.Jobs;
 using FleetPulse.DbWriter.Logging;
 using FleetPulse.DbWriter.Mappings;
 using FleetPulse.DbWriter.Services;
@@ -44,13 +45,16 @@ builder.Services.AddSingleton<IGpsPingConsumer, GpsPingConsumer>();
 builder.Services.AddSingleton<IAlertDatabaseService, AlertDatabaseService>();
 builder.Services.AddSingleton<IAlertConsumer, AlertConsumer>();
 
-// Register background worker for processing and writing GPS pings and Alerts to the database
-builder.Services.AddHostedService<GpsPingDbBatchWriterWorker>();
-builder.Services.AddHostedService<AlertWorker>();
 
 builder.Services.AddOpenPrometheusDependencies(builder.Configuration);
 builder.Services.AddOpenTelemetryDependencies(builder.Configuration);
 builder.Services.AddHangfireConfiguration(builder.Configuration);
+
+// Register background worker for processing and writing GPS pings and Alerts to the database
+builder.Services.AddHostedService<GpsPingDbBatchWriterWorker>();
+builder.Services.AddHostedService<AlertWorker>();
+builder.Services.AddHostedService<HangfireJobRegistrationService>();
+
 
 SqlMapping.RegisterSqlMappings();
 
