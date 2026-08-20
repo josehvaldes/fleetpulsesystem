@@ -12,10 +12,10 @@ using System.Text.Json;
 
 namespace FleetPulse.DbWriter.Services
 {
-    internal class GpsPingConsumerService : IGpsPingConsumerService
+    internal class GpsPingConsumer(IOptions<KafkaSettings> settings,
+            ILogger<GpsPingConsumer> _logger) : IGpsPingConsumer
     {
-        private readonly KafkaSettings _settings;
-        private readonly ILogger<GpsPingConsumerService> _logger;
+        private readonly KafkaSettings _settings = settings.Value;
         private readonly ConcurrentBag<GpsPingDto> _buffer = new();
         private IConsumer<string, string> _consumer = null!;
         private const int MaxBufferSize = 1000;
@@ -23,13 +23,6 @@ namespace FleetPulse.DbWriter.Services
         {
             PropertyNameCaseInsensitive = true
         };
-
-        public GpsPingConsumerService(IOptions<KafkaSettings> settings, 
-            ILogger<GpsPingConsumerService> logger)
-        {
-            _settings = settings.Value;
-            _logger = logger;
-        }
 
         public void Dispose()
         {
@@ -110,6 +103,10 @@ namespace FleetPulse.DbWriter.Services
                             "Buffered ping from {Driver} at ({Lat}, {Lon}) - Buffer: {Count}",
                             ping.DriverId, ping.Latitude, ping.Longitude, _buffer.Count);
                     }
+                    else 
+                    {
+                        FleetMetrics.GpsPingErrors.WithLabels(new string[]{ "deserialization_error", _settings.GpspingTopic }).Inc();
+                    }
 
                     // Commit offset after successful processing
                     _consumer.Commit(consumeResult);
@@ -119,8 +116,9 @@ namespace FleetPulse.DbWriter.Services
                 }
                 catch (ConsumeException ex)
                 {
-                    _logger.LogError(ex, "Consume error on partition {Partition}",
+                    _logger.LogError(ex, "GpsPing Consume error on partition {Partition}",
                         ex.ConsumerRecord?.Partition);
+                    FleetMetrics.GpsPingErrors.WithLabels(new string[] { "consume_exception", _settings.GpspingTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }

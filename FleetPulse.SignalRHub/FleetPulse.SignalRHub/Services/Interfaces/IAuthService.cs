@@ -1,6 +1,6 @@
 ﻿using FleetPulse.SignalRHub.Contracts.Response;
 
-namespace FleetPulse.SignalRHub.Services
+namespace FleetPulse.SignalRHub.Services.Interfaces
 {
     public interface IAuthService
     {

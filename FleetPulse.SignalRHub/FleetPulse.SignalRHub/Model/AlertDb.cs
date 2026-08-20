@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FleetPulse.DbWriter.Models.DB
+﻿namespace FleetPulse.SignalRHub.Model
 {
     public class AlertDb
     {
@@ -18,9 +14,7 @@ namespace FleetPulse.DbWriter.Models.DB
         public string assessment { get; set; } = string.Empty;
         public string recommendation { get; set; } = string.Empty;
         public bool autoscale { get; set; }
-
-        public AlertStatus status { get; set; } = AlertStatus.New;
-
+        public string status { get; set; } = string.Empty;
         public DateTimeOffset raised_at { get; set; }
     }
 }

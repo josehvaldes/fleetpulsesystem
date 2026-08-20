@@ -83,17 +83,22 @@ namespace FleetPulse.DbWriter.Services
                     using var activity = Telemetry.ActivitySource.StartActivity("dbwriter.process_alert", ActivityKind.Consumer, parentCtx);
 
                     var alert = DeserializeAlert(consumeResult);
-                    if ( alert != null)
+                    if (alert != null)
                     {
                         var alertdb = alert.Adapt<AlertDb>();
                         // don't wait for the database operation to complete, just fire and forget
                         var task = _alertDatabaseService.AddAlert(alertdb);
                     }
+                    else 
+                    {
+                        FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { "deserialization_error", _settings.AlertTopic }).Inc();
+                    }
                 }
                 catch (ConsumeException ex) 
                 {
-                    _logger.LogError(ex, "Consume error on partition {Partition}",
+                    _logger.LogError(ex, "Alert Consume error on partition {Partition}",
                         ex.ConsumerRecord?.Partition);
+                    FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { "consume_exception", _settings.AlertTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }

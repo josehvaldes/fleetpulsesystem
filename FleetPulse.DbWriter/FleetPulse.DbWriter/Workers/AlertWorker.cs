@@ -23,5 +23,11 @@ namespace FleetPulse.DbWriter.Workers
                 // Expected during shutdown
             }            
         }
+
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            logger.LogInformation("AlertWorker is shutting down");
+            await base.StopAsync(cancellationToken);
+        }
     }
 }

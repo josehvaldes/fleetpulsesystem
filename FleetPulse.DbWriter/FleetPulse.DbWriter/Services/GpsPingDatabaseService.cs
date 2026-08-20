@@ -19,7 +19,7 @@ namespace FleetPulse.DbWriter.Services
             await using var tx = await conn.BeginTransactionAsync(cancellationToken);
 
             const string copySql = """
-            COPY gps_history
+            COPY fleetpulse.gps_history
                 (driver_id, timestamp, latitude, longitude, speed, heading, accuracy, raw_payload)
             FROM STDIN (FORMAT BINARY)
             """;
@@ -53,7 +53,7 @@ namespace FleetPulse.DbWriter.Services
         public async Task DeletePingsForDriverAsync(string driverId, CancellationToken cancellationToken)
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-            var deleteSql = "DELETE FROM gps_history WHERE driver_id = @DriverId";
+            var deleteSql = "DELETE FROM fleetpulse.gps_history WHERE driver_id = @DriverId";
             var response = await connection.ExecuteAsync(deleteSql, new { DriverId = driverId });
             _logger.LogInformation("Deleted {Count} pings for driver {DriverId}", response, driverId);
         }
@@ -62,7 +62,7 @@ namespace FleetPulse.DbWriter.Services
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
 
-            var selectSql = "SELECT * FROM driver_latest_state WHERE driver_id = @DriverId";
+            var selectSql = "SELECT * FROM fleetpulse.driver_latest_state WHERE driver_id = @DriverId";
             
             var lastState = await connection.QueryFirstOrDefaultAsync<DriverLastState>(selectSql, new { DriverId = driverId });
             return lastState;
@@ -71,7 +71,7 @@ namespace FleetPulse.DbWriter.Services
         public async Task<List<GpsPingDto>> GetGpsPingsForDriverAsync(string driverId, CancellationToken cancellationToken)
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-            var selectSql = "SELECT * FROM gps_history WHERE driver_id = @DriverId";
+            var selectSql = "SELECT * FROM fleetpulse.gps_history WHERE driver_id = @DriverId";
             var pings = await connection.QueryAsync<GpsPingDto>(selectSql, new { DriverId = driverId });
             return pings.ToList();
         }
@@ -103,7 +103,7 @@ namespace FleetPulse.DbWriter.Services
                 })
                 .ToList();
             const string sql = """
-                        INSERT INTO driver_latest_state
+                        INSERT INTO fleetpulse.driver_latest_state
                             (driver_id, latitude, longitude, speed, heading, last_seen, status)
                         VALUES
                             (@Driver_Id, @Latitude, @Longitude, @Speed, @Heading, @Last_Seen, @Status)

@@ -2,6 +2,7 @@
 using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
+using FleetPulse.SignalRHub.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace FleetPulse.SignalRHub.Services

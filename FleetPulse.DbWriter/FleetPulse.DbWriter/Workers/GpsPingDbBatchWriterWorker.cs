@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace FleetPulse.DbWriter.Workers
 {
     internal class GpsPingDbBatchWriterWorker(ILogger<GpsPingDbBatchWriterWorker> logger, 
-        IGpsPingConsumerService consumerService,
+        IGpsPingConsumer consumerService,
         ICompressionService compressionService,
         IGpsPingDatabaseService databaseService) : BackgroundService
     {

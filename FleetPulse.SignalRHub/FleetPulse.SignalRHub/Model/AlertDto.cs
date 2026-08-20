@@ -11,7 +11,7 @@ namespace FleetPulse.SignalRHub.Model
         public string DriverId { get; set; } = string.Empty;
 
         [JsonPropertyName("exit_location")]
-        public AlertLocationDto? ExitLocation { get; set; }
+        public AlertLocationDto ExitLocation { get; set; } = null!;
 
         [JsonPropertyName("exit_speed")]
         public float ExitSpeed { get; set; }

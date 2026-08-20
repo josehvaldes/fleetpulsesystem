@@ -13,6 +13,7 @@ using OpenTelemetry.Context.Propagation;
 using System.Text;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using FleetPulse.SignalRHub.Services.Interfaces;
 
 
 namespace FleetPulse.SignalRHub

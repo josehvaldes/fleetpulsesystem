@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FleetPulse.SignalRHub.Services
+namespace FleetPulse.SignalRHub.Services.Interfaces
 {
     public class JwtTokenService(IOptions<JwtSettings> opts) : IJwtTokenService
     {

@@ -1,7 +1,9 @@
+using Dapper;
 using FleetPulse.DbWriter;
 using FleetPulse.DbWriter.Configuration;
+using FleetPulse.DbWriter.Infrastructure;
 using FleetPulse.DbWriter.Logging;
-
+using FleetPulse.DbWriter.Mappings;
 using FleetPulse.DbWriter.Services;
 using FleetPulse.DbWriter.Services.Interfaces;
 
@@ -38,7 +40,7 @@ builder.Services.AddSingleton(sp =>
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
 builder.Services.AddSingleton<IGpsPingDatabaseService, GpsPingDatabaseService>();
 builder.Services.AddSingleton<ICompressionService, CompressionService>();
-builder.Services.AddSingleton<IGpsPingConsumerService, GpsPingConsumerService>();
+builder.Services.AddSingleton<IGpsPingConsumer, GpsPingConsumer>();
 builder.Services.AddSingleton<IAlertDatabaseService, AlertDatabaseService>();
 builder.Services.AddSingleton<IAlertConsumer, AlertConsumer>();
 
@@ -49,6 +51,8 @@ builder.Services.AddHostedService<AlertWorker>();
 builder.Services.AddOpenPrometheusDependencies(builder.Configuration);
 builder.Services.AddOpenTelemetryDependencies(builder.Configuration);
 builder.Services.AddHangfireConfiguration(builder.Configuration);
+
+SqlMapping.RegisterSqlMappings();
 
 var host = builder.Build();
 

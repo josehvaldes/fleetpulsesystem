@@ -13,14 +13,28 @@ namespace FleetPulse.SignalRHub.Mapping
                 .NewConfig()
                 .Map(dest => dest.LastSeen, src => src.Last_Seen.ToString("o"))
                 .Map(dest => dest.DriverId, src => src.Driver_Id);
+
+            TypeAdapterConfig<AlertDb, AlertResponse>.NewConfig()
+                .Map(dest => dest.Id, src => src.id)
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.EventLatitude, src => src.event_latitude)
+                .Map(dest => dest.EventLongitude, src => src.event_longitude)
+                .Map(dest => dest.ExitSpeed, src => src.exit_speed)
+                .Map(dest => dest.ExitTime, src => src.exit_time)
+                .Map(dest => dest.ZoneName, src => src.zone_name)
+                .Map(dest => dest.ZoneType, src => src.zone_type)
+                .Map(dest => dest.RiskLevel, src => src.risk_level)
+                .Map(dest => dest.Assessment, src => src.assessment)
+                .Map(dest => dest.Recommendation, src => src.recommendation)
+                .Map(dest => dest.AutoScale, src => src.autoscale)
+                .Map(dest => dest.Status, src => src.status)
+                .Map(dest => dest.RaisedAt, src => src.raised_at);
+
             TypeAdapterConfig<GpsPingDto, GpsHistoryResponse>
                 .NewConfig()
                 .Map(dest => dest.Timestamp, src => src.Timestamp.ToString("o"))
                 .Map(dest => dest.DriverId, src => src.Driver_Id);
-            TypeAdapterConfig<AlertDto, AlertResponse>
-                .NewConfig()
-                .Map(dest => dest.CreatedAt, src => src.CreatedAt.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.DriverId);
+
         }
     }
 }

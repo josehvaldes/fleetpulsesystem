@@ -11,10 +11,8 @@ using Xunit;
 
 namespace FleetPulse.Tests.IntegrationTests
 {
-    public class DatabaseIntegrationTests
+    public class GpsPingTests
     {
-
-        public DatabaseIntegrationTests() { }
 
         private static GpsPingDatabaseService CreateDatabaseServiceInstance()
         {
