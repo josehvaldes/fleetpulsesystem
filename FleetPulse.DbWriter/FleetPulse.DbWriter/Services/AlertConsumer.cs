@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Text.Json;
 using Mapster;
 using FleetPulse.DbWriter.Models.DB;
+using Hangfire;
+using FleetPulse.DbWriter.Jobs;
 
 namespace FleetPulse.DbWriter.Services
 {
@@ -87,7 +89,16 @@ namespace FleetPulse.DbWriter.Services
                     {
                         var alertdb = alert.Adapt<AlertDb>();
                         // don't wait for the database operation to complete, just fire and forget
-                        var task = _alertDatabaseService.AddAlert(alertdb);
+                        var task = _alertDatabaseService.AddAlertAsync(alertdb, cancellationToken);
+                        if (alertdb.risk_level == RiskLevel.High)
+                        {
+                            BackgroundJob.Schedule<EscalationJob>
+                            (
+                                x => x.CheckAndEscalateAsync(alertdb.id, cancellationToken),
+                                // Schedule the job to run after 10 seconds. Hardcoded for now, but can be made configurable later.
+                                TimeSpan.FromSeconds(10)
+                            );
+                        }
                     }
                     else 
                     {

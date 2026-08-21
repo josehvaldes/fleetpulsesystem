@@ -30,7 +30,7 @@ namespace FleetPulse.Tests.IntegrationTests
             return new AlertDatabaseService(datasource, logger);
         }
 
-        private static AlertDb CreateAlert(string driverId, string riskLevel) 
+        private static AlertDb CreateAlert(string driverId, RiskLevel riskLevel) 
         {
 
             var alert = new AlertDb
@@ -60,10 +60,10 @@ namespace FleetPulse.Tests.IntegrationTests
             // Arrange
             var databaseService = CreateDatabaseServiceInstance();
             
-            var alert = CreateAlert("driver123", "High");
+            var alert = CreateAlert("driver123", RiskLevel.High);
             try 
             {
-                var alertId = await databaseService.AddAlert(alert);
+                var alertId = await databaseService.AddAlertAsync(alert, CancellationToken.None);
                 alertId.Should().NotBe(Guid.Empty);
             }
             catch (Exception ex)
@@ -80,14 +80,14 @@ namespace FleetPulse.Tests.IntegrationTests
 
             //random number
             var driverId = $"driver_{Random.Shared.Next(100, 999)}";
-            var alert = CreateAlert(driverId, "High");
+            var alert = CreateAlert(driverId, RiskLevel.High);
             alert.status = AlertStatus.InProgress;
             try
             {
-                var alertId = await databaseService.AddAlert(alert);
+                var alertId = await databaseService.AddAlertAsync(alert, CancellationToken.None);
                 alertId.Should().NotBe(Guid.Empty);
 
-                var alerts = await databaseService.GetAlertsByDriverId(driverId);
+                var alerts = await databaseService.GetAlertsByDriverIdAsync(driverId, CancellationToken.None);
                 alerts.Should().NotBeEmpty();
                 var recovered = alerts.Where(a => a.id == alertId && a.status == AlertStatus.InProgress).FirstOrDefault();
                 recovered.Should().NotBeNull();
@@ -105,10 +105,10 @@ namespace FleetPulse.Tests.IntegrationTests
             // Arrange
             var databaseService = CreateDatabaseServiceInstance();
             var driverId = "driver123";
-            var alert = CreateAlert(driverId, "Medium");
-            await databaseService.AddAlert(alert);
+            var alert = CreateAlert(driverId, RiskLevel.Medium);
+            await databaseService.AddAlertAsync(alert, CancellationToken.None);
             // Act
-            var alerts = await databaseService.GetAlertsByDriverId(driverId);
+            var alerts = await databaseService.GetAlertsByDriverIdAsync(driverId, CancellationToken.None);
             // Assert
             alerts.Should().NotBeNull();
             alerts.Should().Contain(a => a.id == alert.id);
@@ -119,12 +119,12 @@ namespace FleetPulse.Tests.IntegrationTests
         {
             // Arrange
             var databaseService = CreateDatabaseServiceInstance();
-            var alert = CreateAlert("driver456", "Low");
-            await databaseService.AddAlert(alert);
+            var alert = CreateAlert("driver456", RiskLevel.Low);
+            await databaseService.AddAlertAsync(alert, CancellationToken.None);
             var startDate = DateTime.UtcNow.AddMinutes(-5);
             var endDate = DateTime.UtcNow.AddMinutes(5);
             // Act
-            var alerts = await databaseService.GetAlertsByDateRange(startDate, endDate);
+            var alerts = await databaseService.GetAlertsByDateRangeAsync(startDate, endDate, CancellationToken.None);
             // Assert
             alerts.Should().NotBeNull();
             alerts.Should().Contain(a => a.id == alert.id);
@@ -138,7 +138,7 @@ namespace FleetPulse.Tests.IntegrationTests
             var startDate = DateTime.UtcNow.AddDays(-10);
             var endDate = DateTime.UtcNow.AddDays(-5);
             // Act
-            var alerts = await databaseService.GetAlertsByDateRange(startDate, endDate);
+            var alerts = await databaseService.GetAlertsByDateRangeAsync(startDate, endDate, CancellationToken.None);
             // Assert
             alerts.Should().NotBeNull();
             alerts.Should().BeEmpty();
@@ -149,12 +149,12 @@ namespace FleetPulse.Tests.IntegrationTests
         {
             // Arrange
             var databaseService = CreateDatabaseServiceInstance();
-            var alert = CreateAlert("driver789", "Critical");
-            await databaseService.AddAlert(alert);
+            var alert = CreateAlert("driver789", RiskLevel.High);
+            await databaseService.AddAlertAsync(alert, CancellationToken.None);
             var startDate = DateTime.UtcNow.AddMinutes(-5);
             var endDate = DateTime.UtcNow.AddMinutes(5);
             // Act
-            var alerts = await databaseService.GetAlertsByStatusDateRange(AlertStatus.New, startDate, endDate);
+            var alerts = await databaseService.GetAlertsByStatusDateRangeAsync(AlertStatus.New, startDate, endDate, CancellationToken.None);
             // Assert
             alerts.Should().NotBeNull();
             alerts.Should().Contain(a => a.id == alert.id);

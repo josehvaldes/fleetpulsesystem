@@ -12,6 +12,7 @@ namespace FleetPulse.DbWriter.Mappings
 
             // SQL mappings
             SqlMapper.AddTypeHandler(new AlertStatusTypeHandler());
+            SqlMapper.AddTypeHandler(new RiskLevelTypeHandler());
         }
     }
 }

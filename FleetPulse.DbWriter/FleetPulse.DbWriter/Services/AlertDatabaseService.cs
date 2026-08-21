@@ -10,7 +10,7 @@ namespace FleetPulse.DbWriter.Services
     public class AlertDatabaseService(NpgsqlDataSource _dataSource,
         ILogger<AlertDatabaseService> _logger) : IAlertDatabaseService
     {
-        public async Task<Guid> AddAlert(AlertDb alert)
+        public async Task<Guid> AddAlertAsync(AlertDb alert, CancellationToken ct)
         {
             if (alert.id == Guid.Empty)
                 alert.id = Guid.NewGuid();
@@ -43,7 +43,7 @@ namespace FleetPulse.DbWriter.Services
 
         }
 
-        public async Task<IEnumerable<AlertDb>> GetAlertsByDriverId(string driverId)
+        public async Task<IEnumerable<AlertDb>> GetAlertsByDriverIdAsync(string driverId, CancellationToken ct)
         {
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
@@ -59,7 +59,7 @@ namespace FleetPulse.DbWriter.Services
             return rows;
         }
 
-        public async Task<IEnumerable<AlertDb>> GetAlertsByDateRange(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AlertDb>> GetAlertsByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken ct)
         {
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
@@ -75,7 +75,7 @@ namespace FleetPulse.DbWriter.Services
             return rows;
         }
 
-        public async Task<IEnumerable<AlertDb>> GetAlertsByStatusDateRange(AlertStatus status, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AlertDb>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, CancellationToken ct)
         {
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
@@ -89,6 +89,21 @@ namespace FleetPulse.DbWriter.Services
             await using var connection = await _dataSource.OpenConnectionAsync();
             var rows = await connection.QueryAsync<AlertDb>(sql, new { Status = status, StartDate = startDate, EndDate = endDate });
             return rows;
+        }
+
+        public async Task<AlertDb?> GetAlertByIdAsync(Guid alertId, CancellationToken ct)
+        {
+            var sql = """
+                SELECT id, driver_id, event_latitude, event_longitude,
+                       exit_speed, exit_time, zone_name, zone_type,
+                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                FROM fleetpulse.alerts
+                WHERE id = @AlertId
+                """;
+
+            await using var connection = await _dataSource.OpenConnectionAsync();
+            var row = await connection.QuerySingleOrDefaultAsync<AlertDb>(sql, new { AlertId = alertId });
+            return row;
         }
     }
 }

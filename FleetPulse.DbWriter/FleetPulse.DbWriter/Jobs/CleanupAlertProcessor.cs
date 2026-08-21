@@ -4,8 +4,8 @@ using Hangfire;
 
 namespace FleetPulse.DbWriter.Jobs
 {
-    public class AlertProcessor(IAlertDatabaseService databaseService,
-        ILogger<AlertProcessor> logger)
+    public class CleanupAlertProcessor(IAlertDatabaseService databaseService,
+        ILogger<CleanupAlertProcessor> logger)
     {
         //for now, disable concurrent execution of this job to avoid processing the same alerts multiple times 
         [DisableConcurrentExecution(timeoutInSeconds: 300)]
@@ -14,8 +14,8 @@ namespace FleetPulse.DbWriter.Jobs
             logger.LogInformation("AlertProcessor job is starting.");
             var toDate = DateTime.UtcNow;
             var fromDate = toDate.AddDays(-1);
-            var alerts = await databaseService.GetAlertsByStatusDateRange( AlertStatus.New, fromDate, toDate);
-            logger.LogInformation($"Retrieved {alerts.Count()} new alerts from the database.");
+            var alerts = await databaseService.GetAlertsByStatusDateRangeAsync( AlertStatus.Closed, fromDate, toDate, cancellationToken);
+            logger.LogInformation($"Retrieved {alerts.Count()} closed alerts from the database.");
         }
 
     }

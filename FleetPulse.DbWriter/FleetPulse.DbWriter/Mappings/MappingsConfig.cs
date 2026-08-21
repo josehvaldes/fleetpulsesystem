@@ -20,7 +20,7 @@ namespace FleetPulse.DbWriter.Mappings
                 .Map(dest => dest.exit_time, src => src.ExitTime)
                 .Map(dest => dest.zone_name, src => src.ZoneName)
                 .Map(dest => dest.zone_type, src => src.ZoneType)
-                .Map(dest => dest.risk_level, src => src.AgentRiskLevel)
+                .Map(dest => dest.risk_level, src => Enum.Parse<RiskLevel>(src.AgentRiskLevel, ignoreCase: true))
                 .Map(dest => dest.assessment, src => src.AgentAssessment)
                 .Map(dest => dest.recommendation, src => src.AgentRecommendation)
                 .Map(dest => dest.autoscale, src => src.AgentAutoEscalate)

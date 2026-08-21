@@ -10,10 +10,10 @@ namespace FleetPulse.DbWriter.Jobs
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _recurringJobManager.AddOrUpdate<AlertProcessor>(
-                "AlertWorker",
+            _recurringJobManager.AddOrUpdate<CleanupAlertProcessor>(
+                "CleanupAlertWorker",
                 worker => worker.ExecuteAsync(CancellationToken.None),
-                Cron.MinuteInterval(1));
+                Cron.Hourly );
 
             return Task.CompletedTask;
         }
