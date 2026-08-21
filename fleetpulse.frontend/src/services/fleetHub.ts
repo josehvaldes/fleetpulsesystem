@@ -4,8 +4,8 @@ import {
   LogLevel,
   type HubConnection,
 } from "@microsoft/signalr";
-import type { GpsPing } from "../types/gps";
-import type { AlertDto } from "../types/alert_dto";
+import type { GpsPing } from "@/types/gps";
+import type { AlertDto } from "@/types/alert_dto";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.

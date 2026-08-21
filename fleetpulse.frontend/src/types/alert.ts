@@ -5,7 +5,7 @@ export type RiskLevel = "Low" | "Medium" | "High";
 export interface Alert {
     id: string;
     driverId: string;
-    exitLocation: {
+    eventLocation: {
         latitude: number;
         longitude: number;
     };

@@ -1,4 +1,4 @@
-import { useAlerts } from "../hooks/useAlerts";
+import { useAlerts } from "@/hooks/useAlerts";
 
 
 export function AlertsBox()

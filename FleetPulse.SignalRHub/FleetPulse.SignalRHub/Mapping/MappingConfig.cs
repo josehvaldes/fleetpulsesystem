@@ -23,11 +23,11 @@ namespace FleetPulse.SignalRHub.Mapping
                 .Map(dest => dest.ExitTime, src => src.exit_time)
                 .Map(dest => dest.ZoneName, src => src.zone_name)
                 .Map(dest => dest.ZoneType, src => src.zone_type)
-                .Map(dest => dest.RiskLevel, src => src.risk_level)
+                .Map(dest => dest.RiskLevel, src => src.risk_level.ToString())
                 .Map(dest => dest.Assessment, src => src.assessment)
                 .Map(dest => dest.Recommendation, src => src.recommendation)
                 .Map(dest => dest.AutoScale, src => src.autoscale)
-                .Map(dest => dest.Status, src => src.status)
+                .Map(dest => dest.Status, src => src.status.ToString())
                 .Map(dest => dest.RaisedAt, src => src.raised_at);
 
             TypeAdapterConfig<GpsPingDto, GpsHistoryResponse>

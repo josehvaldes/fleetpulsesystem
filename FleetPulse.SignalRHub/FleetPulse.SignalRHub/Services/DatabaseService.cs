@@ -15,32 +15,48 @@ namespace FleetPulse.SignalRHub.Services
             return version ?? "Not Available";
         }
 
-        public async Task<List<AlertDb>> GetAlertsAsync(DateTime startTime, DateTime endTime, int limit, CancellationToken cancellationToken)
+        public async Task<IEnumerable<AlertDb>> GetAlertsAsync(DateTime startTime, DateTime endTime, int limit, CancellationToken cancellationToken)
         {
             await using var conn = await _dataSource.OpenConnectionAsync(cancellationToken);
             var sql = "select * from fleetpulse.alerts where created_at between @StartTime and @EndTime limit @Limit";
             var alerts = await conn.QueryAsync<AlertDb>(sql, new { StartTime = startTime, EndTime = endTime, Limit = limit });
-            return alerts.ToList();
+            return alerts;
         }
 
-        public async Task<List<GpsPingDto>> GetGPSHistory(string driverId, DateTime startTime, DateTime endTime, CancellationToken cancellationToken)
+        public async Task<IEnumerable<GpsPingDto>> GetGPSHistory(string driverId, DateTime startTime, DateTime endTime, CancellationToken cancellationToken)
         {
             await using var conn = await _dataSource.OpenConnectionAsync(cancellationToken);
             var sql = "SELECT driver_id, latitude, longitude, speed, heading, timestamp " +
                 "FROM fleetpulse.gps_history WHERE driver_id = @DriverId AND timestamp BETWEEN @StartTime AND @EndTime";
 
             var pings = await conn.QueryAsync<GpsPingDto>(sql, new { DriverId = driverId, StartTime = startTime, EndTime = endTime });
-            return pings.ToList();
+            return pings;
         }
 
-        public async Task<List<LatestDriverStateDto>> GetLatestDriverStatesAsync(DateTime after, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LatestDriverStateDto>> GetLatestDriverStatesAsync(DateTime after, CancellationToken cancellationToken)
         {
             await using var conn = await _dataSource.OpenConnectionAsync(cancellationToken);
             var sql = "SELECT driver_id, latitude, longitude, speed, heading, last_seen, status " +
                 "FROM fleetpulse.driver_latest_state where last_seen > @After";
             // Execute the query and map the results to LatestDriverStateDto
             var lastStates = await conn.QueryAsync<LatestDriverStateDto>(sql, new { After = after });
-            return lastStates.ToList();
+            return lastStates;
+        }
+
+        public async Task<IEnumerable<AlertDb>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+        {
+            var sql = """
+                SELECT id, driver_id, event_latitude, event_longitude,
+                       exit_speed, exit_time, zone_name, zone_type,
+                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                FROM fleetpulse.alerts
+                WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
+                ORDER BY raised_at DESC
+                """;
+
+            await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
+            var rows = await connection.QueryAsync<AlertDb>(sql, new { Status = status, StartDate = startDate, EndDate = endDate });
+            return rows;
         }
     }
 }

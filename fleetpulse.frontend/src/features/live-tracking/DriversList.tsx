@@ -1,4 +1,4 @@
-import { useGpsPings } from "../hooks/useGpsPings";
+import { useGpsPings } from "@/hooks/useGpsPings";
 
 export function DriversList() {
   const { drivers } = useGpsPings();

@@ -10,6 +10,8 @@ MappingConfig.RegisterMappings();
 
 var builder = WebApplication.CreateBuilder(args);
 
+SqlMapping.RegisterSqlMappings();
+
 var appSettings = builder.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();
 

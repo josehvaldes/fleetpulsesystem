@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fleetHub } from "../services/fleetHub";
-import type { GpsPing } from "../types/gps";
-import type { FleetHubConnectionStatus } from "../services/fleetHub";
+import { fleetHub } from "@/services/fleetHub";
+import type { GpsPing } from "@/types/gps";
+import type { FleetHubConnectionStatus } from "@/services/fleetHub";
 
 // Keep at most N most-recent pings in memory for the textarea view.
 const MAX_PINGS = 200;

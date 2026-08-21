@@ -1,5 +1,5 @@
-import { useGpsPings } from "../hooks/useGpsPings";
-import { statusStyle } from "../utils/fleethub_utils";
+import { useGpsPings } from "@/hooks/useGpsPings";
+import { statusStyle } from "@/utils/fleethub_utils";
 
 export function MessageLog() {
   const { pings, status } = useGpsPings();

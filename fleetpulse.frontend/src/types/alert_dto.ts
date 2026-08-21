@@ -1,22 +1,20 @@
 
-export interface LocationDto {
-    latitude: number;
-    longitude: number;
-}
 
 export interface AlertDto {
     id: string;
-    driver_id: string;
-    exit_location: LocationDto;
-    exit_speed: number;
-    exit_heading: number;
-    exit_time: string; // ISO-8601
-    zone_name: string;
+    driverId: string;
+    eventLatitude: number;
+    eventLongitude: number;
+    exitSpeed: number;
+    exitHeading: number;
+    exitTime: string; // ISO-8601
+    zoneName: string;
+    zoneType: string;
 
-    agent_risk_level: "Low" | "Medium" | "High";
-    agent_assessment: string;
-    agent_recommendation: string;
+    riskLevel: "Low" | "Medium" | "High";
+    assessment: string;
+    recommendation: string;
 
-    created_at: string; // ISO-8601
-
+    status: "New"| "InProgress" | "Resolved"| "Closed"| "OnError";
+    raisedAt: string; // ISO-8601
 }

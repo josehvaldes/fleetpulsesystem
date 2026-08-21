@@ -1,10 +1,10 @@
 import './App.css'
-import { Login } from "./components/Login";
-import { FleetMap } from "./components/FleetMap";
-import { MessageLog } from "./components/MessageLog";
-import { DriversList } from "./components/DriversList";
-import { useAuth } from "./hooks/useAuth";
-import { AlertsBox } from './components/AlertsBox';
+import { Login } from "@/features/login/Login";
+import { FleetMap } from "@/features/live-tracking/FleetMap";
+import { MessageLog } from "@/features/live-tracking/MessageLog";
+import { DriversList } from "@/features/live-tracking/DriversList";
+import { useAuth } from "@/hooks/useAuth";
+import { AlertsBox } from "@/features/live-tracking/AlertsBox";
 function App() {
   const { isAuthenticated, logout } = useAuth();
 

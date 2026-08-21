@@ -35,3 +35,4 @@ ai-worker/.codacy/*
 simulator/.codacy/*
 fleetpulse.frontend/.codacy/*
 simulator/.env
+ai-worker/.pytest_cache/*

@@ -1,10 +1,12 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
+using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
@@ -96,10 +98,13 @@ namespace FleetPulse.SignalRHub.Workers
                     foreach (var stale in _lastSent.Where(kv => kv.Value < cutoff).Select(kv => kv.Key).ToList())
                         _lastSent.Remove(stale);
                     FleetMetrics.ActiveDrivers.Set(_lastSent.Count);
-
+                    
+                    //transform to AlertResponse for SignalR clients
+                    var alertResponse = dto.Adapt<AlertResponse>();
+                    
                     // Fan-out via SignalR group (one group per fleet, or broadcast)
                     await _hubContext.Clients.All
-                        .SendAsync(_signalRSettings.GpsPingCallbackMethod, dto, stoppingToken);
+                        .SendAsync(_signalRSettings.GpsPingCallbackMethod, alertResponse, stoppingToken);
                 }
             }
             catch (OperationCanceledException) { /* graceful shutdown */ }

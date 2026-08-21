@@ -10,11 +10,11 @@
         public DateTimeOffset exit_time { get; set; }
         public string zone_name { get; set; } = string.Empty;
         public string zone_type { get; set; } = string.Empty;
-        public string risk_level { get; set; } = string.Empty;
+        public RiskLevel risk_level { get; set; } = RiskLevel.Low;
         public string assessment { get; set; } = string.Empty;
         public string recommendation { get; set; } = string.Empty;
         public bool autoscale { get; set; }
-        public string status { get; set; } = string.Empty;
+        public AlertStatus status { get; set; } = AlertStatus.New;
         public DateTimeOffset raised_at { get; set; }
     }
 }

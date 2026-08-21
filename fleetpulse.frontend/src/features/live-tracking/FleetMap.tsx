@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useGpsPings } from "../hooks/useGpsPings";
-import { statusStyle } from "../utils/fleethub_utils";
+import { useGpsPings } from "@/hooks/useGpsPings";
+import { statusStyle } from "@/utils/fleethub_utils";
 
 // Fix for default marker icons in Vite/Webpack environments
 delete (L.Icon.Default.prototype as any)._getIconUrl;

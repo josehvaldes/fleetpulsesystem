@@ -3,6 +3,7 @@ using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Contracts.Requests;
 using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
+using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Services.Interfaces;
 using FleetPulse.SignalRHub.Validators;
 using FluentValidation;
@@ -47,9 +48,10 @@ namespace FleetPulse.SignalRHub.Mapping
                 return gpsHistory.Adapt<List<GpsHistoryResponse>>();
             });//.RequireAuthorization();
 
-            apiGroup.MapGet("/alerts", async (IDatabaseService db, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50) =>
+            apiGroup.MapGet("/alerts", async (IDatabaseService db, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50) =>
             {
-                var alerts = await db.GetAlertsAsync(from, to, limit, CancellationToken.None);
+                var alertStatus = Enum.Parse<AlertStatus>(status, true);
+                var alerts = await db.GetAlertsByStatusDateRangeAsync(alertStatus, from, to, CancellationToken.None);
                 return alerts.Adapt<List<AlertResponse>>();
             });
 

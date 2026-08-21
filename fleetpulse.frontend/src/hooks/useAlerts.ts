@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fleetHub } from "../services/fleetHub";
-import type { Alert } from "../types/alert";
-import type { AlertDto } from "../types/alert_dto";
+import { fleetHub } from "@/services/fleetHub";
+import type { Alert } from "@/types/alert";
+import type { AlertDto } from "@/types/alert_dto";
 
 const MAX_ALERTS = 500;
 export function useAlerts() {
@@ -17,19 +17,19 @@ export function useAlerts() {
         
         const newAlert: Alert = {
           id: newAlertDto.id,
-          driverId: newAlertDto.driver_id,
-          exitLocation: {
-            latitude: newAlertDto.exit_location.latitude,
-            longitude: newAlertDto.exit_location.longitude,
+          driverId: newAlertDto.driverId,
+          eventLocation: {
+            latitude: newAlertDto.eventLatitude,
+            longitude: newAlertDto.eventLongitude,
           },
-          exitSpeed: newAlertDto.exit_speed,
-          exitHeading: newAlertDto.exit_heading,
-          exitTime: new Date(newAlertDto.exit_time),
-          zoneName: newAlertDto.zone_name,
-          riskLevel: newAlertDto.agent_risk_level,
-          assessment: newAlertDto.agent_assessment,
-          recommendation: newAlertDto.agent_recommendation,
-          createdAt: new Date(newAlertDto.created_at),
+          exitSpeed: newAlertDto.exitSpeed,
+          exitHeading: newAlertDto.exitHeading,
+          exitTime: new Date(newAlertDto.exitTime),
+          zoneName: newAlertDto.zoneName,
+          riskLevel: newAlertDto.riskLevel,
+          assessment: newAlertDto.assessment,
+          recommendation: newAlertDto.recommendation,
+          createdAt: new Date(newAlertDto.raisedAt),
         }
 
         const combined = [newAlert, ...prev];

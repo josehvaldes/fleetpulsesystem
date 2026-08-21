@@ -116,7 +116,7 @@ The SignalR Worker subscribes to both topics (gps-pings and ai-alerts) and acts 
        │
        ├──> 2. Hangfire schedule EscalationJob -> Notification
        │
-       ├──> 3. Hangfire enqueue StandardAlertJob
+       └──> 3. Hangfire enqueue StandardAlertJob
 
 ```
 
