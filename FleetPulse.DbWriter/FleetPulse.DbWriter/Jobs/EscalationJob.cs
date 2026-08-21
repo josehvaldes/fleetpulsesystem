@@ -1,11 +1,10 @@
 ﻿using FleetPulse.DbWriter.Models;
 using FleetPulse.DbWriter.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Hangfire;
 
 namespace FleetPulse.DbWriter.Jobs
 {
+    [Queue("escalation-alerts")]
     public class EscalationJob(IAlertDatabaseService _databaseService,
         ILogger<EscalationJob> _logger)
     {

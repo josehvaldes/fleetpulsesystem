@@ -90,15 +90,24 @@ namespace FleetPulse.DbWriter.Services
                         var alertdb = alert.Adapt<AlertDb>();
                         // don't wait for the database operation to complete, just fire and forget
                         var task = _alertDatabaseService.AddAlertAsync(alertdb, cancellationToken);
-                        if (alertdb.risk_level == RiskLevel.High)
+
+                        // Schedule the escalation job only if the risk level is high and autoscale is enabled
+                        if (alertdb.risk_level == RiskLevel.High && alertdb.autoscale)
                         {
                             BackgroundJob.Schedule<EscalationJob>
                             (
+                                //"escalation-alerts", No need to add queue name, as the queue is defined in the job class itself.
                                 x => x.CheckAndEscalateAsync(alertdb.id, cancellationToken),
                                 // Schedule the job to run after 10 seconds. Hardcoded for now, but can be made configurable later.
                                 TimeSpan.FromSeconds(10)
                             );
                         }
+
+                        // Schedule the standard alert processing job
+                        BackgroundJob.Enqueue<StandardAlertJob>
+                        (
+                            x => x.ProcessAlertAsync(alertdb.id, cancellationToken)
+                        );
                     }
                     else 
                     {

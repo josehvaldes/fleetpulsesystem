@@ -106,6 +106,18 @@ The SignalR Worker subscribes to both topics (gps-pings and ai-alerts) and acts 
        ├──> 3. Bulk INSERT -> TimescaleDB `gps_history` table (Hypertable)
        │
        └──> 4. UPSERT -> TimescaleDB `driver_latest_state` table (500 rows)
+
+[ Redpanda Topic: "alerts" ]
+       │
+       ▼
+[ .NET DB Batch Writer (Background Service) ]
+       │
+       ├──> 1. INSERT -> Postgresql
+       │
+       ├──> 2. Hangfire schedule EscalationJob -> Notification
+       │
+       ├──> 3. Hangfire enqueue StandardAlertJob
+
 ```
 
 

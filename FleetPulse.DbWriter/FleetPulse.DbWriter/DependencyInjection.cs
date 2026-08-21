@@ -69,8 +69,17 @@ namespace FleetPulse.DbWriter
                         options.UseNpgsqlConnection(config.GetConnectionString("FleetPulseDb")));
             });
 
-            services.AddHangfireServer();
-            
+            // Register multiple Hangfire servers with different worker counts and queues
+            services.AddHangfireServer(options => {
+                options.WorkerCount = Environment.ProcessorCount * 2;
+                options.Queues = new[] { "escalation-alerts", "notifications" };
+            });
+
+            services.AddHangfireServer(options => {
+                options.WorkerCount = Environment.ProcessorCount * 3;
+                options.Queues = new[] { "default", "standard-alerts" };
+            });
+
             return services;
         }
     }
