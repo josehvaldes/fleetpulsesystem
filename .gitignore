@@ -36,3 +36,8 @@ simulator/.codacy/*
 fleetpulse.frontend/.codacy/*
 simulator/.env
 ai-worker/.pytest_cache/*
+FleetPulse.DbWriter/.codacy/*
+FleetPulse.DbWriter/.github/instructions/codacy.instructions.md
+FleetPulse.DbWriter/.gitignore
+FleetPulse.SignalRHub/.github/instructions/codacy.instructions.md
+FleetPulse.SignalRHub/.gitignore

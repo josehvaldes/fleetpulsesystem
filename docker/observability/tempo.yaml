@@ -19,6 +19,7 @@ ingester:
 compactor:
   compaction:
     block_retention: 48h # Keep traces for 2 days locally
+    compacted_block_retention: 24h # Keep compacted blocks for 1 day
 
 storage:
   trace:

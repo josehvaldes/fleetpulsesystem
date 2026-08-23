@@ -13,7 +13,7 @@ namespace FleetPulse.DbWriter.MetricsConfig
         public static readonly Counter GpsPingErrors = Metrics.CreateCounter(
             "fleetpulse_dbwriter_gps_ping_errors_total",
             "Total GPS pings that failed processing",
-            new CounterConfiguration { LabelNames = ["error_type"]});
+            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
 
         public static readonly Counter GpsPingsCompressedToDb = Metrics.CreateCounter(
             "fleetpulse_dbwriter_gps_pings_compressed_to_db_total",
@@ -37,6 +37,6 @@ namespace FleetPulse.DbWriter.MetricsConfig
         public static readonly Counter AlertsProcessingErrors = Metrics.CreateCounter(
             "fleetpulse_dbwriter_alerts_processing_errors_total",
             "Total alerts that failed processing",
-            new CounterConfiguration { LabelNames = ["error_type"] });
+            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
     }
 }

@@ -111,14 +111,14 @@ namespace FleetPulse.DbWriter.Services
                     }
                     else 
                     {
-                        FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { "deserialization_error", _settings.AlertTopic }).Inc();
+                        FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.DeserializationError.ToString(), _settings.AlertTopic }).Inc();
                     }
                 }
                 catch (ConsumeException ex) 
                 {
                     _logger.LogError(ex, "Alert Consume error on partition {Partition}",
                         ex.ConsumerRecord?.Partition);
-                    FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { "consume_exception", _settings.AlertTopic }).Inc();
+                    FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.ConsumeException.ToString(), _settings.AlertTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }

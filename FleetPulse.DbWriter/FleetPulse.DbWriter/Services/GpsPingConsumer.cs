@@ -105,7 +105,7 @@ namespace FleetPulse.DbWriter.Services
                     }
                     else 
                     {
-                        FleetMetrics.GpsPingErrors.WithLabels(new string[]{ "deserialization_error", _settings.GpspingTopic }).Inc();
+                        FleetMetrics.GpsPingErrors.WithLabels(new string[]{ ErrorLabel.DeserializationError.ToString(), _settings.GpspingTopic }).Inc();
                     }
 
                     // Commit offset after successful processing
@@ -118,7 +118,7 @@ namespace FleetPulse.DbWriter.Services
                 {
                     _logger.LogError(ex, "GpsPing Consume error on partition {Partition}",
                         ex.ConsumerRecord?.Partition);
-                    FleetMetrics.GpsPingErrors.WithLabels(new string[] { "consume_exception", _settings.GpspingTopic }).Inc();
+                    FleetMetrics.GpsPingErrors.WithLabels(new string[] { ErrorLabel.ConsumeException.ToString(), _settings.GpspingTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }
