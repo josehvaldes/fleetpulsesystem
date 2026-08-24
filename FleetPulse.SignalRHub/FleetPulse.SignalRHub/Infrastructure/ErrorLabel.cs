@@ -1,4 +1,4 @@
-namespace FleetPulse.DbWriter.Infrastructure 
+﻿namespace FleetPulse.SignalRHub.Infrastructure
 {
     public enum ErrorLabel
     {
@@ -7,4 +7,3 @@ namespace FleetPulse.DbWriter.Infrastructure
         UnknownError
     }
 }
-

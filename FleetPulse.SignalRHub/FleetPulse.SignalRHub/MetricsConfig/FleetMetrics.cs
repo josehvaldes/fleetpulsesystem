@@ -15,10 +15,20 @@ namespace FleetPulse.SignalRHub.MetricsConfig
             "Total GPS pings consumed from Kafka",
             new CounterConfiguration { LabelNames = ["topic"] });
 
+        public static readonly Counter GpsPingErrors = Metrics.CreateCounter(
+            "fleetpulse_signalrhub_gps_ping_errors_total",
+            "Total errors encountered while processing GPS pings",
+            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
+
         public static readonly Counter AlertsReceived = Metrics.CreateCounter(
             "fleetpulse_signalrhub_alerts_received_total",
             "Total alerts consumed from Kafka",
             new CounterConfiguration { LabelNames = ["topic"] });
+
+        public static readonly Counter AlertProcessingErrors = Metrics.CreateCounter(
+            "fleetpulse_signalrhub_alert_processing_errors_total",
+            "Total errors encountered while processing alerts",
+            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
 
         /// <summary>Number of unique drivers seen in the last 5 minutes (sliding window in GpsPingConsumer).</summary>
         public static readonly Gauge ActiveDrivers = Metrics.CreateGauge(

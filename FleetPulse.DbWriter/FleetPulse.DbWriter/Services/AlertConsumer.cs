@@ -11,15 +11,17 @@ using Mapster;
 using FleetPulse.DbWriter.Models.DB;
 using Hangfire;
 using FleetPulse.DbWriter.Jobs;
+using FleetPulse.DbWriter.Infrastructure;
 
 namespace FleetPulse.DbWriter.Services
 {
     public class AlertConsumer(ILogger<AlertConsumer> _logger,
         IAlertDatabaseService _alertDatabaseService,
-        IOptions<KafkaSettings> kafkaSettings) : IAlertConsumer
+        IOptions<KafkaSettings> kafkaSettings) : KafkaConsumer(), IAlertConsumer
     {
         private IConsumer<string, string> _consumer = null!;
         private readonly KafkaSettings _settings = kafkaSettings.Value;
+        private readonly KafkaLogThrottle _logThrottle = new(_logger, "alerts");
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -29,24 +31,11 @@ namespace FleetPulse.DbWriter.Services
 
         public async Task StartConsumingAsync(CancellationToken stoppingToken)
         {
-            var config = new ConsumerConfig
-            {
-                BootstrapServers = _settings.BootstrapServers,
-                GroupId = _settings.GroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest, // Start from the earliest message if no offset is found
-                EnableAutoCommit = false,  // Manual commit for reliability
-                SessionTimeoutMs = 10000,
-                MaxPollIntervalMs = 300000
-            };
+            var config = CreateConsumerConfig(_settings);
 
             _consumer = new ConsumerBuilder<string, string>(config)
-                .SetErrorHandler((_, e) =>
-                    _logger.LogError("Kafka Error: {Reason}", e.Reason))
-                .SetLogHandler((_, log) =>
-                {
-                    if (log.Level >= SyslogLevel.Warning)
-                        _logger.LogWarning("Kafka Log: {Message}", log.Message);
-                })
+                .SetLogHandler((_, msg) => LogKafkaMessage(_logThrottle, msg))
+                .SetErrorHandler((_, e) => _logThrottle.Emit(LogLevel.Critical, $"Kafka Error: {e.Reason}"))
                 .Build();
 
             _consumer.Subscribe(_settings.AlertTopic);
@@ -56,12 +45,10 @@ namespace FleetPulse.DbWriter.Services
             {
                 await ConsumeLoopAsync(stoppingToken);
             }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Consumption cancelled gracefully");
-            }
             finally
             {
+                _logger.LogInformation("Closing Kafka Alert consumer for topic '{Topic}'", _settings.AlertTopic);
+
                 _consumer.Close();
             }
         }
@@ -114,11 +101,22 @@ namespace FleetPulse.DbWriter.Services
                         FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.DeserializationError.ToString(), _settings.AlertTopic }).Inc();
                     }
                 }
+                catch (OperationCanceledException) 
+                {
+                    // Graceful shutdown
+                    break;
+                }
                 catch (ConsumeException ex) 
                 {
-                    _logger.LogError(ex, "Alert Consume error on partition {Partition}",
-                        ex.ConsumerRecord?.Partition);
+                    // handled the noise via the SetLogHandler/SetErrorHandler throttle.
+                    _logger.LogDebug(ex, "Alert Consume error on partition {Partition}",ex.ConsumerRecord?.Partition);
                     FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.ConsumeException.ToString(), _settings.AlertTopic }).Inc();
+                    await Task.Delay(1000, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unexpected error while consuming alert");
+                    FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.UnknownError.ToString(), _settings.AlertTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }

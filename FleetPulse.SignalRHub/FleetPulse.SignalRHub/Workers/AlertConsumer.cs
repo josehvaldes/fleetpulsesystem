@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
+using FleetPulse.SignalRHub.Infrastructure;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
@@ -56,39 +56,61 @@ namespace FleetPulse.SignalRHub.Workers
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    // Blocks until a message arrives or cancellation is requested
-                    var result = _consumer.Consume(stoppingToken);
-                    _logger.LogInformation("Consumed Alert from Kafka topic '{Topic}': {Message}", _kafkaSettings.AlertsTopic, result.Message.Value);
-                    // Count every message consumed from Kafka, regardless of throttle
-                    FleetMetrics.AlertsReceived.WithLabels(_kafkaSettings.AlertsTopic).Inc();
-                    
-                    var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
-                    using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_alert", ActivityKind.Consumer, parentCtx);
-                    
-                    var dto = DeserializeAlert(result);
-
-                    if (dto is null)
+                    try 
                     {
-                        _logger.LogWarning($"Received null or invalid alert message from Kafka, skipping. [{result.Message.Value}]");
-                        continue;
-                    }
 
-                    // Fan-out via SignalR group (one group per fleet, or broadcast)
-                    await _hubContext.Clients.All
-                        .SendAsync(_signalRSettings.AlertCallbackMethod, dto, stoppingToken);
+                        // Blocks until a message arrives or cancellation is requested
+                        var result = _consumer.Consume(stoppingToken);
+                        _logger.LogInformation("Consumed Alert from Kafka topic '{Topic}': {Message}", _kafkaSettings.AlertsTopic, result.Message.Value);
+                        // Count every message consumed from Kafka, regardless of throttle
+                        FleetMetrics.AlertsReceived.WithLabels(_kafkaSettings.AlertsTopic).Inc();
+
+                        var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
+                        using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_alert", ActivityKind.Consumer, parentCtx);
+
+                        var dto = DeserializeAlert(result);
+
+                        if (dto is null)
+                        {
+                            _logger.LogWarning($"Received null or invalid alert message from Kafka, skipping. [{result.Message.Value}]");
+                            continue;
+                        }
+
+                        // Fan-out via SignalR group (one group per fleet, or broadcast)
+                        await _hubContext.Clients.All
+                            .SendAsync(_signalRSettings.AlertCallbackMethod, dto, stoppingToken);
+                    }
+                    catch (OperationCanceledException) { 
+                        /* graceful shutdown */ 
+                        break;
+                    }
+                    catch (ConsumeException ex)
+                    {
+                        // Broker down, network glitch, etc.
+                        // We catch it INSIDE the loop so the service doesn't die.
+
+                        // handled the noise via the SetLogHandler/SetErrorHandler throttle.
+                        _logger.LogDebug(ex, "Transient Kafka consume error. Retrying...");
+                        FleetMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.AlertsTopic).Inc();
+
+                        // Wait a moment before the next iteration so we don't spin the CPU 
+                        // in a tight loop if the error is immediate.
+                        await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Unexpected error (e.g., DB down while processing a message)
+                        _logger.LogError(ex, "Unexpected error in Kafka consumer loop. Retrying...");
+                        FleetMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.AlertsTopic).Inc();
+
+                        // Wait a bit longer for unexpected errors before retrying
+                        await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    }
                 }
-            }
-            catch (OperationCanceledException) { /* graceful shutdown */ }
-            catch (ConsumeException ex)
-            {
-                _logger.LogError(ex, "Kafka consume error");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error in Kafka consumer loop");
             }
             finally
             {
+                _logger.LogInformation("Closing Alert consumer for topic '{Topic}'", _kafkaSettings.AlertsTopic);
                 _consumer.Close(); // commits final offsets, leaves group cleanly
                 _consumer.Dispose();
             }

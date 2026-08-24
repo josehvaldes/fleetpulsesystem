@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.DbWriter.Configuration;
+using FleetPulse.DbWriter.Infrastructure;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
 using FleetPulse.DbWriter.Services.Interfaces;
@@ -9,14 +10,16 @@ using OpenTelemetry;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FleetPulse.DbWriter.Services
 {
     internal class GpsPingConsumer(IOptions<KafkaSettings> settings,
-            ILogger<GpsPingConsumer> _logger) : IGpsPingConsumer
+            ILogger<GpsPingConsumer> _logger) : KafkaConsumer(), IGpsPingConsumer
     {
         private readonly KafkaSettings _settings = settings.Value;
         private readonly ConcurrentBag<GpsPingDto> _buffer = new();
+        private readonly KafkaLogThrottle _logThrottle = new(_logger, "gps_pings");
         private IConsumer<string, string> _consumer = null!;
         private const int MaxBufferSize = 1000;
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -37,24 +40,11 @@ namespace FleetPulse.DbWriter.Services
 
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
         {
-            var config = new ConsumerConfig
-            {
-                BootstrapServers = _settings.BootstrapServers,
-                GroupId = _settings.GroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest, // Start from the earliest message if no offset is found
-                EnableAutoCommit = false,  // Manual commit for reliability
-                SessionTimeoutMs = 10000,
-                MaxPollIntervalMs = 300000
-            };
+            var config = CreateConsumerConfig(_settings);
 
             _consumer = new ConsumerBuilder<string, string>(config)
-                .SetErrorHandler((_, e) =>
-                    _logger.LogError("Kafka Error: {Reason}", e.Reason))
-                .SetLogHandler((_, log) =>
-                {
-                    if (log.Level >= SyslogLevel.Warning)
-                        _logger.LogWarning("Kafka Log: {Message}", log.Message);
-                })
+                .SetLogHandler((_, msg) => LogKafkaMessage(_logThrottle, msg))
+                .SetErrorHandler((_, e) =>_logThrottle.Emit(LogLevel.Critical, $"Kafka Error: {e.Reason}"))
                 .Build();
 
             _consumer.Subscribe(_settings.GpspingTopic);
@@ -64,12 +54,9 @@ namespace FleetPulse.DbWriter.Services
             {
                 await ConsumeLoopAsync(cancellationToken);
             }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Consumption cancelled gracefully");
-            }
             finally
             {
+                _logger.LogInformation("Closing Kafka GpsPing consumer for topic '{Topic}'", _settings.GpspingTopic);
                 _consumer.Close();
             }
         }
@@ -114,11 +101,22 @@ namespace FleetPulse.DbWriter.Services
                     // Yield control periodically
                     await Task.Yield();
                 }
+                catch (OperationCanceledException)
+                {
+                    // Graceful shutdown
+                    break;
+                }
                 catch (ConsumeException ex)
                 {
-                    _logger.LogError(ex, "GpsPing Consume error on partition {Partition}",
-                        ex.ConsumerRecord?.Partition);
+                    // handled the noise via the SetLogHandler/SetErrorHandler throttle.
+                    _logger.LogDebug(ex, "GpsPing Consume error on partition {Partition}",ex.ConsumerRecord?.Partition);
                     FleetMetrics.GpsPingErrors.WithLabels(new string[] { ErrorLabel.ConsumeException.ToString(), _settings.GpspingTopic }).Inc();
+                    await Task.Delay(1000, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unexpected error while consuming gps ping");
+                    FleetMetrics.GpsPingErrors.WithLabels(new string[] { ErrorLabel.UnknownError.ToString(), _settings.GpspingTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
             }
