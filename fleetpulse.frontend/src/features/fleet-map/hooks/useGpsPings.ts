@@ -19,9 +19,11 @@ export function useGpsPings() {
     void fleetHub.start();
 
     const unsubscribePing = fleetHub.onPing((ping) => {
+      console.log("Received ping:", ping);
+
       setDrivers((prev) => ({
         ...prev,
-        [ping.driver_id]: ping,
+        [ping.driverId]: ping,
       }));
       setPings((prev) => {
         const next = [ping, ...prev];

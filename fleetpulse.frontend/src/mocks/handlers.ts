@@ -17,20 +17,21 @@ async function simulateLatency(
 
 export const handlers = [
 
-    // Mock for login
-    // http.post(/\/api\/v1\/login\/$/i, async () => {
-    //     return HttpResponse.json({ 
-    //             AccessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkxNzIzMi1iNGZiLTRhNDgtYjM0MS00ODhlMzhiNjU0MGQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjE1OTE3MjMyLWI0ZmItNGE0OC1iMzQxLTQ4OGUzOGI2NTQwZCIsIm5hbWUiOiJhZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhZG1pbiIsImp0aSI6Ijk4OWZkOTcxLWFhMWEtNGE3Yy05ZDVlLTkzZGQ3ZTM3MGYwMCIsImlhdCI6MTc4NzU5NDk3MiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJzY29wZSI6ImZsZWV0OnJlYWQiLCJuYmYiOjE3ODc1OTQ5NzIsImV4cCI6MTc4NzU5NTg3MiwiaXNzIjoiRmxlZXRQdWxzZSIsImF1ZCI6IkZsZWV0UHVsc2VBdWRpZW5jZSJ9.gI89LycuixgD94phjN5jKjmiudfuzh0OYn890kTAiK0',
-    //             TokenType: 'Bearer',
-    //             ExpiresIn: 900,
-    //             Username: 'admin',
-    //     }, 
-    //     { status: 200 });
-    // }),
+    //Mock for login
+    http.post(/\/api\/v1\/login$/i, async () => {
+        console.log('Mocking login endpoint');
+        return HttpResponse.json({ 
+                accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkxNzIzMi1iNGZiLTRhNDgtYjM0MS00ODhlMzhiNjU0MGQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjE1OTE3MjMyLWI0ZmItNGE0OC1iMzQxLTQ4OGUzOGI2NTQwZCIsIm5hbWUiOiJhZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhZG1pbiIsImp0aSI6Ijk4OWZkOTcxLWFhMWEtNGE3Yy05ZDVlLTkzZGQ3ZTM3MGYwMCIsImlhdCI6MTc4NzU5NDk3MiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJzY29wZSI6ImZsZWV0OnJlYWQiLCJuYmYiOjE3ODc1OTQ5NzIsImV4cCI6MTc4NzU5NTg3MiwiaXNzIjoiRmxlZXRQdWxzZSIsImF1ZCI6IkZsZWV0UHVsc2VBdWRpZW5jZSJ9.gI89LycuixgD94phjN5jKjmiudfuzh0OYn890kTAiK0',
+                tokenType: 'Bearer',
+                expiresIn: 900,
+                username: 'admin',
+        }, 
+        { status: 200 });
+    }),
 
-    // http.get(/\/health\/live$/i, async () => {
-    //     await simulateLatency('health');
-    //     return HttpResponse.text('Healthy');
-    // })   
+    http.get(/\/health\/live$/i, async () => {
+        await simulateLatency('health');
+        return HttpResponse.text('Healthy');
+    })   
 
 ];

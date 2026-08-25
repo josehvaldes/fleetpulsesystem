@@ -1,10 +1,12 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Infrastructure;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
+using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
@@ -75,10 +77,13 @@ namespace FleetPulse.SignalRHub.Workers
                             _logger.LogWarning($"Received null or invalid alert message from Kafka, skipping. [{result.Message.Value}]");
                             continue;
                         }
-
+                        
+                        //transform to AlertResponse for SignalR clients
+                        var alertResponse = dto.Adapt<AlertResponse>();
+                        
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
                         await _hubContext.Clients.All
-                            .SendAsync(_signalRSettings.AlertCallbackMethod, dto, stoppingToken);
+                            .SendAsync(_signalRSettings.AlertCallbackMethod, alertResponse, stoppingToken);
                     }
                     catch (OperationCanceledException) { 
                         /* graceful shutdown */ 

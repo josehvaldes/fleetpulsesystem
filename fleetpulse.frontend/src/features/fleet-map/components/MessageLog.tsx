@@ -8,9 +8,9 @@ export function MessageLog() {
   // One line per ping, formatted for didactic readability.
   const text = pings
     .map((p) =>
-      `${p.timestamp} | ${p.driver_id} | ` +
+      `${p.timestamp} | ${p.driverId} | ` +
       `lat=${p.latitude.toFixed(6)} lng=${p.longitude.toFixed(6)} | ` +
-      `${p.speed_kmh} km/h | ${p.status}`
+      `${p.speed} km/h | ${p.status}`
     )
     .join("\n");
 

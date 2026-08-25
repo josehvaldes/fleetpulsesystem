@@ -33,7 +33,7 @@ namespace FleetPulse.SignalRHub.Mapping
             TypeAdapterConfig<GpsPingDto, GpsHistoryResponse>
                 .NewConfig()
                 .Map(dest => dest.Timestamp, src => src.Timestamp.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.Driver_Id);
+                .Map(dest => dest.DriverId, src => src.DriverId);
 
         }
     }

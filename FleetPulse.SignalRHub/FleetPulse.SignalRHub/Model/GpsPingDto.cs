@@ -5,7 +5,7 @@ namespace FleetPulse.SignalRHub.Model
     public class GpsPingDto
     {
         [JsonPropertyName("driver_id")]
-        public string Driver_Id { get; init; } = string.Empty;
+        public string DriverId { get; init; } = string.Empty;
 
         [JsonPropertyName("latitude")]
         public double Latitude { get; init; }
@@ -33,7 +33,7 @@ namespace FleetPulse.SignalRHub.Model
 
         public override string ToString()
         {
-            return $"DriverId: {Driver_Id}, Timestamp: {Timestamp}, Lat: {Latitude}, Lon: {Longitude}, Speed: {Speed}, Heading: {Heading}, Accuracy: {Accuracy}, Status: {Status}, VehicleType: {VehicleType}";
+            return $"DriverId: {DriverId}, Timestamp: {Timestamp}, Lat: {Latitude}, Lon: {Longitude}, Speed: {Speed}, Heading: {Heading}, Accuracy: {Accuracy}, Status: {Status}, VehicleType: {VehicleType}";
         }
     }
 }

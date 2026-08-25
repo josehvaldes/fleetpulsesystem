@@ -1,11 +1,11 @@
 export interface GpsPing {
-  driver_id:        string;
+  driverId:        string;
   latitude:         number;
   longitude:        number;
-  speed_kmh:        number;
-  heading_degrees:  number;
-  accuracy_meters:  number;
+  speed:        number;
+  heading:  number;
+  accuracy:  number;
   status:           string;
-  vehicle_type:     string | null;
+  vehicle:     string | null;
   timestamp:        string; // ISO-8601
 }

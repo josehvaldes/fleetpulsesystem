@@ -1,17 +1,14 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.Contracts.Response;
 using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Infrastructure;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
-using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Text.Json;
 
 namespace FleetPulse.SignalRHub.Workers
@@ -89,25 +86,22 @@ namespace FleetPulse.SignalRHub.Workers
 
                         // Throttle per driver
                         var now = DateTimeOffset.UtcNow;
-                        if (_lastSent.TryGetValue(dto.Driver_Id, out var last)
+                        if (_lastSent.TryGetValue(dto.DriverId, out var last)
                             && now - last < MinInterval)
                         {
                             continue;
                         }
-                        _lastSent[dto.Driver_Id] = now;
+                        _lastSent[dto.DriverId] = now;
 
                         // Purge drivers not seen in the last 5 minutes, then update gauge
                         var cutoff = now - TimeSpan.FromMinutes(5);
                         foreach (var stale in _lastSent.Where(kv => kv.Value < cutoff).Select(kv => kv.Key).ToList())
                             _lastSent.Remove(stale);
                         FleetMetrics.ActiveDrivers.Set(_lastSent.Count);
-
-                        //transform to AlertResponse for SignalR clients
-                        var alertResponse = dto.Adapt<AlertResponse>();
-
+                        
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
                         await _hubContext.Clients.All
-                            .SendAsync(_signalRSettings.GpsPingCallbackMethod, alertResponse, stoppingToken);
+                            .SendAsync(_signalRSettings.GpsPingCallbackMethod, dto, stoppingToken);
                     }
                     catch (OperationCanceledException) {
                         /* graceful shutdown */

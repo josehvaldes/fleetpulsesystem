@@ -1,0 +1,29 @@
+[
+  {
+    "id": "alert_01",
+    "driverId": "driver_1",
+    "eventLatitude": -66.15203,
+    "eventLongitude": -17.3785,
+    "exitSpeed": 85,
+    "exitTime": "2024-06-01T12:00:00Z",
+    "zoneName": "Industrial Zone I",
+    "zoneType": "industrial",
+    "riskLevel": "high",
+    "status": "New",
+    "assessment": "mock assessmemt",
+    "recommendation": "mock recommendation",
+    "autoScale": true,
+    "raisedAt": "2024-06-01T12:00:00Z"
+  },
+  {
+    "driverId": "driver_1",
+    "latitude": -66.15203,
+    "longitude": -17.3785,
+    "speed": 0.0,
+    "heading": 0.0,
+    "accuracy": 0.0,
+    "status": "Active",
+    "vehicleType": "Car",
+    "timestamp": "2024-06-01T12:00:00Z"
+  }
+]

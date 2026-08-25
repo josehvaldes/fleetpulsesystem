@@ -1,0 +1,6 @@
+@FleetPulse.MockFleetHub_HostAddress = http://localhost:5156
+
+GET {{FleetPulse.MockFleetHub_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
