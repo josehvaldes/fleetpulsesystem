@@ -1,7 +1,7 @@
 import './App.css'
-import { Login } from "@/features/login";
-import { useAuth } from "@/features/login/hooks/useAuth";
-import { FleetMap } from '@/features/fleet-map';
+import { Login } from "@/features/login/";
+import { useAuth } from "@/features/login/";
+import { FleetMap } from '@/features/fleet-map/';
 
 function App() {
   const { isAuthenticated } = useAuth();

@@ -2,8 +2,8 @@
   {
     "id": "alert_01",
     "driverId": "driver_1",
-    "eventLatitude": -66.15203,
-    "eventLongitude": -17.3785,
+    "eventLatitude": -17.3785,
+    "eventLongitude": -66.15203,
     "exitSpeed": 85,
     "exitTime": "2024-06-01T12:00:00Z",
     "zoneName": "Industrial Zone I",
@@ -17,8 +17,8 @@
   },
   {
     "driverId": "driver_1",
-    "latitude": -66.15203,
-    "longitude": -17.3785,
+    "latitude": -17.3785,
+    "longitude": -66.15203,
     "speed": 0.0,
     "heading": 0.0,
     "accuracy": 0.0,

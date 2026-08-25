@@ -4,7 +4,6 @@ import type { AuthSession } from "@/types/auth";
 
 export async function login(username: string, password: string): Promise<AuthSession> {
   const response = await loginRequest(username, password);
-  console.log("Login response:", response);
   if (!response?.accessToken || !response.username) {
     throw new Error("Login failed: Invalid response from server.");
   }
