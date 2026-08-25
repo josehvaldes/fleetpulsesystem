@@ -1,4 +1,4 @@
-import { useAlerts } from "@/hooks/useAlerts";
+import { useAlerts } from "@/features/fleet-map/hooks/useAlerts";
 
 
 export function AlertsBox()

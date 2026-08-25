@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login as loginService} from "@/services/loginService";
+import { login as loginService} from "@/services/authService";
 import { clearSession, setSession } from "@/store/authUserSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 

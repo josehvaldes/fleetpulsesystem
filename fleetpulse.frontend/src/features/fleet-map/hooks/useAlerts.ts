@@ -11,7 +11,6 @@ export function useAlerts() {
     fleetHub.start();
 
     const unsubscribe = fleetHub.onAlerts((newAlertDto: AlertDto) => {
-        console.log(" * Received alert:", newAlertDto);
 
       setAlerts((prev) => {
         

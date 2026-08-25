@@ -1,7 +1,7 @@
 
 
-import { sendRequest } from "./genericRequest";
-import type { LoginResponse } from "./responses";
+import { sendRequest } from "@/api/genericRequest";
+import type { LoginResponse } from "@/api/auth/types";
 
 export async function login(username: string, password: string): Promise<LoginResponse> {
   

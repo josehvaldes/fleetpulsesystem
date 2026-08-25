@@ -1,4 +1,4 @@
-import { useGpsPings } from "@/hooks/useGpsPings";
+import { useGpsPings } from "@/features/fleet-map/hooks/useGpsPings";
 import { statusStyle } from "@/utils/fleethub_utils";
 
 export function MessageLog() {

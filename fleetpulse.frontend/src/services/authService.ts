@@ -1,5 +1,5 @@
 
-import { login as loginRequest } from "@/api/login";
+import { login as loginRequest } from "@/api/auth/login";
 import type { AuthSession } from "@/types/auth";
 
 export async function login(username: string, password: string): Promise<AuthSession> {

@@ -1,4 +1,4 @@
-import { useGpsPings } from "@/hooks/useGpsPings";
+import { useGpsPings } from "@/features/fleet-map/hooks/useGpsPings";
 
 export function DriversList() {
   const { drivers } = useGpsPings();
