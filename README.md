@@ -57,3 +57,57 @@ TSDB -- "REST API (Aggregated)" --> UI
 
 ```
  ** More details in folder ".docs/"
+
+
+
+## Documentation Index
+Detailed documentation has been split by domain and service.
+
+### Global Architecture & Contracts
+ * Architecture & Deep Dives
+* Data Contracts (DB Schemas, Kafka Messages)
+* Observability (Prometheus, Loki, OpenTelemetry)
+
+### Services
+* SignalR Hub (Real-time Push & REST API)
+* DB Batch Writer (Ingestion & Compression)
+* AI Anomaly Worker (LangGraph & LLMs)
+* Frontend (React 19 + Vite SPA)
+
+### Local Development Topology
+During local development, the entire distributed system is orchestrated via a single docker-compose.yml file, ensuring zero friction for developers cloning the repository.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                  Docker Compose Network                  │
+│                                                          │
+│  ┌──────────────┐  ┌─────────────┐  ┌──────────────────┐ │
+│  │  EMQX        │  │ .NET SignalR│  │ Python AI Worker │ │
+│  │ (MQTT Broker)│  │   Worker    │  │   (LangGraph)    │ │
+│  └──────┬───────┘  └─────┬───────┘  └──────────────────┘ │
+│         │               │                                │
+│         │ Data Bridge   │                                │
+│         ▼               │                                │
+│  ┌────────────┐         │                                │
+│  │  Redpanda  │<>───────┘                                │
+│  │ (Kafka API)│                                          │
+│  └──────┬─────┘                                          │
+│         │                                                │
+│  ┌──────┴─────┐  ┌────────────┐                          │
+│  │TimescaleDB │<>│ .NET DB    │                          │
+│  │  (Postgres)│  │   Writer   │                          │
+│  └────────────┘  └────────────┘                          │
+└──────────────────────────────────────────────────────────┘
+         ▲                              ▲
+         │                              │
+    [Python Simulator]            [Vite React SPA]
+    (Runs on host)                (Runs on host :5173)
+```
+
+### Quick Start
+run the "./docker/docker-compose.yml" file using:
+ docker compose up -d
+
+run the python simulator inside the "./simulator":
+> python main.py
+

@@ -106,9 +106,14 @@ Core runtime libraries:
 - `@microsoft/signalr`
 - `leaflet`, `react-leaflet`
 - `recharts` (available for analytics widgets)
+- `shadcn UI` for UI components
 
 Build and styling toolchain:
 
 - `vite`, `typescript`
 - `tailwindcss`, `@tailwindcss/vite`, `postcss`, `autoprefixer`
+
+
+
+
 
