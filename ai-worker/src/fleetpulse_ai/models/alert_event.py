@@ -22,9 +22,6 @@ class AlertEvent:
 
     created_at: str | None = None
     
-    traceparent: str | None = None
-    tracestate: str | None = None
-
     def to_dict(self) -> dict:
         """Convert the event to a dictionary."""
         return {
@@ -40,8 +37,6 @@ class AlertEvent:
             "agent_recommendation": self.agent_recommendation,
             "agent_auto_escalate": self.agent_auto_escalate,
             "created_at": self.created_at,
-            "traceparent": self.traceparent,
-            "tracestate": self.tracestate,
         }
 
     def to_json(self) -> str:

@@ -105,10 +105,7 @@ def create_ai_worker_handler(
                         alertspan.set_attribute("alert.agent_risk_level", alert.agent_risk_level)
                         alertspan.set_attribute("alert.agent_auto_escalate", alert.agent_auto_escalate)
 
-                        alert.traceparent = carrier.get("traceparent")
-                        alert.tracestate = carrier.get("tracestate")
-
-                        await manager.handle_alert(alert)
+                        await manager.handle_alert(alert, metadata=carrier)
                     
 
     return ai_worker_handler

@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS fleetpulse.driver_latest_state (
     heading        INTEGER,
     last_seen      TIMESTAMPTZ NOT NULL,
     status         VARCHAR(20) DEFAULT 'moving'  -- moving, stopped, offline
+    CONSTRAINT chk_driver_state_status
+        CHECK (status IN ('moving', 'stopped', 'offline'))
 );
 
 -- AI Alerts table
