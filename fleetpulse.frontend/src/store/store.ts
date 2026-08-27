@@ -1,5 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authUserReducer from "@/store/authUserSlice";
+import alertReducer from "@/store/alertSlice";
 
 import {
   FLUSH,
@@ -16,12 +17,13 @@ import storage from "redux-persist/es/storage";
 
 const rootReducer = combineReducers({
   auth: authUserReducer,
+  alert: alertReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
+  whitelist: ["auth", "alert"],
 };
 
 const persistedReducer = persistReducer(

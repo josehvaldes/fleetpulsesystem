@@ -11,12 +11,12 @@ export interface Alert {
     };
     exitSpeed: number;
     exitHeading: number;
-    exitTime: Date;
+    exitTime: string;
     zoneName: string;
 
     riskLevel: RiskLevel;
     assessment: string;
     recommendation: string;
 
-    createdAt: Date;
+    raisedAt: string; // ISO-8601
 }

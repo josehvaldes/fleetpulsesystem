@@ -4,9 +4,25 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor} from "@/store/store";
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 
 import './index.css'
 import App from './App.tsx'
+
+const queryClient = new QueryClient(
+  {
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        retry: 1, // Retry failed requests once
+        refetchOnWindowFocus: false, // Disable refetching on window focus
+        gcTime: 10 * 60 * 1000, // 10 minutes before garbage collecting unused query data
+      },
+    },
+  }
+);
+
 
 const isMockingEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCKS === 'true';
 
@@ -29,7 +45,9 @@ enableMocking().then(() => {
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        {app}
+        <QueryClientProvider client={queryClient}>
+          {app}
+        </QueryClientProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,

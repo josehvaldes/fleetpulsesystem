@@ -1,11 +1,11 @@
 import { useGpsPings } from "@/features/fleet-map/hooks/useGpsPings";
 
-export function DriversList() {
+export function DriversBox() {
   const { drivers } = useGpsPings();
 
   return(
     <>
-        <h2>Drivers</h2>
+        <h3 className="font-bold">Drivers</h3>
         <ul>
         {Object.keys(drivers).length === 0 ? (
           <p>No drivers found.</p>

@@ -1,0 +1,1 @@
+export { useAlertActions } from "@/features/alerts/hooks/useAlertActions";

@@ -15,6 +15,6 @@ export interface AlertDto {
     assessment: string;
     recommendation: string;
 
-    status: "New"| "InProgress" | "Resolved"| "Closed"| "OnError";
+    status: string;//"New"| "InProgress" | "Resolved"| "Closed"| "OnError";
     raisedAt: string; // ISO-8601
 }
