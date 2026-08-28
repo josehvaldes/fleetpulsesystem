@@ -32,16 +32,21 @@ export function AlertPopup({ alert }: AlertPopupProps) {
         console.log(`${action} alert ${alert.id}`);
 
         handleAlertAction(
-            { alertId: alert.id, action: action },
-            {
+            { alertId: alert.id, action: action,
+
+            },{
+                onSuccess: () => {
+                    console.log(`Successfully performed action ${action} on alert ${alert.id}`);
+                    dispatch(removeAlert(alert.id));
+                    setOpen(false);
+                },
                 onError: (error) => {
                     console.error(`Error performing action ${action} on alert ${alert.id}:`, error);
                 }
             }
         );
 
-        dispatch(removeAlert(alert.id));
-        setOpen(false);
+        
     }
 
     return (

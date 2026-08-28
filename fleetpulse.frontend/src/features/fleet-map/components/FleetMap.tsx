@@ -8,7 +8,7 @@ export function FleetMap() {
 
   return (
     <>
-    <div id="center">
+    <div>
         <Header />
         <div className='grid grid-cols-12 gap-1 border border-blue-500 w-full'>
           <div className='col-span-2 border border-green-500'>
