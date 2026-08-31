@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.Contracts.Requests;
-using FleetPulse.SignalRHub.Contracts.Response;
+using FleetPulse.Contracts.Requests;
+using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Services.Interfaces;

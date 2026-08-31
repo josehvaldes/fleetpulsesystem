@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.SignalRHub.Contracts.Response
+﻿namespace FleetPulse.Contracts.Response
 {
     public class LastestDriverStateResponse
     {

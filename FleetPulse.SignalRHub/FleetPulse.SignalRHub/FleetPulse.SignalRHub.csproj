@@ -29,4 +29,8 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FleetPulse.Contracts\FleetPulse.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

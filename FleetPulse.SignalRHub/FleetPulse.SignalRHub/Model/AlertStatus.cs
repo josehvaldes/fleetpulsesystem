@@ -6,6 +6,7 @@
         InProgress,
         Resolved,
         Closed,
-        OnError
+        OnError,
+        Dismissed
     }
 }

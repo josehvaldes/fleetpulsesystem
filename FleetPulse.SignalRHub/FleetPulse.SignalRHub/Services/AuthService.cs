@@ -1,5 +1,5 @@
 ﻿using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.Contracts.Response;
+using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.MetricsConfig;
 using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Services.Interfaces;

@@ -1,4 +1,4 @@
-﻿using FleetPulse.SignalRHub.Contracts.Requests;
+﻿using FleetPulse.Contracts.Requests;
 using FluentValidation;
 
 namespace FleetPulse.SignalRHub.Validators

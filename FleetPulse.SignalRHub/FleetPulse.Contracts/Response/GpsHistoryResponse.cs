@@ -1,6 +1,5 @@
-﻿using System.Text.Json.Serialization;
-
-namespace FleetPulse.SignalRHub.Contracts.Response
+﻿
+namespace FleetPulse.Contracts.Response
 {
     public class GpsHistoryResponse
     {

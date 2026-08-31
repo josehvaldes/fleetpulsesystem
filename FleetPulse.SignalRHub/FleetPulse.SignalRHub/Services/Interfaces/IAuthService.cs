@@ -1,4 +1,4 @@
-﻿using FleetPulse.SignalRHub.Contracts.Response;
+﻿using FleetPulse.Contracts.Response;
 
 namespace FleetPulse.SignalRHub.Services.Interfaces
 {

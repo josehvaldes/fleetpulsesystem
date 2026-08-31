@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="../README.md" />
   </Folder>
+  <Project Path="FleetPulse.Contracts/FleetPulse.Contracts.csproj" Id="f88323e9-0e9f-46ed-9bea-6888ce25680d" />
   <Project Path="FleetPulse.SignalRHub.Tests/FleetPulse.SignalRHub.Tests.csproj" Id="c446bc7f-4171-4f13-ad37-2ba051dbceaf" />
   <Project Path="FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj" />
 </Solution>

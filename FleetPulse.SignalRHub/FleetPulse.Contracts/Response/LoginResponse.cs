@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.SignalRHub.Contracts.Response
+﻿namespace FleetPulse.Contracts.Response
 {
     /// <summary>
     /// Mirrors the OAuth 2.0 token endpoint response (RFC 6749 §5.1).

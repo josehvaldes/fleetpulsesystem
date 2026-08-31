@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FleetPulse.SignalRHub.Contracts.Requests
+namespace FleetPulse.Contracts.Requests
 {
     public class LoginRequest
     {

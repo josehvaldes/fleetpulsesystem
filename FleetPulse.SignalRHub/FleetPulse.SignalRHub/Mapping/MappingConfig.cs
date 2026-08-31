@@ -1,4 +1,4 @@
-﻿using FleetPulse.SignalRHub.Contracts.Response;
+﻿using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Model;
 using Mapster;
 
