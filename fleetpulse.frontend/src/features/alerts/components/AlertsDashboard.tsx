@@ -8,7 +8,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  
   TableHead,
   TableHeader,
   TableRow,
@@ -42,7 +41,7 @@ export function AlertsDashboard() {
             {alerts && alerts.length > 0 ? (
                 <>
                 <Table>
-                    <TableCaption>Alerts Table</TableCaption>
+                    <TableCaption> {`Showing ${alerts.length} of ${totalCount} alerts` } </TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Alert ID</TableHead>
@@ -91,7 +90,17 @@ export function AlertsDashboard() {
                             />
                         </PaginationItem>
                         <PaginationItem>
-                            <PaginationLink href="#" isActive>{page}</PaginationLink>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                <PaginationLink key={pageNum} href="#" isActive={pageNum === page}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setPage(pageNum);
+                                    }}
+                                >
+                                    {pageNum}
+                                </PaginationLink>
+                            ))}
+                            
                         </PaginationItem>
                         <PaginationItem>
                             <PaginationNext

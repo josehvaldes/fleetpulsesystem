@@ -5,7 +5,7 @@ import {
   type HubConnection,
 } from "@microsoft/signalr";
 import type { GpsPing } from "@/types/gps";
-import type { AlertDto } from "@/types/alert_dto";
+import type { AlertWire } from "@/api/alerts/types";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.
@@ -17,7 +17,7 @@ const RECEIVE_ALERT = "ReceiveAlert";
 
 export type PingHandler = (ping: GpsPing) => void;
 
-export type AlertHandler = (alert: AlertDto) => void;
+export type AlertHandler = (alert: AlertWire) => void;
 
 export type FleetHubConnectionStatus =
   | "disconnected"
@@ -53,7 +53,7 @@ class FleetHubService {
       this.pingHandlers.forEach((h) => h(ping));
     });
 
-    this.connection.on(RECEIVE_ALERT, (alert: AlertDto) => {
+    this.connection.on(RECEIVE_ALERT, (alert: AlertWire) => {
       this.alertHandlers.forEach((h) => h(alert));
     });
 

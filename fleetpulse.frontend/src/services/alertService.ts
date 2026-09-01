@@ -1,9 +1,9 @@
 import { fetchAlerts } from "@/api/alerts/alerts";
 import type { AlertRequestParams } from "@/api/alerts/types";
-import type { Alert } from "@/types/alert";
+import { parseRiskLevel, parseAlertStatus, type Alert } from "@/types/alert";
 
 interface AlertsPage {
-    data: Alert[];
+    alerts: Alert[];
     totalCount: number;
     totalPages: number;
     hasNextPage: boolean;
@@ -17,7 +17,8 @@ export async function getAlerts(  pageNumber: number, pageSize: number, riskLeve
     const response = await fetchAlerts({pageNumber, pageSize, riskLevel, status, fromDate, toDate} as AlertRequestParams);
     const data = response.data;
     const alerts = data.map((dto) => 
-        ({
+    { 
+        const alert: Alert = {
             id: dto.id,
             driverId: dto.driverId,
             eventLocation: {
@@ -29,16 +30,18 @@ export async function getAlerts(  pageNumber: number, pageSize: number, riskLeve
             exitTime: dto.exitTime,
             zoneName: dto.zoneName,
             zoneType: dto.zoneType,
-            riskLevel: dto.riskLevel,
             assessment: dto.assessment,
-            status: dto.status,
             recommendation: dto.recommendation,
             raisedAt: dto.raisedAt,
-        } as Alert)
+            status: parseAlertStatus(dto.status),
+            riskLevel: parseRiskLevel(dto.riskLevel)
+            };
+            return alert;
+        }
     );
 
     return {
-        data: alerts,
+        alerts: alerts,
         totalCount: response.totalCount,
         totalPages: response.totalPages,
         hasNextPage: response.hasNextPage,

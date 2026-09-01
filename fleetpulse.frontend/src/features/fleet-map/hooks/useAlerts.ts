@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fleetHub } from "@/services/fleetHub";
-import type { Alert } from "@/types/alert";
-import type { AlertDto } from "@/types/alert_dto";
+import { parseRiskLevel, parseAlertStatus, type Alert } from "@/types/alert";
+import type { AlertWire } from "@/api/alerts/types";
 import { addAlert  } from "@/store/alertSlice";
 import type { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
@@ -14,23 +14,25 @@ export function useAlerts() {
   useEffect(() => {
     fleetHub.start();
 
-    const unsubscribe = fleetHub.onAlerts((newAlertDto: AlertDto) => {
+    const unsubscribe = fleetHub.onAlerts((newAlertDto: AlertWire) => {
       const newAlert: Alert = {
-          id: newAlertDto.id,
-          driverId: newAlertDto.driverId,
-          eventLocation: {
-            latitude: newAlertDto.eventLatitude,
-            longitude: newAlertDto.eventLongitude,
-          },
-          exitSpeed: newAlertDto.exitSpeed,
-          exitHeading: newAlertDto.exitHeading,
-          exitTime: newAlertDto.exitTime,
-          zoneName: newAlertDto.zoneName,
-          riskLevel: newAlertDto.riskLevel,
-          assessment: newAlertDto.assessment,
-          recommendation: newAlertDto.recommendation,
-          raisedAt: newAlertDto.raisedAt,
-        }
+        id: newAlertDto.id,
+        driverId: newAlertDto.driverId,
+        eventLocation: {
+          latitude: newAlertDto.eventLatitude,
+          longitude: newAlertDto.eventLongitude,
+        },
+        exitSpeed: newAlertDto.exitSpeed,
+        exitHeading: newAlertDto.exitHeading,
+        exitTime: newAlertDto.exitTime,
+        zoneName: newAlertDto.zoneName,
+        assessment: newAlertDto.assessment,
+        recommendation: newAlertDto.recommendation,
+        raisedAt: newAlertDto.raisedAt,
+        zoneType: newAlertDto.zoneType,
+        status: parseAlertStatus(newAlertDto.status),
+        riskLevel: parseRiskLevel(newAlertDto.riskLevel),
+      };
 
       setAlerts((prev) => {
         const combined = [newAlert, ...prev];

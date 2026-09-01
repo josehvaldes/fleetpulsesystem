@@ -8,8 +8,7 @@ interface AlertRequestParams {
     toDate?: string;
 }
 
-
-interface AlertResponse{
+interface AlertWire{
     id: string;
     driverId: string;
     eventLatitude: number;
@@ -19,11 +18,12 @@ interface AlertResponse{
     exitTime: string;
     zoneName: string;
     zoneType: string;
-    riskLevel: string;
-    status: string;
     assessment: string;
     recommendation: string;
     raisedAt: string; // ISO-8601
+
+    riskLevel: string;
+    status: string;
 }
 
-export type { AlertResponse, AlertRequestParams };
+export type {AlertWire, AlertRequestParams };
