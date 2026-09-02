@@ -1,18 +1,16 @@
 import { fetchAlerts } from "@/api/alerts/alerts";
 import type { AlertRequestParams } from "@/api/alerts/types";
+import type { PageResponse } from "@/api/genericTypes";
 import { parseRiskLevel, parseAlertStatus, type Alert } from "@/types/alert";
 
-interface AlertsPage {
-    alerts: Alert[];
-    totalCount: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    pageNumber: number;
-    pageSize: number;
-}
 
-export async function getAlerts(  pageNumber: number, pageSize: number, riskLevel?: string, status?: string, fromDate?: string, toDate?: string  ): Promise<AlertsPage> {
+
+export async function getAlerts(  pageNumber: number, 
+    pageSize: number, 
+    riskLevel?: string, 
+    status?: string, 
+    fromDate?: string, 
+    toDate?: string  ): Promise<PageResponse<Alert>> {
   try {
     const response = await fetchAlerts({pageNumber, pageSize, riskLevel, status, fromDate, toDate} as AlertRequestParams);
     const data = response.data;
@@ -41,7 +39,7 @@ export async function getAlerts(  pageNumber: number, pageSize: number, riskLeve
     );
 
     return {
-        alerts: alerts,
+        data: alerts,
         totalCount: response.totalCount,
         totalPages: response.totalPages,
         hasNextPage: response.hasNextPage,

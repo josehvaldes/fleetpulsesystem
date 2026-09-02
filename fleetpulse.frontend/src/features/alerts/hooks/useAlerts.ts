@@ -33,7 +33,7 @@ export function useAlerts(
   return {
     isLoading: isLoading,
     error: error ? (error as Error).message : null,
-    alerts: data ? data.alerts : null,
+    alerts: data ? data.data : null,
     totalCount: data ? data.totalCount : 0,
     totalPages: data ? data.totalPages : 0,
     hasNextPage: data ? data.hasNextPage : false,
