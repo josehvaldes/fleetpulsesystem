@@ -1,10 +1,8 @@
-﻿using FleetPulse.SignalRHub.Services;
+﻿using FleetPulse.Infrastructure.Services;
+using FleetPulse.SignalRHub.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace FleetPulse.SignalRHub.Tests.IntegrationTests

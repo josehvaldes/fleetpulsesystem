@@ -1,14 +1,13 @@
-﻿using Confluent.Kafka;
-using FleetPulse.SignalRHub.Configuration;
+﻿using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.Contracts.Requests;
 using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
-using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Services.Interfaces;
 using FleetPulse.SignalRHub.Validators;
 using FluentValidation;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using FleetPulse.Domain.Enums;
 
 namespace FleetPulse.SignalRHub.Mapping
 {

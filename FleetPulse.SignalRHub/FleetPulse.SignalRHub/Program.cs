@@ -1,3 +1,5 @@
+using FleetPulse.Infrastructure;
+using FleetPulse.Observability;
 using FleetPulse.SignalRHub;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Logging;
@@ -33,6 +35,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSignalR();
 
 builder.Services.AddDependencies(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration);
 
 
 

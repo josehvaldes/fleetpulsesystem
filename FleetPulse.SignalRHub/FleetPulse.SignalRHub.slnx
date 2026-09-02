@@ -2,7 +2,12 @@
   <Folder Name="/Solution Items/">
     <File Path="../README.md" />
   </Folder>
+  <Project Path="FleetPulse.Application/FleetPulse.Application.csproj" Id="a268abd1-1f0a-4eb7-bff9-248b72ef0281" />
   <Project Path="FleetPulse.Contracts/FleetPulse.Contracts.csproj" Id="f88323e9-0e9f-46ed-9bea-6888ce25680d" />
+  <Project Path="FleetPulse.Domain/FleetPulse.Domain.csproj" Id="68fe45ca-5277-4113-a67e-1a8f22b5a4d4" />
+  <Project Path="FleetPulse.Infrastructure.Kafka/FleetPulse.Infrastructure.Kafka.csproj" Id="22b0650e-8fe6-4413-9370-3eb29ea4e2da" />
+  <Project Path="FleetPulse.Infrastructure/FleetPulse.Infrastructure.csproj" Id="f38e5b34-b8ca-4d7f-b46d-693faf6ff645" />
+  <Project Path="FleetPulse.Observability/FleetPulse.Observability.csproj" Id="a74dac4c-203f-4310-b9f0-12e0c2fce88d" />
   <Project Path="FleetPulse.SignalRHub.Tests/FleetPulse.SignalRHub.Tests.csproj" Id="c446bc7f-4171-4f13-ad37-2ba051dbceaf" />
   <Project Path="FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj" />
 </Solution>

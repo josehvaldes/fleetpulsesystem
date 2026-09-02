@@ -1,10 +1,10 @@
 ﻿using Confluent.Kafka;
+using FleetPulse.Infrastructure.Kafka.Dtos;
+using FleetPulse.Observability.FleetMetrics;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.HealthChecks;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Infrastructure;
-using FleetPulse.SignalRHub.MetricsConfig;
-using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
@@ -71,7 +71,7 @@ namespace FleetPulse.SignalRHub.Workers
                         _consumerTracker.RecordHeartbeat();
 
                         // Count every message consumed from Kafka, regardless of throttle
-                        FleetMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.GpsPingsTopic).Inc();
+                        KafkaMetrics.GpsPingsReceived.WithLabels(_kafkaSettings.GpsPingsTopic).Inc();
 
                         var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
                         using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_gps_ping", ActivityKind.Consumer, parentCtx);
@@ -97,7 +97,7 @@ namespace FleetPulse.SignalRHub.Workers
                         var cutoff = now - TimeSpan.FromMinutes(5);
                         foreach (var stale in _lastSent.Where(kv => kv.Value < cutoff).Select(kv => kv.Key).ToList())
                             _lastSent.Remove(stale);
-                        FleetMetrics.ActiveDrivers.Set(_lastSent.Count);
+                        AppMetrics.ActiveDrivers.Set(_lastSent.Count);
                         
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
                         await _hubContext.Clients.All
@@ -111,13 +111,13 @@ namespace FleetPulse.SignalRHub.Workers
                     catch (ConsumeException ex)
                     {
                         _logger.LogDebug(ex, "Transient Kafka consume error. Retrying...");
-                        FleetMetrics.GpsPingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
+                        AppMetrics.GpsPingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
                         await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Unexpected error in Kafka consumer loop. Retrying...");
-                        FleetMetrics.GpsPingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
+                        AppMetrics.GpsPingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     }
                 }

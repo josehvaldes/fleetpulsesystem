@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FleetPulse.Application\FleetPulse.Application.csproj" />
+    <ProjectReference Include="..\FleetPulse.Domain\FleetPulse.Domain.csproj" />
+    <ProjectReference Include="..\FleetPulse.Infrastructure\FleetPulse.Infrastructure.csproj" />
     <ProjectReference Include="..\FleetPulse.SignalRHub\FleetPulse.SignalRHub.csproj" />
   </ItemGroup>
 

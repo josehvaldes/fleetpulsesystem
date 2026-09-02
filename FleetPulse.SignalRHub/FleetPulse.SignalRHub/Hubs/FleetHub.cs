@@ -1,4 +1,4 @@
-﻿using FleetPulse.SignalRHub.MetricsConfig;
+﻿using FleetPulse.Observability.FleetMetrics;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FleetPulse.SignalRHub.Hubs
@@ -9,13 +9,13 @@ namespace FleetPulse.SignalRHub.Hubs
 
         public override Task OnConnectedAsync()
         {
-            FleetMetrics.SignalRClients.Inc();
+            AppMetrics.SignalRClients.Inc();
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            FleetMetrics.SignalRClients.Dec();
+            AppMetrics.SignalRClients.Dec();
             return base.OnDisconnectedAsync(exception);
         }
 

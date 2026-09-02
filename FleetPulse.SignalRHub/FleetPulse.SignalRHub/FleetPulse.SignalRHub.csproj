@@ -30,7 +30,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FleetPulse.Application\FleetPulse.Application.csproj" />
     <ProjectReference Include="..\FleetPulse.Contracts\FleetPulse.Contracts.csproj" />
+    <ProjectReference Include="..\FleetPulse.Domain\FleetPulse.Domain.csproj" />
+    <ProjectReference Include="..\FleetPulse.Infrastructure.Kafka\FleetPulse.Infrastructure.Kafka.csproj" />
+    <ProjectReference Include="..\FleetPulse.Infrastructure\FleetPulse.Infrastructure.csproj" />
+    <ProjectReference Include="..\FleetPulse.Observability\FleetPulse.Observability.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="KafkaDto\" />
   </ItemGroup>
 
 </Project>

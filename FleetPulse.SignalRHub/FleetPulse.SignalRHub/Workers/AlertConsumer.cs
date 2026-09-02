@@ -3,14 +3,14 @@ using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Infrastructure;
-using FleetPulse.SignalRHub.MetricsConfig;
-using FleetPulse.SignalRHub.Model;
 using FleetPulse.SignalRHub.Trace;
 using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text.Json;
+using FleetPulse.Observability.FleetMetrics;
+using FleetPulse.Infrastructure.Kafka.Dtos;
 
 namespace FleetPulse.SignalRHub.Workers
 {
@@ -65,7 +65,7 @@ namespace FleetPulse.SignalRHub.Workers
                         var result = _consumer.Consume(stoppingToken);
                         _logger.LogInformation("Consumed Alert from Kafka topic '{Topic}': {Message}", _kafkaSettings.AlertsTopic, result.Message.Value);
                         // Count every message consumed from Kafka, regardless of throttle
-                        FleetMetrics.AlertsReceived.WithLabels(_kafkaSettings.AlertsTopic).Inc();
+                        KafkaMetrics.AlertsReceived.WithLabels(_kafkaSettings.AlertsTopic).Inc();
 
                         var parentCtx = KafkaTraceContextExtractor.Extract(result.Message.Headers);
                         using var activity = Telemetry.ActivitySource.StartActivity("signalRHub.process_alert", ActivityKind.Consumer, parentCtx);
@@ -96,7 +96,7 @@ namespace FleetPulse.SignalRHub.Workers
 
                         // handled the noise via the SetLogHandler/SetErrorHandler throttle.
                         _logger.LogDebug(ex, "Transient Kafka consume error. Retrying...");
-                        FleetMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.AlertsTopic).Inc();
+                        AppMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.AlertsTopic).Inc();
 
                         // Wait a moment before the next iteration so we don't spin the CPU 
                         // in a tight loop if the error is immediate.
@@ -106,7 +106,7 @@ namespace FleetPulse.SignalRHub.Workers
                     {
                         // Unexpected error (e.g., DB down while processing a message)
                         _logger.LogError(ex, "Unexpected error in Kafka consumer loop. Retrying...");
-                        FleetMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.AlertsTopic).Inc();
+                        AppMetrics.AlertProcessingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.AlertsTopic).Inc();
 
                         // Wait a bit longer for unexpected errors before retrying
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);

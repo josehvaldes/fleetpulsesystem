@@ -1,5 +1,5 @@
 ﻿using FleetPulse.Contracts.Response;
-using FleetPulse.SignalRHub.Model;
+using FleetPulse.Domain.Entities;
 using Mapster;
 
 namespace FleetPulse.SignalRHub.Mapping
@@ -9,12 +9,12 @@ namespace FleetPulse.SignalRHub.Mapping
         public static void RegisterMappings() 
         {
             // Register your Mapster mappings here
-            TypeAdapterConfig<LatestDriverStateDto, LastestDriverStateResponse>
+            TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>
                 .NewConfig()
                 .Map(dest => dest.LastSeen, src => src.Last_Seen.ToString("o"))
                 .Map(dest => dest.DriverId, src => src.Driver_Id);
 
-            TypeAdapterConfig<AlertDb, AlertResponse>.NewConfig()
+            TypeAdapterConfig<Alert, AlertResponse>.NewConfig()
                 .Map(dest => dest.Id, src => src.id)
                 .Map(dest => dest.DriverId, src => src.driver_id)
                 .Map(dest => dest.EventLatitude, src => src.event_latitude)
@@ -30,7 +30,7 @@ namespace FleetPulse.SignalRHub.Mapping
                 .Map(dest => dest.Status, src => src.status.ToString())
                 .Map(dest => dest.RaisedAt, src => src.raised_at);
 
-            TypeAdapterConfig<GpsPingDto, GpsHistoryResponse>
+            TypeAdapterConfig<GpsPing, GpsHistoryResponse>
                 .NewConfig()
                 .Map(dest => dest.Timestamp, src => src.Timestamp.ToString("o"))
                 .Map(dest => dest.DriverId, src => src.DriverId);
