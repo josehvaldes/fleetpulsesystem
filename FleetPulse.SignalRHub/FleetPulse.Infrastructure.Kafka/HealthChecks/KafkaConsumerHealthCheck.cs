@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using FleetPulse.Application.Common.Interfaces;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace FleetPulse.SignalRHub.HealthChecks
+namespace FleetPulse.Infrastructure.Kafka.HealthChecks
 {
     public class KafkaConsumerHealthCheck : IHealthCheck
     {
-        private readonly IKafkaConsumerTracker _tracker;
-        public KafkaConsumerHealthCheck(IKafkaConsumerTracker tracker)
+        private readonly IHealthConsumerTracker _tracker;
+        public KafkaConsumerHealthCheck(IHealthConsumerTracker tracker)
         {
             _tracker = tracker;
         }

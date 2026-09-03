@@ -1,29 +1,30 @@
 ﻿using Confluent.Kafka;
+using FleetPulse.Application.Common.Interfaces;
 using FleetPulse.Infrastructure.Kafka.Dtos;
+using FleetPulse.Infrastructure.Kafka.Settings;
+using FleetPulse.Infrastructure.Kafka.Trace;
 using FleetPulse.Observability.FleetMetrics;
-using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.SignalRHub.HealthChecks;
-using FleetPulse.SignalRHub.Hubs;
+using FleetPulse.Observability.Traces;
 using FleetPulse.SignalRHub.Infrastructure;
-using FleetPulse.SignalRHub.Trace;
-using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace FleetPulse.SignalRHub.Workers
+namespace FleetPulse.Infrastructure.Kafka
 {
     public class GpsPingConsumer : BackgroundService
     {
         private readonly IConsumer<string, string> _consumer;
-        private readonly IHubContext<FleetHub> _hubContext;
+        private readonly IRealTimeNotifier _notifier;
         private readonly ILogger<GpsPingConsumer> _logger;
         private readonly KafkaSettings _kafkaSettings;
-        private readonly SignalRSettings _signalRSettings;
         // Throttle: per ROADMAP — max 2Hz per driver
         private readonly Dictionary<string, DateTimeOffset> _lastSent = new();
         private static readonly TimeSpan MinInterval = TimeSpan.FromMilliseconds(500);
-        private readonly IKafkaConsumerTracker _consumerTracker;
+        private readonly IHealthConsumerTracker _consumerTracker;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -31,16 +32,14 @@ namespace FleetPulse.SignalRHub.Workers
         };
 
         public GpsPingConsumer([FromKeyedServices("gps-pings")] IConsumer<string, string> consumer,
-                                IHubContext<FleetHub> hubContext,
+                                IRealTimeNotifier notifier,
                                 ILogger<GpsPingConsumer> logger, 
                                 IOptions<KafkaSettings> kafkaSettings,
-                                IOptions<SignalRSettings> signalRSettings,
-                                IKafkaConsumerTracker consumerTracker)
+                                IHealthConsumerTracker consumerTracker)
         {
-            _signalRSettings = signalRSettings.Value;
             _kafkaSettings = kafkaSettings.Value;
             _consumer = consumer;
-            _hubContext = hubContext;
+            _notifier = notifier;
             _logger = logger;
             _consumerTracker = consumerTracker;
         }
@@ -100,8 +99,7 @@ namespace FleetPulse.SignalRHub.Workers
                         AppMetrics.ActiveDrivers.Set(_lastSent.Count);
                         
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
-                        await _hubContext.Clients.All
-                            .SendAsync(_signalRSettings.GpsPingCallbackMethod, dto, stoppingToken);
+                        await _notifier.SendToAllAsync(_notifier.GpsPingCallbackMethod, dto, stoppingToken);
                     }
                     catch (OperationCanceledException) {
                         /* graceful shutdown */

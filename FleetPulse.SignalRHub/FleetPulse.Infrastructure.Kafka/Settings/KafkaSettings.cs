@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.SignalRHub.Configuration
+﻿namespace FleetPulse.Infrastructure.Kafka.Settings
 {
     public class KafkaSettings
     {

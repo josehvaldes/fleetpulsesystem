@@ -1,6 +1,8 @@
-﻿namespace FleetPulse.SignalRHub.HealthChecks
+﻿using FleetPulse.Application.Common.Interfaces;
+
+namespace FleetPulse.Infrastructure.Kafka.HealthChecks
 {
-    public class KafkaConsumerTracker : IKafkaConsumerTracker
+    public class KafkaConsumerTracker : IHealthConsumerTracker
     {
         private DateTime _lastHeartbeat = DateTime.UtcNow;
 

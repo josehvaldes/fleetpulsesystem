@@ -4,7 +4,7 @@ using OpenTelemetry.Context.Propagation;
 using System.Diagnostics;
 using System.Text;
 
-namespace FleetPulse.SignalRHub.Trace
+namespace FleetPulse.Infrastructure.Kafka.Trace
 {
     public static class KafkaTraceContextExtractor
     {

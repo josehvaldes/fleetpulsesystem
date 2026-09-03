@@ -1,26 +1,28 @@
 ﻿using Confluent.Kafka;
-using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.Contracts.Response;
-using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Infrastructure;
-using FleetPulse.SignalRHub.Trace;
 using Mapster;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text.Json;
 using FleetPulse.Observability.FleetMetrics;
 using FleetPulse.Infrastructure.Kafka.Dtos;
+using FleetPulse.Application.Common.Interfaces;
+using FleetPulse.Infrastructure.Kafka.Settings;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using FleetPulse.Infrastructure.Kafka.Trace;
+using Microsoft.Extensions.Hosting;
+using FleetPulse.Observability.Traces;
 
-namespace FleetPulse.SignalRHub.Workers
+namespace FleetPulse.Infrastructure.Kafka
 {
     public class AlertConsumer : BackgroundService
     {
         private readonly IConsumer<string, string> _consumer;
         private readonly ILogger<AlertConsumer> _logger;
         private readonly KafkaSettings _kafkaSettings;
-        private readonly IHubContext<FleetHub> _hubContext;
-        private readonly SignalRSettings _signalRSettings;
+        private readonly IRealTimeNotifier _notifier;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -28,16 +30,14 @@ namespace FleetPulse.SignalRHub.Workers
         };
 
         public AlertConsumer([FromKeyedServices("alerts")] IConsumer<string, string> consumer,
+                                IRealTimeNotifier notifier,
                                 ILogger<AlertConsumer> logger,
-                               IOptions<KafkaSettings> kafkaSettings,
-                               IHubContext<FleetHub> hubContext,
-                               IOptions<SignalRSettings> signalRSettings)
+                               IOptions<KafkaSettings> kafkaSettings)
         {
             _consumer = consumer;
             _logger = logger;
             _kafkaSettings = kafkaSettings.Value;
-            _hubContext = hubContext;
-            _signalRSettings = signalRSettings.Value;            
+            _notifier = notifier;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -82,8 +82,7 @@ namespace FleetPulse.SignalRHub.Workers
                         var alertResponse = dto.Adapt<AlertResponse>();
                         
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
-                        await _hubContext.Clients.All
-                            .SendAsync(_signalRSettings.AlertCallbackMethod, alertResponse, stoppingToken);
+                        await _notifier.SendToAllAsync(_notifier.AlertCallbackMethod, alertResponse, stoppingToken);
                     }
                     catch (OperationCanceledException) { 
                         /* graceful shutdown */ 

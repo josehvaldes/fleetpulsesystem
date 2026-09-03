@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace FleetPulse.SignalRHub.Trace
+namespace FleetPulse.Observability.Traces
 {
     public static class Telemetry
     {

@@ -1,4 +1,6 @@
-﻿namespace FleetPulse.SignalRHub.Workers
+﻿using Microsoft.Extensions.Logging;
+
+namespace FleetPulse.Infrastructure.Kafka
 {
     internal sealed class KafkaLogThrottle
     {

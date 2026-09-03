@@ -1,4 +1,5 @@
 using FleetPulse.Infrastructure;
+using FleetPulse.Infrastructure.Kafka;
 using FleetPulse.Observability;
 using FleetPulse.SignalRHub;
 using FleetPulse.SignalRHub.Configuration;
@@ -36,8 +37,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddDependencies(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
-
-
+builder.Services.AddKafkaDependencies(builder.Configuration);
 
 var app = builder.Build();
 
