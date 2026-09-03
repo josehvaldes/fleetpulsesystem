@@ -12,8 +12,8 @@ namespace FleetPulse.SignalRHub.Mapping
             // Register your Mapster mappings here
             TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>
                 .NewConfig()
-                .Map(dest => dest.LastSeen, src => src.Last_Seen.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.Driver_Id);
+                .Map(dest => dest.LastSeen, src => src.last_seen.ToString("o"))
+                .Map(dest => dest.DriverId, src => src.driver_id);
 
             TypeAdapterConfig<Alert, AlertResponse>.NewConfig()
                 .Map(dest => dest.Id, src => src.id)

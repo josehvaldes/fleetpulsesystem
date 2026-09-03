@@ -1,14 +1,15 @@
-﻿using FleetPulse.SignalRHub.Configuration;
-using FleetPulse.Application.Common.Interfaces;
+﻿using FleetPulse.Application.Common.Interfaces;
+using FleetPulse.Application.Features.Drivers.Queries;
 using FleetPulse.Contracts.Requests;
 using FleetPulse.Contracts.Response;
+using FleetPulse.Domain.Enums;
+using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Hubs;
-using FleetPulse.SignalRHub.Services.Interfaces;
 using FleetPulse.SignalRHub.Validators;
 using FluentValidation;
 using Mapster;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
-using FleetPulse.Domain.Enums;
 
 namespace FleetPulse.SignalRHub.Mapping
 {
@@ -36,10 +37,11 @@ namespace FleetPulse.SignalRHub.Mapping
 
             var apiGroup = app.MapGroup($"/api/{version}");//.RequireAuthorization(); // Update this when login page is ready
 
-            apiGroup.MapGet("/drivers", async (IDatabaseService db, [FromQuery] DateTime from) =>
+            apiGroup.MapGet("/drivers", async (IMediator mediator, [FromQuery] DateTime from, [FromQuery] DateTime? to, CancellationToken cancellationToken) =>
             {
-                var lasteststates = await db.GetLatestDriverStatesAsync(from, CancellationToken.None);
-                return lasteststates.Adapt<List<LastestDriverStateResponse>>();
+                var query = new GetDriversQuery(from, to);
+                var result = await mediator.Send(query, cancellationToken);
+                return result.Adapt<List<LastestDriverStateResponse>>();
             });
 
             apiGroup.MapGet("/drivers/{id}/history", async (string id, IDatabaseService db, [FromQuery] DateTime from, [FromQuery] DateTime to) =>

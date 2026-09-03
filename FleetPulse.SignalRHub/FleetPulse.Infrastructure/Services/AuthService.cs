@@ -4,7 +4,6 @@ using FleetPulse.Application.Common.Dtos;
 using FleetPulse.Domain.Auth;
 using FleetPulse.Infrastructure.Settings;
 using FleetPulse.Observability.FleetMetrics;
-using FleetPulse.SignalRHub.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 

@@ -2,8 +2,6 @@
 using FleetPulse.Infrastructure.Auth;
 using FleetPulse.Infrastructure.Services;
 using FleetPulse.Infrastructure.Settings;
-using FleetPulse.SignalRHub.Mapping;
-using FleetPulse.SignalRHub.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,4 +1,5 @@
-﻿using FleetPulse.Application.Common.Interfaces;
+﻿using FleetPulse.Application;
+using FleetPulse.Application.Common.Interfaces;
 using FleetPulse.Observability.Traces;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Services;
@@ -14,7 +15,7 @@ namespace FleetPulse.SignalRHub
     public static class DependencyInjection
     {
 
-        public static IServiceCollection AddDependencies(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration config)
         {
             
             services.Configure<SignalRSettings>(config.GetSection(SignalRSettings.SectionName));
@@ -40,13 +41,22 @@ namespace FleetPulse.SignalRHub
 
             services.AddOpenTelemetry(config);
 
+
+
+            services.AddMediator(options => { 
+                options.Assemblies = [
+                    typeof(ApplicationAssemblyMarker).Assembly
+                    ];
+                options.ServiceLifetime = ServiceLifetime.Scoped;
+            });
+
             return services;
         }
 
 
        
 
-        public static IServiceCollection AddHealthChecks(this IServiceCollection services, ConfigurationManager config) 
+        public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config) 
         {
             services.AddHealthChecks()
                 .AddNpgSql(config.GetConnectionString("FleetPulseDb")!, name: "PostgreSQL");
@@ -55,7 +65,7 @@ namespace FleetPulse.SignalRHub
             return services;
         }
 
-        public static IServiceCollection AddCors(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddCors(this IServiceCollection services, IConfiguration config)
         {
             var corsSettings = config.GetSection(CorsSettings.SectionName)
                      .Get<CorsSettings>() ?? new CorsSettings();
@@ -70,7 +80,7 @@ namespace FleetPulse.SignalRHub
             return services;
         }
 
-        public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, ConfigurationManager config) 
+        public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, IConfiguration config) 
         {
             var openTelemetrySettings = config.GetSection(OpenTelemetrySettings.SectionName)
                 .Get<OpenTelemetrySettings>()?? new OpenTelemetrySettings();

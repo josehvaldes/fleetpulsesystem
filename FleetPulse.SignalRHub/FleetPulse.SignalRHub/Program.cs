@@ -2,6 +2,7 @@ using FleetPulse.Infrastructure;
 using FleetPulse.Infrastructure.Kafka;
 using FleetPulse.Observability;
 using FleetPulse.SignalRHub;
+using FleetPulse.Application;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Logging;
 using FleetPulse.SignalRHub.Mapping;
@@ -35,9 +36,10 @@ builder.Services.AddProblemDetails();
 // --- SignalR ---
 builder.Services.AddSignalR();
 
-builder.Services.AddDependencies(builder.Configuration);
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddKafkaDependencies(builder.Configuration);
+builder.Services.AddDependencies(builder.Configuration); // API Dependencies
+builder.Services.AddApplicationDependencies(builder.Configuration); // Application Dependencies
+builder.Services.AddInfrastructure(builder.Configuration); // Infrastructure Dependencies
+builder.Services.AddKafkaDependencies(builder.Configuration); // Kafka Dependencies
 
 var app = builder.Build();
 

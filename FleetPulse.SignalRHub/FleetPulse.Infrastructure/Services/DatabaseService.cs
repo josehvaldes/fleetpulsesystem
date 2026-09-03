@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using FleetPulse.Domain.Entities;
 using FleetPulse.Domain.Enums;
-using FleetPulse.SignalRHub.Services.Interfaces;
+using FleetPulse.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 

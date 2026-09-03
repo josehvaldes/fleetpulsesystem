@@ -2,7 +2,7 @@
 using FleetPulse.Domain.Entities;
 using FleetPulse.Domain.Enums;
 
-namespace FleetPulse.SignalRHub.Services.Interfaces
+namespace FleetPulse.Application.Common.Interfaces
 {
     public interface IDatabaseService
     {

@@ -10,7 +10,7 @@ namespace FleetPulse.Infrastructure.Kafka
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddKafkaDependencies(this IServiceCollection services, ConfigurationManager config) 
+        public static IServiceCollection AddKafkaDependencies(this IServiceCollection services, IConfiguration config) 
         {
             services.Configure<KafkaSettings>(config.GetSection(KafkaSettings.SectionName));
 
@@ -50,7 +50,7 @@ namespace FleetPulse.Infrastructure.Kafka
         }
 
 
-        public static IServiceCollection AddBackgroundWorkers(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddBackgroundWorkers(this IServiceCollection services, IConfiguration config)
         {
             // AddHostedService guarantees single instance, start/stop with the host
             services.AddHostedService<GpsPingConsumer>();
