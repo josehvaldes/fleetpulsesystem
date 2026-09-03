@@ -1,9 +1,9 @@
-﻿using FleetPulse.Contracts.Response;
+﻿using FleetPulse.Application.Common.Dtos;
 
-namespace FleetPulse.SignalRHub.Services.Interfaces
+namespace FleetPulse.Application.Common.Interfaces
 {
     public interface IAuthService
     {
-        Task<LoginResponse> LoginAsync(string username, string password, CancellationToken none);
+        Task<AuthenticationResult> LoginAsync(string username, string password, CancellationToken cancellationToken);
     }
 }

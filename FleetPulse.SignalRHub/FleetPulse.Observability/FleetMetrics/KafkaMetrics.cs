@@ -1,7 +1,4 @@
 ﻿using Prometheus;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FleetPulse.Observability.FleetMetrics
 {
@@ -12,6 +9,11 @@ namespace FleetPulse.Observability.FleetMetrics
             "fleetpulse_signalrhub_gps_pings_received_total",
             "Total GPS pings consumed from Kafka",
             new CounterConfiguration { LabelNames = ["topic"] });
+
+        public static readonly Counter GpsPingErrors = Metrics.CreateCounter(
+            "fleetpulse_signalrhub_gps_ping_errors_total",
+            "Total errors encountered while processing GPS pings",
+            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
 
         public static readonly Counter AlertsReceived = Metrics.CreateCounter(
             "fleetpulse_signalrhub_alerts_received_total",

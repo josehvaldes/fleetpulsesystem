@@ -5,9 +5,9 @@ namespace FleetPulse.Infrastructure.Kafka.Dtos
     public class AlertLocationDto
     {
         [JsonPropertyName("latitude")]
-        public double Latitude { get; set; }
+        public double latitude { get; set; }
         
         [JsonPropertyName("longitude")]
-        public double Longitude { get; set; }
+        public double longitude { get; set; }
     }
 }

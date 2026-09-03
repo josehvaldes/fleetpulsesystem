@@ -1,10 +1,11 @@
 ﻿using FleetPulse.Contracts.Response;
 using FleetPulse.Domain.Entities;
+using FleetPulse.Infrastructure.Kafka;
 using Mapster;
 
 namespace FleetPulse.SignalRHub.Mapping
 {
-    public static class MappingConfig
+    public static class AppMapping
     {
         public static void RegisterMappings() 
         {
@@ -26,15 +27,16 @@ namespace FleetPulse.SignalRHub.Mapping
                 .Map(dest => dest.RiskLevel, src => src.risk_level.ToString())
                 .Map(dest => dest.Assessment, src => src.assessment)
                 .Map(dest => dest.Recommendation, src => src.recommendation)
-                .Map(dest => dest.AutoScale, src => src.autoscale)
+                .Map(dest => dest.AutoScale, src => src.auto_escalate)
                 .Map(dest => dest.Status, src => src.status.ToString())
                 .Map(dest => dest.RaisedAt, src => src.raised_at);
 
-            TypeAdapterConfig<GpsPing, GpsHistoryResponse>
+            TypeAdapterConfig<GpsPing, GpsPingResponse>
                 .NewConfig()
-                .Map(dest => dest.Timestamp, src => src.Timestamp.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.DriverId);
+                .Map(dest => dest.Timestamp, src => src.timestamp.ToString("o"))
+                .Map(dest => dest.DriverId, src => src.driver_id);
 
+            KafkaMapping.RegisterMappings(); // Register Kafka mappings
         }
     }
 }

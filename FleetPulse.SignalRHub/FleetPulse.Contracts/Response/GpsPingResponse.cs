@@ -1,7 +1,7 @@
 ﻿
 namespace FleetPulse.Contracts.Response
 {
-    public class GpsHistoryResponse
+    public class GpsPingResponse
     {
         public string DriverId { get; init; } = string.Empty;
 

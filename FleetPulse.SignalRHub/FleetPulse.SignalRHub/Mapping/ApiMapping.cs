@@ -1,4 +1,5 @@
 ﻿using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.Application.Common.Interfaces;
 using FleetPulse.Contracts.Requests;
 using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Hubs;
@@ -44,7 +45,7 @@ namespace FleetPulse.SignalRHub.Mapping
             apiGroup.MapGet("/drivers/{id}/history", async (string id, IDatabaseService db, [FromQuery] DateTime from, [FromQuery] DateTime to) =>
             {
                 var gpsHistory = await db.GetGPSHistory(id, from, to, CancellationToken.None);
-                return gpsHistory.Adapt<List<GpsHistoryResponse>>();
+                return gpsHistory.Adapt<List<GpsPingResponse>>();
             });//.RequireAuthorization();
 
             apiGroup.MapGet("/alerts", async (IDatabaseService db, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50) =>
@@ -63,7 +64,15 @@ namespace FleetPulse.SignalRHub.Mapping
                 validationResult.ThrowIfInvalid();
 
                 var result = await authService.LoginAsync(request.Username, request.Password, CancellationToken.None);
-                return result;
+
+                // Map application DTO to API contract
+                var response = new LoginResponse(result.AccessToken, result.Username, result.ExpiresIn)
+                {
+                    RawRefreshToken = result.RawRefreshToken,
+                    RefreshTokenExpiry = result.RefreshTokenExpiry
+                };
+
+                return response;
             });
         }
     }

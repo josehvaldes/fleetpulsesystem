@@ -10,14 +10,6 @@ namespace FleetPulse.Observability.FleetMetrics
     public static class AppMetrics
     {
 
-
-        public static readonly Counter GpsPingErrors = Metrics.CreateCounter(
-            "fleetpulse_signalrhub_gps_ping_errors_total",
-            "Total errors encountered while processing GPS pings",
-            new CounterConfiguration { LabelNames = ["error_type", "topic"] });
-
-
-
         public static readonly Counter AlertProcessingErrors = Metrics.CreateCounter(
             "fleetpulse_signalrhub_alert_processing_errors_total",
             "Total errors encountered while processing alerts",

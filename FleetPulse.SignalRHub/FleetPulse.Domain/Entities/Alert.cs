@@ -5,6 +5,11 @@ using System.Text;
 
 namespace FleetPulse.Domain.Entities
 {
+    /// <summary>
+    /// This class follows the model of the Database to reduce the need for mapping between the two. 
+    /// It is used to represent an alert in the system, containing information about the driver, event location, 
+    /// speed, time, zone details, risk level, assessment, recommendation, and status.
+    /// </summary>
     public class Alert
     {
         public Guid id { get; set; } = Guid.Empty;
@@ -18,7 +23,7 @@ namespace FleetPulse.Domain.Entities
         public RiskLevel risk_level { get; set; } = RiskLevel.Low;
         public string assessment { get; set; } = string.Empty;
         public string recommendation { get; set; } = string.Empty;
-        public bool autoscale { get; set; }
+        public bool auto_escalate { get; set; }
         public AlertStatus status { get; set; } = AlertStatus.New;
         public DateTimeOffset raised_at { get; set; }
     }

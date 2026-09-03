@@ -1,24 +1,28 @@
 ﻿
 namespace FleetPulse.Domain.Entities
 {
+    /// <summary>
+    /// This class follows the structure of the GPS pings in the database to avoid unnecessary mapping. 
+    /// It is used to represent the GPS ping data received from Kafka and sent to clients via SignalR.
+    /// </summary>
     public class GpsPing
     {
-        public string DriverId { get; init; } = string.Empty;
+        public string event_id { get; init; } = string.Empty;
 
-        public double Latitude { get; init; }
+        public string driver_id { get; init; } = string.Empty;
 
-        public double Longitude { get; init; }
+        public double latitude { get; init; }
 
-        public double Speed { get; set; }
+        public double longitude { get; init; }
 
-        public double Heading { get; init; }
+        public double speed { get; set; }
 
-        public double Accuracy { get; init; }
+        public double heading { get; init; }
 
-        public string Status { get; init; } = string.Empty;
+        public double accuracy { get; init; }
 
-        public string? VehicleType { get; init; }
+        public string status { get; init; } = string.Empty;
 
-        public DateTimeOffset Timestamp { get; init; }
+        public DateTimeOffset timestamp { get; init; }
     }
 }

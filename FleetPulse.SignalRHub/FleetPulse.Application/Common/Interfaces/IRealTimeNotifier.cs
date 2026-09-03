@@ -1,3 +1,5 @@
+using FleetPulse.Application.Common.Dtos;
+using FleetPulse.Domain.Entities;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +14,11 @@ namespace FleetPulse.Application.Common.Interfaces
         string GpsPingCallbackMethod { get; }
 
         Task SendToAllAsync(string method, object payload, CancellationToken cancellationToken = default);
+
+        Task SendAlertToAllAsync(Alert payload, CancellationToken cancellationToken = default);
+
+        Task SendgpsPingToAllAsync(GpsPing payload, CancellationToken cancellationToken = default);
+
         Task SendToGroupAsync(string group, string method, object payload, CancellationToken cancellationToken = default);
     }
 }

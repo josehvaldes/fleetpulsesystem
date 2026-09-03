@@ -1,11 +1,13 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.Application.Common.Interfaces;
+using FleetPulse.Domain.Entities;
 using FleetPulse.Infrastructure.Kafka.Dtos;
 using FleetPulse.Infrastructure.Kafka.Settings;
 using FleetPulse.Infrastructure.Kafka.Trace;
 using FleetPulse.Observability.FleetMetrics;
 using FleetPulse.Observability.Traces;
 using FleetPulse.SignalRHub.Infrastructure;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -85,12 +87,12 @@ namespace FleetPulse.Infrastructure.Kafka
 
                         // Throttle per driver
                         var now = DateTimeOffset.UtcNow;
-                        if (_lastSent.TryGetValue(dto.DriverId, out var last)
+                        if (_lastSent.TryGetValue(dto.driver_id, out var last)
                             && now - last < MinInterval)
                         {
                             continue;
                         }
-                        _lastSent[dto.DriverId] = now;
+                        _lastSent[dto.driver_id] = now;
 
                         // Purge drivers not seen in the last 5 minutes, then update gauge
                         var cutoff = now - TimeSpan.FromMinutes(5);
@@ -99,7 +101,7 @@ namespace FleetPulse.Infrastructure.Kafka
                         AppMetrics.ActiveDrivers.Set(_lastSent.Count);
                         
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
-                        await _notifier.SendToAllAsync(_notifier.GpsPingCallbackMethod, dto, stoppingToken);
+                        await _notifier.SendgpsPingToAllAsync(dto.Adapt<GpsPing>(), stoppingToken);
                     }
                     catch (OperationCanceledException) {
                         /* graceful shutdown */
@@ -109,13 +111,13 @@ namespace FleetPulse.Infrastructure.Kafka
                     catch (ConsumeException ex)
                     {
                         _logger.LogDebug(ex, "Transient Kafka consume error. Retrying...");
-                        AppMetrics.GpsPingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
+                        KafkaMetrics.GpsPingErrors.WithLabels(ErrorLabel.ConsumeException.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
                         await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Unexpected error in Kafka consumer loop. Retrying...");
-                        AppMetrics.GpsPingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
+                        KafkaMetrics.GpsPingErrors.WithLabels(ErrorLabel.UnknownError.ToString(), _kafkaSettings.GpsPingsTopic).Inc();
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     }
                 }

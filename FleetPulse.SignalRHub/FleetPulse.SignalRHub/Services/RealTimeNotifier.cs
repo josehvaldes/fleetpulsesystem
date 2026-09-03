@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using System.Threading;
 using System.Threading.Tasks;
+using FleetPulse.Application.Common.Dtos;
+using Mapster;
+using FleetPulse.Contracts.Response;
+using FleetPulse.Domain.Entities;
 
 namespace FleetPulse.SignalRHub.Services
 {
@@ -22,6 +26,17 @@ namespace FleetPulse.SignalRHub.Services
         public string AlertCallbackMethod => _settings.AlertCallbackMethod;
 
         public string GpsPingCallbackMethod => _settings.GpsPingCallbackMethod;
+
+        public Task SendAlertToAllAsync(Alert payload, CancellationToken cancellationToken = default)
+        {
+            var alertResponse = payload.Adapt<AlertResponse>();
+            return _hubContext.Clients.All.SendAsync(AlertCallbackMethod, alertResponse, cancellationToken);
+        }
+
+        public Task SendgpsPingToAllAsync(GpsPing payload, CancellationToken cancellationToken = default)
+        {
+            return _hubContext.Clients.All.SendAsync(GpsPingCallbackMethod, payload, cancellationToken);
+        }
 
         public Task SendToAllAsync(string method, object payload, CancellationToken cancellationToken = default)
         {

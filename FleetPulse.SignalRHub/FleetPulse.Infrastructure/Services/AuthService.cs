@@ -1,6 +1,6 @@
 ﻿
 using FleetPulse.Application.Common.Interfaces;
-using FleetPulse.Contracts.Response;
+using FleetPulse.Application.Common.Dtos;
 using FleetPulse.Domain.Auth;
 using FleetPulse.Infrastructure.Settings;
 using FleetPulse.Observability.FleetMetrics;
@@ -15,7 +15,7 @@ namespace FleetPulse.Infrastructure.Services
         private readonly AuthSettings _authSetting = options.Value;
         private readonly IJwtTokenService _jwtTokenService = jwt;
 
-        public async Task<LoginResponse> LoginAsync(string username, string password, CancellationToken none)
+        public async Task<AuthenticationResult> LoginAsync(string username, string password, CancellationToken none)
         {
             // User/passwor feature will be implemented later. For now, we will use a default user and password from the configuration.
             if (username == _authSetting.DefaultUsername && password == _authSetting.DefaultPassword)
@@ -26,7 +26,7 @@ namespace FleetPulse.Infrastructure.Services
                 var accessToken = _jwtTokenService.GenerateAccessToken(authUser, roles, scopes);
                 var (refreshTokenValue, refreshTokenExpiry) = _jwtTokenService.GenerateRefreshToken();
 
-                return new LoginResponse(accessToken, username, _jwtTokenService.AccessTokenExpirySeconds)
+                return new AuthenticationResult(accessToken, username, _jwtTokenService.AccessTokenExpirySeconds)
                 {
                     RawRefreshToken = refreshTokenValue,
                     RefreshTokenExpiry = refreshTokenExpiry

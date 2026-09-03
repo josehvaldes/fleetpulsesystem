@@ -1,5 +1,4 @@
 ﻿using Confluent.Kafka;
-using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Infrastructure;
 using Mapster;
 using Microsoft.Extensions.Options;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using FleetPulse.Infrastructure.Kafka.Trace;
 using Microsoft.Extensions.Hosting;
 using FleetPulse.Observability.Traces;
+using FleetPulse.Domain.Entities;
 
 namespace FleetPulse.Infrastructure.Kafka
 {
@@ -78,11 +78,8 @@ namespace FleetPulse.Infrastructure.Kafka
                             continue;
                         }
                         
-                        //transform to AlertResponse for SignalR clients
-                        var alertResponse = dto.Adapt<AlertResponse>();
-                        
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
-                        await _notifier.SendToAllAsync(_notifier.AlertCallbackMethod, alertResponse, stoppingToken);
+                        await _notifier.SendAlertToAllAsync(dto.Adapt<Alert>(), stoppingToken);
                     }
                     catch (OperationCanceledException) { 
                         /* graceful shutdown */ 

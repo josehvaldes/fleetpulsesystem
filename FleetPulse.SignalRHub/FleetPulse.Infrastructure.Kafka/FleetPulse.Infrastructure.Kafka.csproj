@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FleetPulse.Application\FleetPulse.Application.csproj" />
+    <ProjectReference Include="..\FleetPulse.Domain\FleetPulse.Domain.csproj" />
     <ProjectReference Include="..\FleetPulse.Observability\FleetPulse.Observability.csproj" />
   </ItemGroup>
 
