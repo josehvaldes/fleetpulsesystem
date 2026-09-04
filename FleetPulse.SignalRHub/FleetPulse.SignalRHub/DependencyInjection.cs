@@ -1,4 +1,5 @@
 ﻿using FleetPulse.Application;
+using FleetPulse.Application.Common.Behaviors;
 using FleetPulse.Application.Common.Interfaces;
 using FleetPulse.Observability.Traces;
 using FleetPulse.SignalRHub.Configuration;
@@ -43,10 +44,13 @@ namespace FleetPulse.SignalRHub
 
 
 
-            services.AddMediator(options => { 
+            services.AddMediator(options => {
                 options.Assemblies = [
                     typeof(ApplicationAssemblyMarker).Assembly
                     ];
+                options.PipelineBehaviors = [
+                    typeof(ValidationBehavior<,>)
+                ];
                 options.ServiceLifetime = ServiceLifetime.Scoped;
             });
 

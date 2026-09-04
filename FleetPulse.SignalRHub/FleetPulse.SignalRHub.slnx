@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="../README.md" />
+    <File Path="AGENTS.md" />
   </Folder>
   <Project Path="FleetPulse.Application/FleetPulse.Application.csproj" Id="a268abd1-1f0a-4eb7-bff9-248b72ef0281" />
   <Project Path="FleetPulse.Contracts/FleetPulse.Contracts.csproj" Id="f88323e9-0e9f-46ed-9bea-6888ce25680d" />

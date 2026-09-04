@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.SignalRHub.Validators
+﻿namespace FleetPulse.Application.Common.Exceptions
 {
     public class ValidationException: Exception
     {

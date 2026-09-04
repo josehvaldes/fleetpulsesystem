@@ -1,5 +1,6 @@
 ﻿using FleetPulse.Application.Common.Interfaces;
-using FleetPulse.Application.Features.Drivers.Queries;
+using FleetPulse.Application.Features.Drivers.Queries.GetDrivers;
+using FleetPulse.Application.Features.Drivers.Queries.GetDriverHistory;
 using FleetPulse.Contracts.Requests;
 using FleetPulse.Contracts.Response;
 using FleetPulse.Domain.Enums;
@@ -10,6 +11,8 @@ using FluentValidation;
 using Mapster;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
+using FleetPulse.Application.Features.Alerts.Queries.GetAlertsByStatusDateRange;
+using FleetPulse.Application.Features.Auth.Commands.Login;
 
 namespace FleetPulse.SignalRHub.Mapping
 {
@@ -44,28 +47,31 @@ namespace FleetPulse.SignalRHub.Mapping
                 return result.Adapt<List<LastestDriverStateResponse>>();
             });
 
-            apiGroup.MapGet("/drivers/{id}/history", async (string id, IDatabaseService db, [FromQuery] DateTime from, [FromQuery] DateTime to) =>
+            apiGroup.MapGet("/drivers/{id}/history", async (IMediator mediator, string id,  [FromQuery] DateTime from, [FromQuery] DateTime to, CancellationToken cancellationToken) =>
             {
-                var gpsHistory = await db.GetGPSHistory(id, from, to, CancellationToken.None);
-                return gpsHistory.Adapt<List<GpsPingResponse>>();
-            });//.RequireAuthorization();
+                var query = new GetDriverHistoryQuery(id, from, to);
+                var result = await mediator.Send(query, cancellationToken);
+                return result.Adapt<List<GpsPingResponse>>();
 
-            apiGroup.MapGet("/alerts", async (IDatabaseService db, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50) =>
+            });
+
+            apiGroup.MapGet("/alerts", async (IMediator mediator, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50, CancellationToken cancellationToken = default) =>
             {
-                var alertStatus = Enum.Parse<AlertStatus>(status, true);
-                var alerts = await db.GetAlertsByStatusDateRangeAsync(alertStatus, from, to, CancellationToken.None);
-                return alerts.Adapt<List<AlertResponse>>();
+                var query = new GetAlertsByStatusDateRangeQuery(status, from, to);
+                var result = await mediator.Send(query, cancellationToken);
+                return result.Adapt<List<AlertResponse>>();
             });
 
 
-            app.MapPost($"/api/{version}/login", async (IAuthService authService, 
+            app.MapPost($"/api/{version}/login", async (IMediator mediator, 
                 IValidator<LoginRequest> loginValidator, 
                 [FromBody] LoginRequest request) =>
             {
                 var validationResult = await loginValidator.ValidateAsync(request);
                 validationResult.ThrowIfInvalid();
 
-                var result = await authService.LoginAsync(request.Username, request.Password, CancellationToken.None);
+                var command = new LoginCommand(request.Username, request.Password);
+                var result = await mediator.Send(command);
 
                 // Map application DTO to API contract
                 var response = new LoginResponse(result.AccessToken, result.Username, result.ExpiresIn)

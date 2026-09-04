@@ -1,4 +1,5 @@
-﻿using FluentValidation.Results;
+﻿using FleetPulse.Application.Common.Exceptions;
+using FluentValidation.Results;
 namespace FleetPulse.SignalRHub.Validators
 {
     public static class ValidationResultExtensions
