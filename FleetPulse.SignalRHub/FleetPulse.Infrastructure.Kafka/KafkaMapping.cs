@@ -1,9 +1,6 @@
 ﻿using FleetPulse.Domain.Entities;
 using FleetPulse.Infrastructure.Kafka.Dtos;
 using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FleetPulse.Infrastructure.Kafka
 {

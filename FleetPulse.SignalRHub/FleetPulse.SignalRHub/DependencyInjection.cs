@@ -44,7 +44,8 @@ namespace FleetPulse.SignalRHub
 
 
 
-            services.AddMediator(options => {
+            services.AddMediator(options =>
+            {
                 options.Assemblies = [
                     typeof(ApplicationAssemblyMarker).Assembly
                     ];
@@ -60,7 +61,8 @@ namespace FleetPulse.SignalRHub
 
        
 
-        public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config) 
+
+        public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
         {
             services.AddHealthChecks()
                 .AddNpgSql(config.GetConnectionString("FleetPulseDb")!, name: "PostgreSQL");
@@ -84,10 +86,10 @@ namespace FleetPulse.SignalRHub
             return services;
         }
 
-        public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, IConfiguration config) 
+        public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, IConfiguration config)
         {
             var openTelemetrySettings = config.GetSection(OpenTelemetrySettings.SectionName)
-                .Get<OpenTelemetrySettings>()?? new OpenTelemetrySettings();
+                .Get<OpenTelemetrySettings>() ?? new OpenTelemetrySettings();
 
             var appSettings = config.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();

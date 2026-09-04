@@ -5,9 +5,9 @@ using Mapster;
 
 namespace FleetPulse.SignalRHub.Mapping
 {
-    public static class AppMapping
+    public static class DomainMapping
     {
-        public static void RegisterMappings() 
+        public static void RegisterMappings()
         {
             // Register your Mapster mappings here
             TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>

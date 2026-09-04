@@ -1,7 +1,4 @@
-using FleetPulse.Application.Common.Dtos;
 using FleetPulse.Domain.Entities;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FleetPulse.Application.Common.Interfaces
 {

@@ -52,13 +52,13 @@ namespace FleetPulse.Infrastructure.Kafka
             return Task.CompletedTask;
         }
 
-        private async Task ConsumeLoopAsync(CancellationToken stoppingToken) 
+        private async Task ConsumeLoopAsync(CancellationToken stoppingToken)
         {
             try
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    try 
+                    try
                     {
 
                         // Blocks until a message arrives or cancellation is requested
@@ -81,8 +81,9 @@ namespace FleetPulse.Infrastructure.Kafka
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
                         await _notifier.SendAlertToAllAsync(dto.Adapt<Alert>(), stoppingToken);
                     }
-                    catch (OperationCanceledException) { 
-                        /* graceful shutdown */ 
+                    catch (OperationCanceledException)
+                    {
+                        /* graceful shutdown */
                         break;
                     }
                     catch (ConsumeException ex)
@@ -117,14 +118,14 @@ namespace FleetPulse.Infrastructure.Kafka
             }
         }
 
-        private AlertDto? DeserializeAlert(ConsumeResult<string, string> result) 
+        private AlertDto? DeserializeAlert(ConsumeResult<string, string> result)
         {
-            try 
-            { 
+            try
+            {
                 var message = result.Message.Value;
                 return JsonSerializer.Deserialize<AlertDto>(message, JsonOptions);
             }
-            catch (JsonException) 
+            catch (JsonException)
             {
                 _logger.LogWarning("Failed to deserialize message from Kafka: {Message}", result.Message.Value);
                 return null;

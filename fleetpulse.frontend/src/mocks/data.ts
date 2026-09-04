@@ -1,6 +1,6 @@
-import type { AlertResponse } from '@/api/alerts/types';
+import type { AlertWire } from '@/api/alerts/types';
 
-const mockAlerts:AlertResponse[] = [
+const mockAlerts:AlertWire[] = [
     {
         id: "1",
         driverId: "driver1",
@@ -16,7 +16,7 @@ const mockAlerts:AlertResponse[] = [
         assessment: "Assessment 1",
         recommendation: "Recommendation 1",
         raisedAt: "2026-08-30T12:05:00Z"
-    } as AlertResponse,
+    } as AlertWire,
     {
         id: "2",
         driverId: "driver2",
@@ -32,7 +32,7 @@ const mockAlerts:AlertResponse[] = [
         assessment: "Assessment 2",
         recommendation: "Recommendation 2",
         raisedAt: "2026-08-31T14:35:00Z"
-    } as AlertResponse,
+    } as AlertWire,
     {
         id: "3",
         driverId: "driver3",
@@ -48,7 +48,7 @@ const mockAlerts:AlertResponse[] = [
         assessment: "Assessment 2",
         recommendation: "Recommendation 2",
         raisedAt: "2026-08-31T14:35:00Z"
-    } as AlertResponse,
+    } as AlertWire,
     {
         id: "4",
         driverId: "driver4",
@@ -64,7 +64,7 @@ const mockAlerts:AlertResponse[] = [
         assessment: "Assessment 2",
         recommendation: "Recommendation 2",
         raisedAt: "2026-08-30T14:35:00Z"
-    } as AlertResponse,
+    } as AlertWire,
     {
         id: "5",
         driverId: "driver5",
@@ -80,7 +80,7 @@ const mockAlerts:AlertResponse[] = [
         assessment: "Assessment 2",
         recommendation: "Recommendation 2",
         raisedAt: "2026-08-31T14:35:00Z"
-    }as AlertResponse,
+    }as AlertWire,
 ];
 
 export { mockAlerts };

@@ -1,4 +1,3 @@
-using System;
 
 namespace FleetPulse.Application.Common.Dtos
 {

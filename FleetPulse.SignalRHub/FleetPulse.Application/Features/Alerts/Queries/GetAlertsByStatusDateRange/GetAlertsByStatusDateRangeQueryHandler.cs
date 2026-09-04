@@ -2,10 +2,6 @@
 using FleetPulse.Domain.Entities;
 using FleetPulse.Domain.Enums;
 using Mediator;
-using System;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Text;
 
 namespace FleetPulse.Application.Features.Alerts.Queries.GetAlertsByStatusDateRange
 {

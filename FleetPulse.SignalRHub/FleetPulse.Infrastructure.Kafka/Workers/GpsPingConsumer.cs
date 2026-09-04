@@ -35,7 +35,7 @@ namespace FleetPulse.Infrastructure.Kafka
 
         public GpsPingConsumer([FromKeyedServices("gps-pings")] IConsumer<string, string> consumer,
                                 IRealTimeNotifier notifier,
-                                ILogger<GpsPingConsumer> logger, 
+                                ILogger<GpsPingConsumer> logger,
                                 IOptions<KafkaSettings> kafkaSettings,
                                 IHealthConsumerTracker consumerTracker)
         {
@@ -103,7 +103,8 @@ namespace FleetPulse.Infrastructure.Kafka
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
                         await _notifier.SendgpsPingToAllAsync(dto.Adapt<GpsPing>(), stoppingToken);
                     }
-                    catch (OperationCanceledException) {
+                    catch (OperationCanceledException)
+                    {
                         /* graceful shutdown */
                         break;
                     }

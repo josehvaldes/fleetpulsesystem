@@ -1,7 +1,5 @@
 ﻿using FleetPulse.Observability.FleetMetrics;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Prometheus;
 
 namespace FleetPulse.Observability

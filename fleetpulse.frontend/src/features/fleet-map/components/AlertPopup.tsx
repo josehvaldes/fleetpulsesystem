@@ -18,7 +18,7 @@ type AlertPopupProps = {
 };
 
 export function AlertPopup({ alert }: AlertPopupProps) {
-    const { mutate: handleAlertAction, isPending: isSubmittingAction} = useAlertActions();
+    const { mutate: handleAlertAction } = useAlertActions();
     const [open, setOpen] = useState(false)
     const dispatch: AppDispatch = useDispatch<AppDispatch>();
         

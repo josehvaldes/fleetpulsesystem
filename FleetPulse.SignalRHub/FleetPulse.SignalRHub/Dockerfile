@@ -12,6 +12,12 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj", "FleetPulse.SignalRHub/"]
+COPY ["FleetPulse.Application/FleetPulse.Application.csproj", "FleetPulse.Application/"]
+COPY ["FleetPulse.Contracts/FleetPulse.Contracts.csproj", "FleetPulse.Contracts/"]
+COPY ["FleetPulse.Domain/FleetPulse.Domain.csproj", "FleetPulse.Domain/"]
+COPY ["FleetPulse.Infrastructure/FleetPulse.Infrastructure.csproj", "FleetPulse.Infrastructure/"]
+COPY ["FleetPulse.Infrastructure.Kafka/FleetPulse.Infrastructure.Kafka.csproj", "FleetPulse.Infrastructure.Kafka/"]
+COPY ["FleetPulse.Observability/FleetPulse.Observability.csproj", "FleetPulse.Observability/"]
 RUN dotnet restore "./FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj"
 COPY . .
 WORKDIR "/src/FleetPulse.SignalRHub"

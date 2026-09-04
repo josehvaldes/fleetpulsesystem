@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FleetPulse.Contracts.Requests
+﻿namespace FleetPulse.Contracts.Requests
 {
     public class LoginRequest
     {

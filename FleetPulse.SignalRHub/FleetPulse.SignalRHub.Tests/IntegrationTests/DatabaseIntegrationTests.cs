@@ -1,5 +1,4 @@
 ﻿using FleetPulse.Infrastructure.Services;
-using FleetPulse.SignalRHub.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Npgsql;

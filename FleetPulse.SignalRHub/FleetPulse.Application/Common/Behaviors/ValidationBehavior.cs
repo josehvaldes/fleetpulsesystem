@@ -1,27 +1,23 @@
 ﻿using FluentValidation;
 using Mediator;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace FleetPulse.Application.Common.Behaviors
 {
-    public sealed class ValidationBehavior<TRequest, TResponse>
-        : IPipelineBehavior<TRequest, TResponse> where TRequest : IMessage
+    public sealed class ValidationBehavior<TMessage, TResponse>
+        : IPipelineBehavior<TMessage, TResponse> where TMessage : IMessage
     {
-        private readonly IEnumerable<IValidator<TRequest>> _validators;
-        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+        private readonly IEnumerable<IValidator<TMessage>> _validators;
+        public ValidationBehavior(IEnumerable<IValidator<TMessage>> validators)
             => _validators = validators;
 
-        public async ValueTask<TResponse> Handle(TRequest request, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> Handle(TMessage request, MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken cancellationToken)
         {
             if (_validators == null || !_validators.Any())
             {
                 return await next(request, cancellationToken);
             }
 
-            var context = new ValidationContext<TRequest>(request);
+            var context = new ValidationContext<TMessage>(request);
 
             var validationTasks = _validators.Select(v => v.ValidateAsync(context, cancellationToken));
             var results = await Task.WhenAll(validationTasks);

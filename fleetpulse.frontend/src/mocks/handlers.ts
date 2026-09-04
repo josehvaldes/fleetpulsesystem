@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { mockAlerts as alerts } from './data';
-import type { AlertResponse } from '@/api/alerts/types';
+import type { AlertWire } from '@/api/alerts/types';
 import type { PageResponse } from '@/api/genericTypes';
 
 const ENDPOINT_LATENCY_MS = {
@@ -59,7 +59,7 @@ export const handlers = [
         });
 
         const sliced = filteredAlerts.slice((pagenumber - 1) * pagesize, pagenumber * pagesize);
-        const response:PageResponse<AlertResponse> = {
+        const response:PageResponse<AlertWire> = {
             data: sliced,
             totalCount: filteredAlerts.length,
             totalPages: Math.ceil(filteredAlerts.length / pagesize),

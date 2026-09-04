@@ -5,7 +5,7 @@ namespace FleetPulse.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplicationDependencies(this IServiceCollection services, IConfiguration config) 
+        public static IServiceCollection AddApplicationDependencies(this IServiceCollection services, IConfiguration config)
         {
 
             services.AddValidatorsFromAssembly(typeof(ApplicationAssemblyMarker).Assembly);
@@ -13,6 +13,6 @@ namespace FleetPulse.Application
 
 
             return services;
-        }    
+        }
     }
 }

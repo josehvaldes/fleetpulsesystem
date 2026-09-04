@@ -9,7 +9,7 @@ using FleetPulse.SignalRHub.Mapping;
 using FleetPulse.SignalRHub.Middleware;
 using Serilog;
 
-AppMapping.RegisterMappings();
+DomainMapping.RegisterMappings();
 
 var builder = WebApplication.CreateBuilder(args);
 

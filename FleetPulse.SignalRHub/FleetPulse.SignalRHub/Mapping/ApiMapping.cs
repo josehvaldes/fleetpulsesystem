@@ -3,7 +3,6 @@ using FleetPulse.Application.Features.Drivers.Queries.GetDrivers;
 using FleetPulse.Application.Features.Drivers.Queries.GetDriverHistory;
 using FleetPulse.Contracts.Requests;
 using FleetPulse.Contracts.Response;
-using FleetPulse.Domain.Enums;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Hubs;
 using FleetPulse.SignalRHub.Validators;
@@ -18,9 +17,9 @@ namespace FleetPulse.SignalRHub.Mapping
 {
     public static class ApiMapping
     {
-        
 
-        public static void AddApiMapping(this WebApplication app) 
+
+        public static void AddApiMapping(this WebApplication app)
         {
             var appSettings = app.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();
@@ -47,7 +46,7 @@ namespace FleetPulse.SignalRHub.Mapping
                 return result.Adapt<List<LastestDriverStateResponse>>();
             });
 
-            apiGroup.MapGet("/drivers/{id}/history", async (IMediator mediator, string id,  [FromQuery] DateTime from, [FromQuery] DateTime to, CancellationToken cancellationToken) =>
+            apiGroup.MapGet("/drivers/{id}/history", async (IMediator mediator, string id, [FromQuery] DateTime from, [FromQuery] DateTime to, CancellationToken cancellationToken) =>
             {
                 var query = new GetDriverHistoryQuery(id, from, to);
                 var result = await mediator.Send(query, cancellationToken);
@@ -63,8 +62,8 @@ namespace FleetPulse.SignalRHub.Mapping
             });
 
 
-            app.MapPost($"/api/{version}/login", async (IMediator mediator, 
-                IValidator<LoginRequest> loginValidator, 
+            app.MapPost($"/api/{version}/login", async (IMediator mediator,
+                IValidator<LoginRequest> loginValidator,
                 [FromBody] LoginRequest request) =>
             {
                 var validationResult = await loginValidator.ValidateAsync(request);

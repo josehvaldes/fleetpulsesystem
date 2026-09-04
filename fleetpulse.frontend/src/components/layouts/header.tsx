@@ -2,10 +2,9 @@
 import { useAuth } from "@/features/login/hooks/useAuth";
 import type { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 export function Header() {
     const {logout, user } = useAuth();
-    const location = useLocation()
     const alerts = useSelector((state: RootState) => state.alert.alerts.length);
     return (
         <header className='w-full border border-blue-500'>

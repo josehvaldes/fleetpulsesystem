@@ -1,8 +1,5 @@
 ﻿using FleetPulse.Application.Common.Dtos;
 using Mediator;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FleetPulse.Application.Features.Auth.Commands.Login
 {

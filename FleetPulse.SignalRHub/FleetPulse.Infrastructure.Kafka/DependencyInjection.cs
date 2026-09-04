@@ -10,7 +10,7 @@ namespace FleetPulse.Infrastructure.Kafka
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddKafkaDependencies(this IServiceCollection services, IConfiguration config) 
+        public static IServiceCollection AddKafkaDependencies(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<KafkaSettings>(config.GetSection(KafkaSettings.SectionName));
 
@@ -43,8 +43,8 @@ namespace FleetPulse.Infrastructure.Kafka
             
             services.AddHealthChecks().AddCheck<KafkaConsumerHealthCheck>("kafka_consumer_check");
             services.AddSingleton<IHealthConsumerTracker, KafkaConsumerTracker>();
-            
-            services.AddBackgroundWorkers(config);            
+
+            services.AddBackgroundWorkers(config);
 
             return services;
         }
