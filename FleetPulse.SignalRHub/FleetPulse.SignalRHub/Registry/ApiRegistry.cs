@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Mvc;
 using FleetPulse.Application.Features.Alerts.Queries.GetAlertsByStatusDateRange;
 using FleetPulse.Application.Features.Auth.Commands.Login;
 
-namespace FleetPulse.SignalRHub.Mapping
+namespace FleetPulse.SignalRHub.Registry
 {
-    public static class ApiMapping
+    public static class ApiRegistry
     {
 
 
-        public static void AddApiMapping(this WebApplication app)
+        public static void RegisterApiEndpoints(this WebApplication app)
         {
             var appSettings = app.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();

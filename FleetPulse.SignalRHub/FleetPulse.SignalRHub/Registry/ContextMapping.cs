@@ -3,9 +3,9 @@ using FleetPulse.Domain.Entities;
 using FleetPulse.Infrastructure.Kafka;
 using Mapster;
 
-namespace FleetPulse.SignalRHub.Mapping
+namespace FleetPulse.SignalRHub.Registry
 {
-    public static class DomainMapping
+    public static class ContextMapping
     {
         public static void RegisterMappings()
         {

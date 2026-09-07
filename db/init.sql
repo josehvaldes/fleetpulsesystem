@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS fleetpulse.driver_latest_state (
     speed          DOUBLE PRECISION,
     heading        INTEGER,
     last_seen      TIMESTAMPTZ NOT NULL,
-    status         VARCHAR(20) DEFAULT 'moving'  -- moving, stopped, offline
+    status         VARCHAR(20) DEFAULT 'moving',  -- moving, stopped, offline
     CONSTRAINT chk_driver_state_status
         CHECK (status IN ('moving', 'stopped', 'offline'))
 );
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
     status           VARCHAR(20) NOT NULL,
     autoscale        BOOLEAN,    
     raised_at        TIMESTAMPTZ,
-    created_at       TIMESTAMPTZ DEFAULT NOW()
+    created_at       TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT chk_jobs_status
         CHECK (status IN ('New', 'InProgress', 'Resolved', 'Closed', 'OnError'))
 );

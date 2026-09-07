@@ -21,8 +21,6 @@
   <ItemGroup>
     <Folder Include="Features\Alerts\Commands\" />
     <Folder Include="Features\Drivers\Commands\" />
-    <Folder Include="Features\GpsHistory\Commands\" />
-    <Folder Include="Features\GpsHistory\Queries\" />
   </ItemGroup>
 
 </Project>

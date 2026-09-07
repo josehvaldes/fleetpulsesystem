@@ -7,9 +7,10 @@ using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Logging;
 using FleetPulse.SignalRHub.Mapping;
 using FleetPulse.SignalRHub.Middleware;
+using FleetPulse.SignalRHub.Registry;
 using Serilog;
 
-DomainMapping.RegisterMappings();
+ContextMapping.RegisterMappings();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,8 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.UseCors();
-app.AddApiMapping();
+app.RegisterApiEndpoints();
 app.AddPrometheusMapping();
 app.Run();
 
+public partial class Program { }
