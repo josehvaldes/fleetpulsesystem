@@ -13,7 +13,12 @@ namespace FleetPulse.SignalRHub.Registry
             TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>
                 .NewConfig()
                 .Map(dest => dest.LastSeen, src => src.last_seen.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.driver_id);
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.Status, src => src.status)
+                .Map(dest => dest.Longitude, src => src.longitude)
+                .Map(dest => dest.Latitude, src => src.latitude)
+                .Map(dest => dest.Speed, src => src.speed)
+                .Map(dest => dest.Heading, src => src.heading);
 
             TypeAdapterConfig<Alert, AlertResponse>.NewConfig()
                 .Map(dest => dest.Id, src => src.id)
@@ -34,7 +39,11 @@ namespace FleetPulse.SignalRHub.Registry
             TypeAdapterConfig<GpsPing, GpsPingResponse>
                 .NewConfig()
                 .Map(dest => dest.Timestamp, src => src.timestamp.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.driver_id);
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.Latitude, src => src.latitude)
+                .Map(dest => dest.Longitude, src => src.longitude)
+                .Map(dest => dest.Speed, src => src.speed)
+                .Map(dest => dest.Heading, src => src.heading);
 
             KafkaMapping.RegisterMappings(); // Register Kafka mappings
         }

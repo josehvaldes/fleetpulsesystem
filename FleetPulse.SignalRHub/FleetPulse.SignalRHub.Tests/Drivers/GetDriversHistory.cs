@@ -3,10 +3,7 @@ using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Tests.Infrastructure;
 using FluentAssertions;
 using Npgsql;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
-using System.Text;
 using Xunit;
 
 namespace FleetPulse.SignalRHub.Tests.Drivers
@@ -51,6 +48,83 @@ namespace FleetPulse.SignalRHub.Tests.Drivers
             history.Should().HaveCount(3); // 3 in-window pings; the 30-minute-old ping is out of range
             history.Should().OnlyContain(p => p.DriverId == driverId);
 
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldIncludeOlderPings_WhenWindowIsWideEnough()
+        {
+            var driverId = "driver1";
+            var from = DateTime.UtcNow.AddHours(-1).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/drivers/{driverId}/history?from={from}&to={to}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var history = await response.Content.ReadFromJsonAsync<List<GpsPingResponse>>(CancellationToken.None);
+
+            history.Should().NotBeNull();
+            history.Should().HaveCount(4); // the 30-minute-old ping falls inside a 1-hour window
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldReturnOnlyRequestedDriver()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-10).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/drivers/driver2/history?from={from}&to={to}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var history = await response.Content.ReadFromJsonAsync<List<GpsPingResponse>>(CancellationToken.None);
+
+            history.Should().NotBeNull();
+            history.Should().ContainSingle(p => p.DriverId == "driver2");
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldReturnEmpty_WhenFromIsInTheFuture()
+        {
+            var from = DateTime.UtcNow.AddHours(1).ToString("o");
+            var to = DateTime.UtcNow.AddHours(2).ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/drivers/driver1/history?from={from}&to={to}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var history = await response.Content.ReadFromJsonAsync<List<GpsPingResponse>>(CancellationToken.None);
+
+            history.Should().NotBeNull();
+            history.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldMapFieldsCorrectly()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-10).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/drivers/driver1/history?from={from}&to={to}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var history = await response.Content.ReadFromJsonAsync<List<GpsPingResponse>>(CancellationToken.None);
+
+            var ping = history.Should().ContainSingle(p =>
+                p.Latitude == 37.7749 && p.Longitude == -122.4194).Which;
+            ping.DriverId.Should().Be("driver1");
+            ping.Speed.Should().Be(42.0);
+            ping.Heading.Should().Be(90);
+            DateTime.TryParse(ping.Timestamp, out _).Should().BeTrue(); // ISO 8601 round-trip format
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldReturnBadRequest_WhenFromIsMissing()
+        {
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/drivers/driver1/history?to={to}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task GetDriversHistoryAsync_ShouldReturnBadRequest_WhenDatesAreInvalid()
+        {
+            var response = await Client.GetAsync("/api/v1/drivers/driver1/history?from=not-a-date&to=also-not-a-date", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
         }
     }
 }

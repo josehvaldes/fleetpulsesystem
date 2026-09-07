@@ -79,5 +79,109 @@ namespace FleetPulse.SignalRHub.Tests.Alerts
             alerts.Should().HaveCount(1);
             alerts.First().Status.Should().Be(status);
         }
+
+        [Fact]
+        public async Task GetAlerts_ShouldFilterByStatus()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            alerts.Should().NotBeNull();
+            alerts.Should().HaveCount(3);
+            alerts.Should().OnlyContain(a => a.Status == "New");
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldOrderByRaisedAtDescending()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            alerts.Should().NotBeNull();
+            alerts.Should().BeInDescendingOrder(a => a.RaisedAt);
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldRespectLimit()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=2", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            alerts.Should().NotBeNull();
+            alerts.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldReturnEmpty_WhenStatusHasNoAlerts()
+        {
+            // 'Closed' is a valid status, but no seed data uses it
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=Closed&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            alerts.Should().NotBeNull();
+            alerts.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldExcludeAlertsOutsideWindow()
+        {
+            // 4-minute window only covers the OnError alert raised 1 minute ago;
+            // the other alerts (raised 2-12 minutes ago) fall outside it
+            var from = DateTime.UtcNow.AddMinutes(-4).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=InProgress&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            alerts.Should().NotBeNull();
+            alerts.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldMapFieldsCorrectly()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+
+            var alert = alerts.Should().ContainSingle(a => a.ZoneName == "Downtown Core").Which;
+            alert.Id.Should().NotBeNullOrEmpty();
+            alert.DriverId.Should().Be("driver1");
+            alert.ZoneType.Should().Be("restricted");
+            alert.RiskLevel.Should().Be("High");
+            alert.Assessment.Should().Be("High-speed exit from restricted zone");
+            alert.Recommendation.Should().Be("Dispatch supervisor immediately");
+            alert.AutoScale.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GetAlerts_ShouldReturnBadRequest_WhenStatusIsMissing()
+        {
+            var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
+            var to = DateTime.UtcNow.ToString("o");
+
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&limit=10", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        }
     }
 }

@@ -45,19 +45,20 @@ namespace FleetPulse.Infrastructure.Services
             return lastStates;
         }
 
-        public async Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, int limit, CancellationToken cancellationToken)
         {
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                       risk_level, assessment, recommendation, autoscale AS auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC
+                LIMIT @Limit
                 """;
 
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-            var rows = await connection.QueryAsync<Alert>(sql, new { Status = status, StartDate = startDate, EndDate = endDate });
+            var rows = await connection.QueryAsync<Alert>(sql, new { Status = status, StartDate = startDate, EndDate = endDate, Limit = limit });
             return rows;
         }
     }

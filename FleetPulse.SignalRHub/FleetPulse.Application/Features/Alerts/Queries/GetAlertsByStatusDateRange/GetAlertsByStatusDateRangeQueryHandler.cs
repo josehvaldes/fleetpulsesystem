@@ -10,7 +10,7 @@ namespace FleetPulse.Application.Features.Alerts.Queries.GetAlertsByStatusDateRa
         public async ValueTask<IReadOnlyList<Alert>> Handle(GetAlertsByStatusDateRangeQuery request, CancellationToken cancellationToken)
         {
             var alertStatus = Enum.Parse<AlertStatus>(request.Status, true);
-            var alerts = await dbService.GetAlertsByStatusDateRangeAsync(alertStatus, request.From, request.To, cancellationToken);
+            var alerts = await dbService.GetAlertsByStatusDateRangeAsync(alertStatus, request.From, request.To, request.Limit, cancellationToken);
             return alerts.ToList().AsReadOnly();
         }
     }

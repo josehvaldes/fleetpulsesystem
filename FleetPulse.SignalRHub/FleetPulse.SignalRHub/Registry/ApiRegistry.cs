@@ -54,9 +54,14 @@ namespace FleetPulse.SignalRHub.Registry
 
             });
 
-            apiGroup.MapGet("/alerts", async (IMediator mediator, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit = 50, CancellationToken cancellationToken = default) =>
+            apiGroup.MapGet("/alerts", async (IMediator mediator, [FromQuery] string status, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int limit, CancellationToken cancellationToken) =>
             {
-                var query = new GetAlertsByStatusDateRangeQuery(status, from, to);
+                if (limit <= 0)
+                {
+                    limit = 50;
+                }
+
+                var query = new GetAlertsByStatusDateRangeQuery(status, from, to, limit);
                 var result = await mediator.Send(query, cancellationToken);
                 return result.Adapt<List<AlertResponse>>();
             });
