@@ -78,8 +78,8 @@ namespace FleetPulse.DbWriter.Services
                         // don't wait for the database operation to complete, just fire and forget
                         var task = _alertDatabaseService.AddAlertAsync(alertdb, cancellationToken);
 
-                        // Schedule the escalation job only if the risk level is high and autoscale is enabled
-                        if (alertdb.risk_level == RiskLevel.High && alertdb.autoscale)
+                        // Schedule the escalation job only if the risk level is high and auto_escalate is enabled
+                        if (alertdb.risk_level == RiskLevel.High && alertdb.auto_escalate)
                         {
                             BackgroundJob.Schedule<EscalationJob>
                             (

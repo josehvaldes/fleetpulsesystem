@@ -50,7 +50,7 @@ namespace FleetPulse.Infrastructure.Services
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale AS auto_escalate, status, raised_at
+                       risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC

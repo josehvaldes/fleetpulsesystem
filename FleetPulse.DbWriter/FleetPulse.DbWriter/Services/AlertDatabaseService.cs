@@ -23,7 +23,7 @@ namespace FleetPulse.DbWriter.Services
                     zone_name, zone_type,
                     risk_level, assessment, recommendation,
                     status,
-                    autoscale, raised_at
+                    auto_escalate, raised_at
                 ) VALUES (
                     @id, @driver_id,
                     @event_latitude, @event_longitude,
@@ -31,7 +31,7 @@ namespace FleetPulse.DbWriter.Services
                     @zone_name, @zone_type,
                     @risk_level, @assessment, @recommendation,
                     @status,
-                    @autoscale, @raised_at
+                    @auto_escalate, @raised_at
                 )
                 """;
 
@@ -48,7 +48,7 @@ namespace FleetPulse.DbWriter.Services
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                       risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE driver_id = @DriverId
                 ORDER BY raised_at DESC
@@ -64,7 +64,7 @@ namespace FleetPulse.DbWriter.Services
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                       risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC
@@ -80,7 +80,7 @@ namespace FleetPulse.DbWriter.Services
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                       risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC
@@ -96,7 +96,7 @@ namespace FleetPulse.DbWriter.Services
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
-                       risk_level, assessment, recommendation, autoscale, status, raised_at
+                       risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
                 WHERE id = @AlertId
                 """;

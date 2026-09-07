@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
     assessment       TEXT NOT NULL,
     recommendation   TEXT NOT NULL,
     status           TEXT NOT NULL,
-    autoscale        BOOLEAN,    
+    auto_escalate        BOOLEAN,    
     raised_at        TIMESTAMPTZ,
     created_at       TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT chk_jobs_status

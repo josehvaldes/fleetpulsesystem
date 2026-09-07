@@ -23,7 +23,7 @@ namespace FleetPulse.DbWriter.Mappings
                 .Map(dest => dest.risk_level, src => Enum.Parse<RiskLevel>(src.AgentRiskLevel, ignoreCase: true))
                 .Map(dest => dest.assessment, src => src.AgentAssessment)
                 .Map(dest => dest.recommendation, src => src.AgentRecommendation)
-                .Map(dest => dest.autoscale, src => src.AgentAutoEscalate)
+                .Map(dest => dest.auto_escalate, src => src.AgentAutoEscalate)
                 .Map(dest => dest.raised_at, src => src.CreatedAt);
         }
     }

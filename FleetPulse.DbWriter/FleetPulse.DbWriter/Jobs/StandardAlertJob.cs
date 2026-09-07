@@ -20,7 +20,7 @@ namespace FleetPulse.DbWriter.Jobs
                 return;
             }
             // Check if the alert is still open and has not been escalated
-            if (alert.status == AlertStatus.New && !alert.autoscale)
+            if (alert.status == AlertStatus.New && !alert.auto_escalate)
             {
                 // Process the standard alert
                 _logger.LogInformation("Processing standard alert with ID: {AlertId}", alertId);

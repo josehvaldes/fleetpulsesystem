@@ -46,7 +46,7 @@ namespace FleetPulse.Tests.IntegrationTests
                 risk_level = riskLevel,
                 assessment = $"Test Assessment: {driverId}",
                 recommendation = $"Test Recommendation: {driverId}",
-                autoscale = false,
+                auto_escalate = false,
                 status = AlertStatus.New,
                 raised_at = DateTime.UtcNow
             };

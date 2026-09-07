@@ -17,7 +17,7 @@ namespace FleetPulse.DbWriter.Models.DB
         public RiskLevel risk_level { get; set; } = RiskLevel.Low;
         public string assessment { get; set; } = string.Empty;
         public string recommendation { get; set; } = string.Empty;
-        public bool autoscale { get; set; }
+        public bool auto_escalate { get; set; }
 
         public AlertStatus status { get; set; } = AlertStatus.New;
 
