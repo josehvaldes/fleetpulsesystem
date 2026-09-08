@@ -15,7 +15,7 @@
         public string Status { get; set; } = string.Empty;
         public string Assessment { get; set; } = string.Empty;
         public string Recommendation { get; set; } = string.Empty;
-        public bool AutoScale { get; set; }
+        public bool AutoEscalate { get; set; }
         public DateTimeOffset RaisedAt { get; set; }
 
     }

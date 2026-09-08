@@ -2,7 +2,7 @@
 using Xunit;
 using Dapper;
 
-namespace FleetPulse.SignalRHub.Tests.Infrastructure
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure
 {
     public sealed class IntegrationTestFixture : IAsyncLifetime
     {

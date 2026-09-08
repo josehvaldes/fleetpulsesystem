@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace FleetPulse.SignalRHub.Tests.Infrastructure
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure
 {
     public abstract class IntegrationTest : IAsyncLifetime
     {

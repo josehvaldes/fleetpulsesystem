@@ -7,8 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Login\" />
-    <Folder Include="UnitTests\" />
+    <Folder Include="IntegrationTests\Login\" />
+    <Folder Include="E2ETests\" />
+    <Folder Include="UnitTests\Application\" />
+    <Folder Include="UnitTests\Domain\" />
   </ItemGroup>
 
   <ItemGroup>

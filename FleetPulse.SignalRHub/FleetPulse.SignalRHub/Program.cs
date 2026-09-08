@@ -46,8 +46,13 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.UseCors();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.RegisterApiEndpoints();
 app.AddPrometheusMapping();
+
 app.Run();
 
 public partial class Program { }

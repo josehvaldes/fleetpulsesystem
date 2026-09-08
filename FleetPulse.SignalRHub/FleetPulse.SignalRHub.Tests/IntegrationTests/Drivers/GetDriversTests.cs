@@ -1,12 +1,12 @@
 ﻿using Dapper;
 using FleetPulse.Contracts.Response;
-using FleetPulse.SignalRHub.Tests.Infrastructure;
+using FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Npgsql;
 using System.Net.Http.Json;
 using Xunit;
 
-namespace FleetPulse.SignalRHub.Tests.Drivers
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Drivers
 {
     // Use GetDriversTests :IClassFixture = one fixture instance (one Postgres container + one app) per test class. 
     // Use ICollectionFixture = one fixture instance shared across all classes tagged [Collection("Integration")].

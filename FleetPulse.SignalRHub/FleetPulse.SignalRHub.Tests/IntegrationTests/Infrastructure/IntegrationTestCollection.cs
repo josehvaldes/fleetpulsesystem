@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace FleetPulse.SignalRHub.Tests.Infrastructure
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure
 {
     [CollectionDefinition("Integration")]
     public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>

@@ -1,7 +1,7 @@
 ﻿using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace FleetPulse.SignalRHub.Tests.Infrastructure
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure
 {
     public sealed class PostgresFixture : IAsyncLifetime
     {

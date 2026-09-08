@@ -27,17 +27,17 @@ namespace FleetPulse.SignalRHub.Registry
             var version = appSettings.ApiVersion;
 
             // Map the SignalR hub endpoint
-            app.MapHub<FleetHub>($"/{version}/fleetHub");//.RequireAuthorization(); to protect the hub with authentication. // Update this when login page is ready
+            app.MapHub<FleetHub>($"/{version}/fleetHub").RequireAuthorization();
 
             app.MapGet("/", () => "Welcome to SignalR Hub");
-            
+
             app.MapGet("/health", () => "Healthy");
-            
+
             app.MapHealthChecks("/healthz");
 
-            app.MapGet("/dbversion", async (IDatabaseService db) => await db.GetVersion(CancellationToken.None));//.RequireAuthorization(); // Update this when login page is ready
+            app.MapGet("/dbversion", async (IDatabaseService db) => await db.GetVersion(CancellationToken.None)).RequireAuthorization();
 
-            var apiGroup = app.MapGroup($"/api/{version}");//.RequireAuthorization(); // Update this when login page is ready
+            var apiGroup = app.MapGroup($"/api/{version}").RequireAuthorization();
 
             apiGroup.MapGet("/drivers", async (IMediator mediator, [FromQuery] DateTime from, [FromQuery] DateTime? to, CancellationToken cancellationToken) =>
             {

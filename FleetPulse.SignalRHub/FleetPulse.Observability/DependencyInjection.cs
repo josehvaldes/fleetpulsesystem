@@ -8,7 +8,6 @@ namespace FleetPulse.Observability
     {
         public static void AddPrometheusMapping(this WebApplication app)
         {
-            app.UseRouting();
             app.UseHttpMetrics();
             app.MapMetrics();
 

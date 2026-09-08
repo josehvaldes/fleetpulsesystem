@@ -1,12 +1,12 @@
 ﻿using Dapper;
 using FleetPulse.Contracts.Response;
-using FleetPulse.SignalRHub.Tests.Infrastructure;
+using FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Npgsql;
 using System.Net.Http.Json;
 using Xunit;
 
-namespace FleetPulse.SignalRHub.Tests.Alerts
+namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
 {
     [Collection("Integration")]
     public class GetAlertsTests : IntegrationTest
@@ -20,7 +20,7 @@ namespace FleetPulse.SignalRHub.Tests.Alerts
                 INSERT INTO fleetpulse.alerts
                     (driver_id, event_latitude, event_longitude, exit_speed, exit_time,
                      zone_name, zone_type, risk_level, assessment, recommendation,
-                     status, autoscale, raised_at)
+                     status, auto_escalate, raised_at)
                 VALUES
                     ('driver1', 37.7749, -122.4194, 45.0, NOW() - INTERVAL '12 minutes',
                      'Downtown Core', 'restricted', 'High',
@@ -171,7 +171,7 @@ namespace FleetPulse.SignalRHub.Tests.Alerts
             alert.RiskLevel.Should().Be("High");
             alert.Assessment.Should().Be("High-speed exit from restricted zone");
             alert.Recommendation.Should().Be("Dispatch supervisor immediately");
-            alert.AutoScale.Should().BeTrue();
+            alert.AutoEscalate.Should().BeTrue();
         }
 
         [Fact]
