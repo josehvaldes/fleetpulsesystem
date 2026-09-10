@@ -77,9 +77,9 @@ namespace FleetPulse.Infrastructure.Kafka
                             _logger.LogWarning($"Received null or invalid alert message from Kafka, skipping. [{result.Message.Value}]");
                             continue;
                         }
-                        
+                        var alert = dto.Adapt<Alert>();
                         // Fan-out via SignalR group (one group per fleet, or broadcast)
-                        await _notifier.SendAlertToAllAsync(dto.Adapt<Alert>(), stoppingToken);
+                        await _notifier.SendAlertToAllAsync(alert, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {

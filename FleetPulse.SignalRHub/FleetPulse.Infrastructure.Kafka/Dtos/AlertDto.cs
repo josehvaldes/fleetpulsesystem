@@ -4,7 +4,6 @@ namespace FleetPulse.Infrastructure.Kafka.Dtos
 {
     public class AlertDto
     {
-        public string id { get; set; } = string.Empty;
 
         [JsonPropertyName("driver_id")]
         public string driver_id { get; set; } = string.Empty;
