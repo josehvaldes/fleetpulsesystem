@@ -32,11 +32,9 @@ class AlertManager:
 
     async def handle_alert(self, alert: AlertEvent, metadata: dict) -> None:
         """Handle a violation event."""
-        headers = []
-        if alert.traceparent:
-            headers.append(("traceparent", metadata.get("traceparent", "").encode("utf-8")))
-        if alert.tracestate:
-            headers.append(("tracestate", metadata.get("tracestate", "").encode("utf-8")))
+        headers = []        
+        headers.append(("traceparent", metadata.get("traceparent", "").encode("utf-8")))
+        headers.append(("tracestate", metadata.get("tracestate", "").encode("utf-8")))
 
         self.producer.produce(
             topic=settings.kafka_alert_topic,

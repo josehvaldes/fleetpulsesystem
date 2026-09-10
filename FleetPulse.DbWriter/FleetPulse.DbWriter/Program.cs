@@ -3,13 +3,17 @@ using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Jobs;
 using FleetPulse.DbWriter.Logging;
 using FleetPulse.DbWriter.Mappings;
-using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Services.Alerts;
+using FleetPulse.DbWriter.Services.Common;
+using FleetPulse.DbWriter.Services.GpsPing;
 using FleetPulse.DbWriter.Services.Interfaces;
 using FleetPulse.DbWriter.Workers;
 using Npgsql;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+MappingsConfig.ConfigureMappings();
 
 var appSettings = builder.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();

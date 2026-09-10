@@ -1,5 +1,5 @@
 ﻿using FleetPulse.DbWriter.Configuration;
-using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Services.GpsPing;
 using FleetPulse.Tests.Infrastructure;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;

@@ -2,7 +2,7 @@ using FleetPulse.DbWriter.Jobs;
 using FleetPulse.DbWriter.Services.Interfaces;
 using Hangfire;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Alerts
 {
     public class AlertJobScheduler(IBackgroundJobClient backgroundJobClient) : IAlertJobScheduler
     {

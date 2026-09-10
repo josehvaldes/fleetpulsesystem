@@ -6,8 +6,9 @@ using FleetPulse.DbWriter.Trace;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using FleetPulse.DbWriter.Infrastructure;
+using FleetPulse.DbWriter.Services.Common;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Alerts
 {
     public class AlertConsumer(ILogger<AlertConsumer> logger,
         [FromKeyedServices("Alerts")]

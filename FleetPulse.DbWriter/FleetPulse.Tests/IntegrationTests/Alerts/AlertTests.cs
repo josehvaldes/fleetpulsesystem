@@ -1,7 +1,7 @@
 ﻿using FleetPulse.DbWriter.Mappings;
 using FleetPulse.DbWriter.Models;
 using FleetPulse.DbWriter.Models.DB;
-using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Services.Alerts;
 using FleetPulse.Tests.Infrastructure;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;

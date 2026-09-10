@@ -12,7 +12,6 @@ namespace FleetPulse.DbWriter.Mappings
         public static void ConfigureMappings()
         {
             TypeAdapterConfig<AlertDto, AlertDb>.NewConfig()
-                .Map(dest => dest.id, src => src.Id)
                 .Map(dest => dest.driver_id, src => src.DriverId)
                 .Map(dest => dest.event_latitude, src => src.ExitLocation.Latitude)
                 .Map(dest => dest.event_longitude, src => src.ExitLocation.Longitude)

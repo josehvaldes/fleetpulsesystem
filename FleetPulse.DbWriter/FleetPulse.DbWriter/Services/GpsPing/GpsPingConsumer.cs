@@ -3,6 +3,7 @@ using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Infrastructure;
 using FleetPulse.DbWriter.MetricsConfig;
 using FleetPulse.DbWriter.Models;
+using FleetPulse.DbWriter.Services.Common;
 using FleetPulse.DbWriter.Services.Interfaces;
 using FleetPulse.DbWriter.Trace;
 using Microsoft.Extensions.Options;
@@ -11,7 +12,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.GpsPing
 {
     internal class GpsPingConsumer(IOptions<KafkaSettings> settings,
         IKafkaConsumerFactory kafkaConsumerFactory,

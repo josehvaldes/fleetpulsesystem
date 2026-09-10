@@ -6,7 +6,7 @@ using Npgsql;
 using NpgsqlTypes;
 using Prometheus;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.GpsPing
 {
     public class GpsPingDatabaseService(NpgsqlDataSource _dataSource, ILogger<GpsPingDatabaseService> _logger) : IGpsPingDatabaseService
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Common
 {
     public abstract class KafkaConsumer
     {

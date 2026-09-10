@@ -5,7 +5,7 @@ using FleetPulse.DbWriter.Models.DB;
 using FleetPulse.DbWriter.Services.Interfaces;
 using Npgsql;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Alerts
 {
     public class AlertDatabaseService(NpgsqlDataSource _dataSource,
         ILogger<AlertDatabaseService> _logger) : IAlertDatabaseService

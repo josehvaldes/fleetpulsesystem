@@ -1,6 +1,6 @@
 ﻿using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Models;
-using FleetPulse.DbWriter.Services;
+using FleetPulse.DbWriter.Services.GpsPing;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using System.Text;

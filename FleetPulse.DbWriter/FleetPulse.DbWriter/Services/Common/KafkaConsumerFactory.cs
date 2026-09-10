@@ -1,7 +1,7 @@
 using Confluent.Kafka;
 using FleetPulse.DbWriter.Services.Interfaces;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Common
 {
     public class KafkaConsumerFactory : IKafkaConsumerFactory
     {

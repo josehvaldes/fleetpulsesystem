@@ -9,7 +9,7 @@ using Mapster;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
-namespace FleetPulse.DbWriter.Services
+namespace FleetPulse.DbWriter.Services.Alerts
 {
     public class AlertMessageHandler(
         ILogger<AlertMessageHandler> logger,
