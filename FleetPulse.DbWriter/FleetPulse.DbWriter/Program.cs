@@ -1,13 +1,10 @@
-using Dapper;
 using FleetPulse.DbWriter;
 using FleetPulse.DbWriter.Configuration;
-using FleetPulse.DbWriter.Infrastructure;
 using FleetPulse.DbWriter.Jobs;
 using FleetPulse.DbWriter.Logging;
 using FleetPulse.DbWriter.Mappings;
 using FleetPulse.DbWriter.Services;
 using FleetPulse.DbWriter.Services.Interfaces;
-
 using FleetPulse.DbWriter.Workers;
 using Npgsql;
 using Serilog;
@@ -41,8 +38,11 @@ builder.Services.AddSingleton(sp =>
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.SectionName));
 builder.Services.AddSingleton<IGpsPingDatabaseService, GpsPingDatabaseService>();
 builder.Services.AddSingleton<ICompressionService, CompressionService>();
+builder.Services.AddSingleton<IKafkaConsumerFactory, KafkaConsumerFactory>();
 builder.Services.AddSingleton<IGpsPingConsumer, GpsPingConsumer>();
 builder.Services.AddSingleton<IAlertDatabaseService, AlertDatabaseService>();
+builder.Services.AddSingleton<IAlertJobScheduler, AlertJobScheduler>();
+builder.Services.AddKeyedSingleton<IKafkaMessageHandler, AlertMessageHandler>("Alerts");
 builder.Services.AddSingleton<IAlertConsumer, AlertConsumer>();
 
 
@@ -61,3 +61,6 @@ SqlMapping.RegisterSqlMappings();
 var host = builder.Build();
 
 host.Run();
+
+
+public partial class Program { }

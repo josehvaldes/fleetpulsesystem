@@ -1,23 +1,28 @@
 ﻿using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.Services;
+using FleetPulse.Tests.Infrastructure;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
-namespace FleetPulse.Tests.IntegrationTests
+namespace FleetPulse.Tests.IntegrationTests.Gps
 {
-    public class GpsPingTests
+    [Collection("Integration")]
+    public class GpsPingTests //: IClassFixture<IntegrationTestFixture>
     {
+        private readonly IntegrationTestFixture _fixture;
 
-        private static GpsPingDatabaseService CreateDatabaseServiceInstance()
+        public GpsPingTests(IntegrationTestFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
+        private GpsPingDatabaseService CreateDatabaseServiceInstance()
         {
             // Here you would typically set up your database connection string and any other required settings.
-            var connectionString = "Host=localhost;Port=5432;Database=fleetpulse;Username=fleetpulse;Password=fleetpulse_dev";
+            var connectionString = _fixture.ConnectionString;
             var datasource = new NpgsqlDataSourceBuilder(connectionString).Build();
             ILogger<GpsPingDatabaseService> logger = new LoggerFactory().CreateLogger<GpsPingDatabaseService>();
             return new GpsPingDatabaseService(datasource, logger);

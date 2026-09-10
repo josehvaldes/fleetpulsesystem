@@ -1,30 +1,30 @@
-﻿
-using Dapper;
-using FleetPulse.DbWriter.Infrastructure;
-using FleetPulse.DbWriter.Mappings;
+﻿using FleetPulse.DbWriter.Mappings;
 using FleetPulse.DbWriter.Models;
 using FleetPulse.DbWriter.Models.DB;
 using FleetPulse.DbWriter.Services;
+using FleetPulse.Tests.Infrastructure;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Xunit;
 
-namespace FleetPulse.Tests.IntegrationTests
+namespace FleetPulse.Tests.IntegrationTests.Alerts
 {
-    public class AlertTests
+    [Collection("Integration")]
+    public class AlertTests //: IClassFixture<IntegrationTestFixture>
     {
+        protected readonly IntegrationTestFixture Fixture;
 
-        public AlertTests() 
+        public AlertTests(IntegrationTestFixture fixture)
         {
             // Register SQL mappings for Dapper
             SqlMapping.RegisterSqlMappings();
+            Fixture = fixture;
         }
 
-        private static AlertDatabaseService CreateDatabaseServiceInstance()
+        private AlertDatabaseService CreateDatabaseServiceInstance()
         {
-            // Here you would typically set up your database connection string and any other required settings.
-            var connectionString = "Host=localhost;Port=5432;Database=fleetpulse;Username=fleetpulse;Password=fleetpulse_dev";
+            var connectionString = Fixture.ConnectionString;
             var datasource = new NpgsqlDataSourceBuilder(connectionString).Build();
             ILogger<AlertDatabaseService> logger = new LoggerFactory().CreateLogger<AlertDatabaseService>();
             return new AlertDatabaseService(datasource, logger);

@@ -1,45 +1,37 @@
 ﻿using Confluent.Kafka;
 using FleetPulse.DbWriter.Configuration;
 using FleetPulse.DbWriter.MetricsConfig;
-using FleetPulse.DbWriter.Models;
 using FleetPulse.DbWriter.Services.Interfaces;
 using FleetPulse.DbWriter.Trace;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using System.Text.Json;
-using Mapster;
-using FleetPulse.DbWriter.Models.DB;
-using Hangfire;
-using FleetPulse.DbWriter.Jobs;
 using FleetPulse.DbWriter.Infrastructure;
 
 namespace FleetPulse.DbWriter.Services
 {
-    public class AlertConsumer(ILogger<AlertConsumer> _logger,
-        IAlertDatabaseService _alertDatabaseService,
+    public class AlertConsumer(ILogger<AlertConsumer> logger,
+        [FromKeyedServices("Alerts")]
+        IKafkaMessageHandler alertMessageHandler,        
+        IKafkaConsumerFactory kafkaConsumerFactory,
         IOptions<KafkaSettings> kafkaSettings) : KafkaConsumer(), IAlertConsumer
     {
         private IConsumer<string, string> _consumer = null!;
         private readonly KafkaSettings _settings = kafkaSettings.Value;
-        private readonly KafkaLogThrottle _logThrottle = new(_logger, "alerts");
-
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            PropertyNameCaseInsensitive = true
-        };
+        private readonly KafkaLogThrottle _logThrottle = new(logger, "alerts");
 
 
         public async Task StartConsumingAsync(CancellationToken stoppingToken)
         {
             var config = CreateConsumerConfig(_settings);
+            config.EnableAutoCommit = true; // Enable auto-commit for alerts, as we want to commit offsets after processing
 
-            _consumer = new ConsumerBuilder<string, string>(config)
-                .SetLogHandler((_, msg) => LogKafkaMessage(_logThrottle, msg))
-                .SetErrorHandler((_, e) => _logThrottle.Emit(LogLevel.Critical, $"Kafka Error: {e.Reason}"))
-                .Build();
+            _consumer = kafkaConsumerFactory.Create(
+                config,
+                msg => LogKafkaMessage(_logThrottle, msg),
+                error => _logThrottle.Emit(LogLevel.Critical, $"Kafka Error: {error.Reason}"));
 
             _consumer.Subscribe(_settings.AlertTopic);
-            _logger.LogInformation("Subscribed to Kafka topic: {Topic} with group: {GroupId}", _settings.AlertTopic, _settings.GroupId);
+            logger.LogInformation("Subscribed to Kafka topic: {Topic} with group: {GroupId}", _settings.AlertTopic, _settings.GroupId);
 
             try
             {
@@ -47,7 +39,7 @@ namespace FleetPulse.DbWriter.Services
             }
             finally
             {
-                _logger.LogInformation("Closing Kafka Alert consumer for topic '{Topic}'", _settings.AlertTopic);
+                logger.LogInformation("Closing Kafka Alert consumer for topic '{Topic}'", _settings.AlertTopic);
 
                 _consumer.Close();
             }
@@ -62,7 +54,7 @@ namespace FleetPulse.DbWriter.Services
 
                     if (consumeResult.IsPartitionEOF)
                     {
-                        _logger.LogDebug("Reached end of partition {Partition}",
+                        logger.LogDebug("Reached end of partition {Partition}",
                             consumeResult.Partition);
                         continue;
                     }
@@ -71,35 +63,7 @@ namespace FleetPulse.DbWriter.Services
                     var parentCtx = KafkaTraceContextExtractor.Extract(consumeResult.Message.Headers);
                     using var activity = Telemetry.ActivitySource.StartActivity("dbwriter.process_alert", ActivityKind.Consumer, parentCtx);
 
-                    var alert = DeserializeAlert(consumeResult);
-                    if (alert != null)
-                    {
-                        var alertdb = alert.Adapt<AlertDb>();
-                        // don't wait for the database operation to complete, just fire and forget
-                        var task = _alertDatabaseService.AddAlertAsync(alertdb, cancellationToken);
-
-                        // Schedule the escalation job only if the risk level is high and auto_escalate is enabled
-                        if (alertdb.risk_level == RiskLevel.High && alertdb.auto_escalate)
-                        {
-                            BackgroundJob.Schedule<EscalationJob>
-                            (
-                                //"escalation-alerts", No need to add queue name, as the queue is defined in the job class itself.
-                                x => x.CheckAndEscalateAsync(alertdb.id, cancellationToken),
-                                // Schedule the job to run after 10 seconds. Hardcoded for now, but can be made configurable later.
-                                TimeSpan.FromSeconds(10)
-                            );
-                        }
-
-                        // Schedule the standard alert processing job
-                        BackgroundJob.Enqueue<StandardAlertJob>
-                        (
-                            x => x.ProcessAlertAsync(alertdb.id, cancellationToken)
-                        );
-                    }
-                    else 
-                    {
-                        FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.DeserializationError.ToString(), _settings.AlertTopic }).Inc();
-                    }
+                    await alertMessageHandler.HandleAsync(consumeResult.Message.Value, cancellationToken);
                 }
                 catch (OperationCanceledException) 
                 {
@@ -109,30 +73,16 @@ namespace FleetPulse.DbWriter.Services
                 catch (ConsumeException ex) 
                 {
                     // handled the noise via the SetLogHandler/SetErrorHandler throttle.
-                    _logger.LogDebug(ex, "Alert Consume error on partition {Partition}",ex.ConsumerRecord?.Partition);
+                    logger.LogDebug(ex, "Alert Consume error on partition {Partition}",ex.ConsumerRecord?.Partition);
                     FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.ConsumeException.ToString(), _settings.AlertTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Unexpected error while consuming alert");
+                    logger.LogError(ex, "Unexpected error while consuming alert");
                     FleetMetrics.AlertsProcessingErrors.WithLabels(new string[] { ErrorLabel.UnknownError.ToString(), _settings.AlertTopic }).Inc();
                     await Task.Delay(1000, cancellationToken);
                 }
-            }
-        }
-
-        private AlertDto? DeserializeAlert(ConsumeResult<string, string> result) 
-        {
-            try
-            {
-                var message = result.Message.Value;
-                return JsonSerializer.Deserialize<AlertDto>(message, JsonOptions);
-            }
-            catch (JsonException)
-            {
-                _logger.LogWarning("Failed to deserialize message from Kafka: {Message}", result.Message.Value);
-                return null;
             }
         }
     }
