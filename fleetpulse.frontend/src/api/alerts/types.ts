@@ -4,8 +4,8 @@ interface AlertRequestParams {
     pageSize: number;
     riskLevel?: string;
     status?: string;
-    fromDate?: string;
-    toDate?: string;
+    from?: string;
+    to?: string;
 }
 
 interface AlertWire{

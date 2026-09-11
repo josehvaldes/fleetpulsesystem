@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FleetPulse.MockFleetHub.Contracts
+namespace FleetPulse.MockFleetHub.Contracts.Requests
 {
     public class GpsPingRequest
     {

@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.Contracts.Response
+﻿namespace FleetPulse.MockFleetHub.Contracts.Response
 {
     public class LastestDriverStateResponse
     {

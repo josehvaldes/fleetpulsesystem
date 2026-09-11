@@ -26,7 +26,13 @@ import { AlertActionCombobox } from "./AlertRowAction";
 export function AlertsDashboard() {
     const pagesize = 3;
     const [page, setPage] = useState(1);
-    const { isLoading, error, alerts, totalCount, totalPages, hasNextPage, hasPreviousPage } = useAlerts(page, pagesize);
+    const { isLoading, 
+        error, 
+        alerts, 
+        totalCount, 
+        totalPages, 
+        hasNextPage, 
+        hasPreviousPage } = useAlerts(page, pagesize,  );
 
     return (
     <div>

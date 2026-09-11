@@ -1,10 +1,5 @@
-﻿namespace FleetPulse.Contracts.Response
+﻿namespace FleetPulse.MockFleetHub.Contracts.Response
 {
-    /// <summary>
-    /// Mirrors the OAuth 2.0 token endpoint response (RFC 6749 §5.1).
-    /// The refresh token is delivered via an HttpOnly cookie instead of
-    /// this body to prevent JavaScript access from the SPA.
-    /// </summary>
     public class LoginResponse(string accessToken, string username, int expiresIn)
     {
         /// <summary>Short-lived JWT bearer token.</summary>

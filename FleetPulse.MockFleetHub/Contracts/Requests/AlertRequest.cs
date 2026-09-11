@@ -1,6 +1,6 @@
-﻿namespace FleetPulse.Contracts.Response
+﻿namespace FleetPulse.MockFleetHub.Contracts.Requests
 {
-    public class AlertResponse
+    public class AlertRequest
     {
         public string Id { get; set; } = string.Empty;
         public string DriverId { get; set; } = string.Empty;
@@ -15,8 +15,7 @@
         public string Status { get; set; } = string.Empty;
         public string Assessment { get; set; } = string.Empty;
         public string Recommendation { get; set; } = string.Empty;
-        public bool AutoEscalate { get; set; }
+        public bool AutoScale { get; set; }
         public DateTimeOffset RaisedAt { get; set; }
-
     }
 }

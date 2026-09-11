@@ -12,9 +12,10 @@ export async function fetchAlerts(
       pagesize: requestParams.pageSize.toString(),
         ...(requestParams.riskLevel ? { riskLevel: requestParams.riskLevel } : {}),
         ...(requestParams.status ? { status: requestParams.status } : {}),
-      ...(requestParams.fromDate ? { fromDate: requestParams.fromDate } : {}),
-      ...(requestParams.toDate ? { toDate: requestParams.toDate } : {}),
+      ...(requestParams.from ? { fromDate: requestParams.from } : {}),
+      ...(requestParams.to ? { toDate: requestParams.to } : {}),
     });
+    console.log('Fetching alerts with query params:', queryParams.toString());
     const data = await sendRequest<PageResponse<AlertWire>>(`/alerts?${queryParams.toString()}`, {
       method: "GET",
     });

@@ -3,5 +3,5 @@ using Mediator;
 
 namespace FleetPulse.Application.Features.Alerts.Queries.GetAlertsByStatusDateRange
 {
-    public sealed record GetAlertsByStatusDateRangeQuery(string Status, DateTime From, DateTime To, int Limit) : IRequest<IReadOnlyList<Alert>>;
+    public sealed record GetAlertsByStatusDateRangeQuery(string? Status, string? RiskLevel, DateTime? From, DateTime? To, int PageSize, int PageNumber) : IRequest<IReadOnlyList<Alert>>;
 }

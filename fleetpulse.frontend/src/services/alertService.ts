@@ -13,7 +13,7 @@ export async function getAlerts(  pageNumber: number,
     toDate?: string  ): Promise<PageResponse<Alert>> {
   try {
     const response = await fetchAlerts({pageNumber, pageSize, riskLevel, status, fromDate, toDate} as AlertRequestParams);
-    const data = response.data;
+    const data = response.items;
     const alerts = data.map((dto) => 
     { 
         const alert: Alert = {
@@ -39,7 +39,7 @@ export async function getAlerts(  pageNumber: number,
     );
 
     return {
-        data: alerts,
+        items: alerts,
         totalCount: response.totalCount,
         totalPages: response.totalPages,
         hasNextPage: response.hasNextPage,

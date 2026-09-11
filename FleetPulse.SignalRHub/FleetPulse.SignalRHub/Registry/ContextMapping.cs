@@ -1,4 +1,5 @@
-﻿using FleetPulse.Contracts.Response;
+﻿using FleetPulse.Contracts.Response.Alerts;
+using FleetPulse.Contracts.Response.Drivers;
 using FleetPulse.Domain.Entities;
 using FleetPulse.Infrastructure.Kafka;
 using Mapster;

@@ -1,5 +1,5 @@
-﻿using FleetPulse.MockFleetHub.Contracts;
-using FleetPulse.MockFleetHub.Hubs;
+﻿using FleetPulse.MockFleetHub.Contracts.Requests;
+using FleetPulse.MockFleetHub.Features.Hubs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;

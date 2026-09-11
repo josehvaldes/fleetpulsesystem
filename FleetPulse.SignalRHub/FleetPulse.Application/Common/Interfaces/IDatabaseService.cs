@@ -12,7 +12,7 @@ namespace FleetPulse.Application.Common.Interfaces
         public Task<IEnumerable<GpsPing>> GetGPSHistory(string driverId, DateTime startTime, DateTime endTime, CancellationToken cancellationToken);
         public Task<IEnumerable<Alert>> GetAlertsAsync(DateTime startTime, DateTime endTime, int limit, CancellationToken cancellationToken);
 
-        public Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, int limit, CancellationToken ct);
+        public Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus? status, RiskLevel? riskLevel, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber, CancellationToken ct);
 
     }
 }

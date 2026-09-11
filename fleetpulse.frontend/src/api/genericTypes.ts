@@ -1,7 +1,7 @@
 
 
 interface PageResponse<T> {
-    data: T[];
+    items: T[];
     totalCount: number;
     totalPages: number;
     hasNextPage: boolean;

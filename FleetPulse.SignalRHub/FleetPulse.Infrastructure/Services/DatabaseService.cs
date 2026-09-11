@@ -4,6 +4,7 @@ using FleetPulse.Domain.Enums;
 using FleetPulse.Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using System.Data;
 
 namespace FleetPulse.Infrastructure.Services
 {
@@ -45,20 +46,32 @@ namespace FleetPulse.Infrastructure.Services
             return lastStates;
         }
 
-        public async Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus status, DateTime startDate, DateTime endDate, int limit, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Alert>> GetAlertsByStatusDateRangeAsync(AlertStatus? status, RiskLevel? riskLevel, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber, CancellationToken cancellationToken)
         {
             var sql = """
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
                        risk_level, assessment, recommendation, auto_escalate, status, raised_at
                 FROM fleetpulse.alerts
-                WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
+                WHERE (@Status IS NULL OR status = CAST(@Status AS text))
+                     AND (@RiskLevel IS NULL OR risk_level = CAST(@RiskLevel AS text))
+                     AND (@StartDate IS NULL OR raised_at >= CAST(@StartDate AS timestamptz))
+                     AND (@EndDate IS NULL OR raised_at <= CAST(@EndDate AS timestamptz))
                 ORDER BY raised_at DESC
-                LIMIT @Limit
+                LIMIT @Limit OFFSET @Offset
                 """;
 
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-            var rows = await connection.QueryAsync<Alert>(sql, new { Status = status, StartDate = startDate, EndDate = endDate, Limit = limit });
+            var offset = (pageNumber - 1) * pageSize;
+            var parameters = new DynamicParameters();
+            parameters.Add("Status", status?.ToString(), DbType.String);
+            parameters.Add("RiskLevel", riskLevel?.ToString(), DbType.String);
+            parameters.Add("StartDate", startDate, DbType.DateTime);
+            parameters.Add("EndDate", endDate, DbType.DateTime);
+            parameters.Add("Limit", pageSize);
+            parameters.Add("Offset", offset);
+
+            var rows = await connection.QueryAsync<Alert>(sql, parameters);
             return rows;
         }
     }

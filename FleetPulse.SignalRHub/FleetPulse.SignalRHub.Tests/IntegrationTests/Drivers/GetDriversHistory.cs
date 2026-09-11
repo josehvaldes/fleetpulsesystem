@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using FleetPulse.Contracts.Response;
+using FleetPulse.Contracts.Response.Drivers;
 using FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Npgsql;

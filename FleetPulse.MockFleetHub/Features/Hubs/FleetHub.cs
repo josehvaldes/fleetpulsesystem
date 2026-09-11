@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace FleetPulse.MockFleetHub.Hubs
+namespace FleetPulse.MockFleetHub.Features.Hubs
 {
     public class FleetHub : Hub
     {

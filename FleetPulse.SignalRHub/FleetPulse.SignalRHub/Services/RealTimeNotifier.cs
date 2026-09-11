@@ -4,8 +4,8 @@ using FleetPulse.SignalRHub.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Mapster;
-using FleetPulse.Contracts.Response;
 using FleetPulse.Domain.Entities;
+using FleetPulse.Contracts.Response.Alerts;
 
 namespace FleetPulse.SignalRHub.Services
 {

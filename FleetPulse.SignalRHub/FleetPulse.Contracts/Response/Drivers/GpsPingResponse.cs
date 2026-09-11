@@ -1,5 +1,4 @@
-﻿
-namespace FleetPulse.Contracts.Response
+﻿namespace FleetPulse.Contracts.Response.Drivers
 {
     public class GpsPingResponse
     {

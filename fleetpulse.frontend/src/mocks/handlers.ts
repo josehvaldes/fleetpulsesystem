@@ -60,7 +60,7 @@ export const handlers = [
 
         const sliced = filteredAlerts.slice((pagenumber - 1) * pagesize, pagenumber * pagesize);
         const response:PageResponse<AlertWire> = {
-            data: sliced,
+            items: sliced,
             totalCount: filteredAlerts.length,
             totalPages: Math.ceil(filteredAlerts.length / pagesize),
             hasNextPage: pagenumber * pagesize < filteredAlerts.length,
