@@ -16,18 +16,41 @@ graph TD
 Hub[SignalR Hub<br/>/v1/fleetHub]
 
 subgraph Browser[React SPA]
+Shell[Browser Shell]
+Redux[Redux State]
 Service[fleetHub service<br/>HubConnection singleton]
 Hook[useGpsPings hook<br/>drivers + pings state]
 Map[FleetMap]
 List[DriversList]
 Log[MessageLog]
+
 end
 
+Shell --> Service
 Hub -- "ReceiveGpsPing" --> Service
 Service --> Hook
 Hook --> Map
 Hook --> List
 Hook --> Log
+
+subgraph MFE[MFE Modules]
+AlertModule[Alert MFE]
+end
+
+subgraph API[FleetPulse API]
+Endpoints[Endpoints]
+Database[(FleetApi)]
+end
+Endpoints --> Database
+
+Shell -- "/alerts"--> AlertModule
+AlertModule -- "localhost:" --> API
+
+AlertModule -- "getAuthToken()" -->Redux
+Shell -- "SetAuth" --> Redux
+
+
+
 ```
 
 ### Functional Responsibilities

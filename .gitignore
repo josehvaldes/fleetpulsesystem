@@ -42,3 +42,7 @@ FleetPulse.DbWriter/.gitignore
 FleetPulse.SignalRHub/.github/instructions/codacy.instructions.md
 FleetPulse.SignalRHub/.gitignore
 FleetPulse.MockFleetHub/appsettings.Development.json
+fleetpulse.alert-mgmt/.codacy/*
+fleetpulse.alert-mgmt/.github/*
+fleetpulse.alert-mgmt/.env
+fleetpulse.alert-mgmt/.gitignore
