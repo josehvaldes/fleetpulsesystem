@@ -1,4 +1,5 @@
 import { Suspense, useState } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
   Table,
   TableBody,
@@ -18,25 +19,52 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { AlertActionCombobox } from "./AlertRowAction";
-import { useAlerts } from "../hooks/useAlerts";
+import { useAlerts } from "@/features/alerts/hooks/useAlerts";
 
-export function AlertsDashboard() {
+export interface AlertsMfeProps {
+  getAuthToken: () => string | null;
+}
+
+// Own QueryClient so this MFE works standalone in a host that doesn't provide one.
+const remoteQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      gcTime: 10 * 60 * 1000,
+    },
+  },
+});
+
+export default function AlertsDashboard(props: AlertsMfeProps) {
+  return (
+    <QueryClientProvider client={remoteQueryClient}>
+      <AlertsDashboardContent {...props} />
+    </QueryClientProvider>
+  );
+}
+
+function AlertsDashboardContent({ getAuthToken}: AlertsMfeProps) {
     const pagesize = 2;
     const [page, setPage] = useState(1);
+    // TODO remove the console.log when deploying to production
+    const authToken = getAuthToken();
+    console.log("Received Auth Token:", authToken);
     const { isLoading, 
         error, 
         alerts, 
         totalCount, 
         totalPages, 
         hasNextPage, 
-        hasPreviousPage } = useAlerts(page, pagesize,  );
+        hasPreviousPage } = useAlerts(page, pagesize);
 
     return (
     <div>
         <div className="alerts-dashboard border border-blue-500 p-2">
             {isLoading && <p>Loading...</p>}
             {error && <p>Error loading alerts: {error}</p>}
-            <h3 className="font-bold">Alerts Dashboard</h3>
+            <h3 className="font-bold">Alerts Dashboard from MFE</h3>
 
             <Suspense fallback={<p>Loading alerts...</p>}>
 
