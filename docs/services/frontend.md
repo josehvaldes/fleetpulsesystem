@@ -13,11 +13,10 @@ The `FleetPulse.Frontend` is a React 19 + TypeScript Single-Page Application bui
 ```mermaid
 graph TD
 
-Hub[SignalR Hub<br/>/v1/fleetHub]
-
 subgraph Browser[React SPA]
-Shell[Browser Shell]
+Shell["Browser Shell<br/>(React+Vite)"]
 Redux[Redux State]
+AlertsMfeProps[AlertsMfeProps: <br/>getAuthToken <br/> apiBaseUrl]
 Service[fleetHub service<br/>HubConnection singleton]
 Hook[useGpsPings hook<br/>drivers + pings state]
 Map[FleetMap]
@@ -32,24 +31,33 @@ Service --> Hook
 Hook --> Map
 Hook --> List
 Hook --> Log
+Redux --> AlertsMfeProps
 
 subgraph MFE[MFE Modules]
-AlertModule[Alert MFE]
+AlertsModule["Alert MFE <br/>(React+Vite)<br/>:5173"]
+DriversModule["Drivers MFE <br/>(Angular 22)<br/>:5174"]
 end
+
 
 subgraph API[FleetPulse API]
+Hub[SignalR Hub<br/>/v1/fleetHub]
 Endpoints[Endpoints]
-Database[(FleetApi)]
 end
+
+Database[(FleetApi)]
+
 Endpoints --> Database
 
-Shell -- "/alerts"--> AlertModule
-AlertModule -- "localhost:" --> API
+Shell -- "/alerts_mfe/AlertsDashboard"--> AlertsModule
+Shell -- "/drivers_mfe/DriversDashboard" --> DriversModule
 
-AlertModule -- "getAuthToken()" -->Redux
+AlertsModule -- "use" -->AlertsMfeProps
+DriversModule -- "use" -->AlertsMfeProps
+
+AlertsModule --> Endpoints
+DriversModule --> Endpoints
+
 Shell -- "SetAuth" --> Redux
-
-
 
 ```
 
