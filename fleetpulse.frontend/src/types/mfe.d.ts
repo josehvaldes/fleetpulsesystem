@@ -3,6 +3,7 @@ declare module 'alerts_mfe/AlertsDashboard' {
 
   interface AlertsMfeProps {
     getAuthToken: () => string | null;
+    apiBaseUrl?: string | null;
   }
 
   const Alerts: ComponentType<AlertsMfeProps>;

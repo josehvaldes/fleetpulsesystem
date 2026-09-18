@@ -1,7 +1,13 @@
+import { getCurrentAuthToken, getApiBaseUrlOverride } from "@/api/authTokenProvider";
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
-export const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
-export const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
+const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
+const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
+const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
+
+// Prefers the host-provided base URL so it always matches the API that issued the auth token.
+export function getApiBaseUrl(): string {
+  return getApiBaseUrlOverride() || DEFAULT_API_BASE_URL;
+}
 
 export interface ApiRequestOptions extends RequestInit {
   excludeApiVersion?: boolean;
@@ -28,14 +34,15 @@ export async function sendRequest<T>(
 ): Promise<T> {
   const { excludeApiVersion = false, headers, ...requestInit } = options;
   const normalizedEndpoint = endpoint.replace(/^\/+/, "");
+  const apiBaseUrl = getApiBaseUrl();
   const url = excludeApiVersion
-    ? `${API_BASE_URL}/${normalizedEndpoint}`
-    : `${API_BASE_URL}/${joinUrlSegments(API_VERSION, normalizedEndpoint)}`;
+    ? `${apiBaseUrl}/${normalizedEndpoint}`
+    : `${apiBaseUrl}/${joinUrlSegments(API_VERSION, normalizedEndpoint)}`;
 
   const mergedHeaders = new Headers(headers);
   mergedHeaders.set("x-api-key", API_KEY);
 
-  const accessToken = ""; //TODO Get the access token from your authentication mechanism here
+  const accessToken = getCurrentAuthToken();
   if (accessToken && !mergedHeaders.has("Authorization")) {
     mergedHeaders.set("Authorization", `Bearer ${accessToken}`);
   }

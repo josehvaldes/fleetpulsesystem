@@ -1,11 +1,9 @@
 import './App.css'
-import { AlertsDashboard } from '@/features/alerts/';
+import { AlertsDashboardContent } from '@/features/alerts/';
 function App() {
-  
-
   return (
     <>
-      <AlertsDashboard getAuthToken={() => ""} />      
+      <AlertsDashboardContent  getAuthToken={() => ""} />
     </>
   )
 }

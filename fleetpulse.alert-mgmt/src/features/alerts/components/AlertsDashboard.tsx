@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
   Table,
@@ -20,9 +20,12 @@ import {
 } from "@/components/ui/pagination"
 import { AlertActionCombobox } from "./AlertRowAction";
 import { useAlerts } from "@/features/alerts/hooks/useAlerts";
+import { setAuthTokenGetter, setApiBaseUrlOverride } from "@/api/authTokenProvider";
+
 
 export interface AlertsMfeProps {
   getAuthToken: () => string | null;
+  apiBaseUrl?: string | null;
 }
 
 // Own QueryClient so this MFE works standalone in a host that doesn't provide one.
@@ -45,12 +48,22 @@ export default function AlertsDashboard(props: AlertsMfeProps) {
   );
 }
 
-function AlertsDashboardContent({ getAuthToken}: AlertsMfeProps) {
+export function AlertsDashboardContent({ getAuthToken, apiBaseUrl }: AlertsMfeProps) {
     const pagesize = 2;
     const [page, setPage] = useState(1);
-    // TODO remove the console.log when deploying to production
-    const authToken = getAuthToken();
-    console.log("Received Auth Token:", authToken);
+
+    // Register the host's token getter so API calls can read a fresh token on demand.
+    useEffect(() => {
+        setAuthTokenGetter(getAuthToken);
+        return () => setAuthTokenGetter(null);
+    }, [getAuthToken]);
+
+    // Host can pin the API base URL to the same backend that issued the token; otherwise falls back to this remote's own env var.
+    useEffect(() => {
+        setApiBaseUrlOverride(apiBaseUrl);
+        return () => setApiBaseUrlOverride(null);
+    }, [apiBaseUrl]);
+
     const { isLoading, 
         error, 
         alerts, 

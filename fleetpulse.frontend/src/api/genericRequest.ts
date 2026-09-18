@@ -1,9 +1,8 @@
-
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
-export const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
-export const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
 import { store } from "@/store/store";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
+const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
+const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
 
 export interface ApiRequestOptions extends RequestInit {
   excludeApiVersion?: boolean;

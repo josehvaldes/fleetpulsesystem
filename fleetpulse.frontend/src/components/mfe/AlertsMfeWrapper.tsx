@@ -14,14 +14,14 @@ export default function AlertsMfeWrapper() {
     return token;
   }, [token]);
 
-  //const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:your_api_port';
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
 
   return (
     <div className="mfe-wrapper">
       <Suspense fallback={<div>Loading Alerts Module...</div>}>
         <AlertsMfe 
           getAuthToken={getAuthToken} 
-          //apiBaseUrl={apiBaseUrl} 
+          apiBaseUrl={apiBaseUrl} 
         />
       </Suspense>
     </div>

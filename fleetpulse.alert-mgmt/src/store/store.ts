@@ -1,5 +1,4 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-
 import alertReducer from "@/store/alertSlice";
 
 import {
@@ -22,7 +21,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "alert"],
+  whitelist: ["alert"],
 };
 
 const persistedReducer = persistReducer(
