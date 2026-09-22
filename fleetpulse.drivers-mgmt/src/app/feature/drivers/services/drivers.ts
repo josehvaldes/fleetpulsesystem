@@ -20,7 +20,6 @@ export class Drivers {
             }
         )))
         );
-        console.log("Mapped drivers:", drivers.subscribe(data => console.log(data)));
         return drivers;
     }
 }
