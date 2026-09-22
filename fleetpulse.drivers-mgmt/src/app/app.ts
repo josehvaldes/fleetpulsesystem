@@ -2,9 +2,10 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from './shared/components/header/header';
 import { AuthUser } from './types/authuser';
+import { DriversDashboard } from './feature/drivers/components/driversDashboard';
 
 @Component({
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, Header, DriversDashboard],
   selector: 'app-root',
   styleUrls: ['./app.css'],
   templateUrl: './app.html',

@@ -1,15 +1,20 @@
 
-import {Component, inject} from '@angular/core';
-import { DriversApiService } from '@app/core/api/drivers-api.service';
+import { Component, inject, signal } from '@angular/core';
+import { Driver } from '../models/driver';
+import { Drivers } from '../services/drivers';
 
 @Component({
   selector: 'app-drivers-dashboard',
   templateUrl: './driversDashboard.html',
 })
 export class DriversDashboard {
-    driverService = inject(DriversApiService);
+    driverService = inject(Drivers);
+    drivers = signal<Driver[]>([]);
 
     constructor() {
-
+        this.driverService.getDrivers().subscribe(drivers => {
+            console.log("Fetched drivers:", drivers);
+            this.drivers.set(drivers);
+        });
     }
 }
