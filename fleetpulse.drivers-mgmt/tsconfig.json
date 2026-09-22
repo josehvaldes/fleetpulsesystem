@@ -13,6 +13,7 @@
     "module": "preserve",
     "paths": {
       "@app/*": ["./src/app/*"],
+      "@env/*": ["./src/environments/*"],
       "@spartan-ng/helm/pagination": ["./src/app/shared/ui/pagination/src/index.ts"],
       "@spartan-ng/helm/utils": ["./src/app/shared/ui/utils/src/index.ts"],
       "@spartan-ng/helm/button": ["./src/app/shared/ui/button/src/index.ts"],

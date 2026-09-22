@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 import { DriverStateResponse } from '@app/core/contracts/driverstateresponse';
+import { environment } from '@env/environment';
 
 const mockDrivers: DriverStateResponse[] = [
     {
@@ -33,7 +34,7 @@ const mockDrivers: DriverStateResponse[] = [
 ]
 
 export const handlers = [
-  http.get('/api/v1/drivers', () => {
+  http.get(`${environment.apiUrl}/api/v1/drivers`, () => {
     console.log("Fetching mock drivers data");
     return HttpResponse.json(mockDrivers);
   }),

@@ -27,7 +27,9 @@
                 <td hlmTableCell class="font-medium">{{ driver.name }}</td>
                 <td hlmTableCell>{{ driver.status }}</td>
                 <td hlmTableCell>{{ driver.speed }}</td>
-                <td hlmTableCell class="text-right">{{ driver.LastTimeSeen }}</td>
+                <td hlmTableCell class="text-right">
+                    {{ driver.LastTimeSeen  | date:'dd/MM/yyyy HH:mm:ss' }}
+                </td>
             </tr>
             }
             </tbody>

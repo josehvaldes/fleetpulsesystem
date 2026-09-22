@@ -1,5 +1,10 @@
 
 <div class="border border-blue-500 width-full">
-    <h1>{{ title() }}, {{ user()?.username }}</h1>
-    
+    <div class="font-bold text-xl">{{ title() }}, {{ user()?.username }}</div>
+    <ul class="flex gap-4">
+        <li><a class="text-black hover:underline font-medium"
+             routerLink="/drivers" >Drivers</a></li>
+        <li><a class="text-black hover:underline font-medium"
+             routerLink="/settings">Settings</a></li>
+    </ul>
 </div>

@@ -3,9 +3,9 @@ import { Component, inject, signal } from '@angular/core';
 import { Driver } from '../models/driver';
 import { Drivers } from '../services/drivers';
 import { HlmTableImports } from '@app/shared/ui/table/src';
-
+import { CommonModule } from '@angular/common';
 @Component({
-    imports: [HlmTableImports],
+    imports: [CommonModule, HlmTableImports],
   selector: 'app-drivers-dashboard',
   templateUrl: './driversDashboard.html',
 })
