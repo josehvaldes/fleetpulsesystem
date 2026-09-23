@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:7042',
+  apiUrl: 'http://localhost:8380/api',
   enableMsw: true
 };

@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import './index.css'
 import App from './App.tsx'
+import { initializeNativeFederation } from '@/federation/native-federation';
+
 
 const queryClient = new QueryClient(
   {
@@ -26,6 +28,12 @@ const queryClient = new QueryClient(
 
 const isMockingEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCKS === 'true';
 
+const app = (
+  <BrowserRouter >
+    <App />
+  </BrowserRouter>
+);
+
 async function enableMocking() {
   if (isMockingEnabled) {
     const { worker } = await import('./mocks/browser');
@@ -33,26 +41,32 @@ async function enableMocking() {
     await worker.start({ onUnhandledRequest: 'warn' });
   }
 }
-
 enableMocking().then(() => {
-  const app = (
-    <BrowserRouter >
-      <App />
-    </BrowserRouter>
-  );
+  console.log('Mocking enabled');
 
-  createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-          {app}
-        </QueryClientProvider>
-      </PersistGate>
-    </Provider>
-  </StrictMode>,
-)
+initializeNativeFederation()
+  .catch((err:any) => console.error('Error initializing federation', err))
+  .then(() => {
+    console.log('Federation initialized successfully');
+
+    createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <QueryClientProvider client={queryClient}>
+            {app}
+          </QueryClientProvider>
+        </PersistGate>
+      </Provider>
+    </StrictMode>,
+    );
+  })
 });
+
+
+
+
+
 
 
 

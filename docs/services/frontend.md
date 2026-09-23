@@ -16,7 +16,7 @@ graph TD
 subgraph Browser[React SPA]
 Shell["Browser Shell<br/>(React+Vite)"]
 Redux[Redux State]
-AlertsMfeProps[AlertsMfeProps: <br/>getAuthToken <br/> apiBaseUrl]
+MfeProps[MfeProps: <br/>getAuthToken <br/> apiBaseUrl]
 Service[fleetHub service<br/>HubConnection singleton]
 Hook[useGpsPings hook<br/>drivers + pings state]
 Map[FleetMap]
@@ -31,11 +31,11 @@ Service --> Hook
 Hook --> Map
 Hook --> List
 Hook --> Log
-Redux --> AlertsMfeProps
+Redux --> MfeProps
 
 subgraph MFE[MFE Modules]
-AlertsModule["Alert MFE <br/>(React+Vite)<br/>:5173"]
-DriversModule["Drivers MFE <br/>(Angular 22)<br/>:5174"]
+AlertsModule["Alert MFE <br/>(React+Vite)<br/>:5174"]
+DriversModule["Drivers MFE <br/>(Angular 22)<br/>:4200"]
 end
 
 
@@ -51,8 +51,8 @@ Endpoints --> Database
 Shell -- "/alerts_mfe/AlertsDashboard"--> AlertsModule
 Shell -- "/drivers_mfe/DriversDashboard" --> DriversModule
 
-AlertsModule -- "use" -->AlertsMfeProps
-DriversModule -- "use" -->AlertsMfeProps
+AlertsModule -- "use" -->MfeProps
+DriversModule -- "use" -->MfeProps
 
 AlertsModule --> Endpoints
 DriversModule --> Endpoints

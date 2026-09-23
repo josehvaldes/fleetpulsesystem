@@ -1,16 +1,11 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
-import { environment } from './environments/environment';
+import { initFederation } from '@angular-architects/native-federation';
 
-async function prepareApp() {
-  if (typeof window !== 'undefined' && environment.enableMsw) {
-    const { worker } = await import('./mocks/browser');
-    await worker.start();
-  }
-}
-prepareApp().then(() => {
-  bootstrapApplication(App, appConfig)
-    .catch((err) => console.error(err));
-});
-
+initFederation(
+  {},
+  {
+    hostRemoteEntry: { url: './remoteEntry.json' },
+  },
+)
+  .catch((err) => console.error(err))
+  .then((_) => import('./bootstrap'))
+  .catch((err) => console.error(err));

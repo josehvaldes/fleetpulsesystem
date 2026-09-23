@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "files": [
+    "src/app/feature/drivers/routes/drivers.routes.ts",
+    "src/app/feature/drivers/drivers-mfe.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+}

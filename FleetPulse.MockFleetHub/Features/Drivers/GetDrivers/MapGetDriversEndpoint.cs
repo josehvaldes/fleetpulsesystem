@@ -7,7 +7,7 @@ namespace FleetPulse.MockFleetHub.Features.Drivers.GetDrivers
     {
         public static void MapGetDrivers(this IEndpointRouteBuilder app) 
         {
-            app.MapGet("/", async ([FromQuery] DateTime from, [FromQuery] DateTime? to, CancellationToken cancellationToken) =>
+            app.MapGet("/", async ([FromQuery] DateTime? from, [FromQuery] DateTime? to, CancellationToken cancellationToken) =>
             {
                 
                 return new List<LastestDriverStateResponse>() { 

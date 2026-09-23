@@ -1,0 +1,185 @@
+{
+  "$version": "v4",
+  "name": "drivers_mfe",
+  "shared": [
+    {
+      "packageName": "@angular/cdk/overlay",
+      "outFileName": "_angular_cdk_overlay.SbIiDHmqp--dev.js",
+      "requiredVersion": "22.0.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.0.0",
+      "bundle": "browser-angular_cdk"
+    },
+    {
+      "packageName": "@angular/common",
+      "outFileName": "_angular_common.5UaFUsc2Nd-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_common"
+    },
+    {
+      "packageName": "@angular/common/http",
+      "outFileName": "_angular_common_http.ieTNl9DpR4-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_common"
+    },
+    {
+      "packageName": "@angular/platform-browser",
+      "outFileName": "_angular_platform_browser.MWl4dloG8o-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_platform_browser"
+    },
+    {
+      "packageName": "@angular/router",
+      "outFileName": "_angular_router.pFnltHp3Fp-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_router"
+    },
+    {
+      "packageName": "clsx",
+      "outFileName": "clsx.7J3RYqqp4W-dev.js",
+      "requiredVersion": "^2.1.1",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "2.1.1",
+      "bundle": "browser-clsx"
+    },
+    {
+      "packageName": "rxjs",
+      "outFileName": "rxjs.BDURTJi1MC-dev.js",
+      "requiredVersion": "~7.8.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "7.8.2",
+      "bundle": "browser-rxjs"
+    },
+    {
+      "packageName": "rxjs/operators",
+      "outFileName": "rxjs_operators.gjJkY6pS5Y-dev.js",
+      "requiredVersion": "~7.8.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "7.8.2",
+      "bundle": "browser-rxjs"
+    },
+    {
+      "packageName": "tailwind-merge",
+      "outFileName": "tailwind_merge.B3YNUjdW8n-dev.js",
+      "requiredVersion": "^3.5.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "3.7.0",
+      "bundle": "browser-tailwind_merge"
+    },
+    {
+      "packageName": "tslib",
+      "outFileName": "tslib.0Cysp-TYcq-dev.js",
+      "requiredVersion": "^2.3.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "2.8.1",
+      "bundle": "browser-tslib"
+    },
+    {
+      "packageName": "@angular/core",
+      "outFileName": "_angular_core.kxDR0WSeru-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    },
+    {
+      "packageName": "@angular/core/event-dispatch-contract.min.js",
+      "outFileName": "_angular_core_event_dispatch_contract_min_js.EzSRhF8dHt-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    },
+    {
+      "packageName": "@angular/core/primitives/di",
+      "outFileName": "_angular_core_primitives_di.Bf9E2KDGm4-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    },
+    {
+      "packageName": "@angular/core/primitives/event-dispatch",
+      "outFileName": "_angular_core_primitives_event_dispatch.KIKqzWWJJ3-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    },
+    {
+      "packageName": "@angular/core/primitives/signals",
+      "outFileName": "_angular_core_primitives_signals.LvL4-od5oy-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    },
+    {
+      "packageName": "@angular/core/rxjs-interop",
+      "outFileName": "_angular_core_rxjs_interop.BesUJL0Lel-dev.js",
+      "requiredVersion": "^22.1.0",
+      "singleton": true,
+      "strictVersion": true,
+      "version": "22.1.7",
+      "bundle": "browser-angular_core"
+    }
+  ],
+  "exposes": [
+    {
+      "key": "./routes",
+      "outFileName": "routes.js",
+      "dev": {
+        "entryPoint": "C:/personal/_advanced_projects/FleetPulseSystem/fleetpulsesystem/fleetpulse.drivers-mgmt/src/app/feature/drivers/routes/drivers.routes.ts"
+      }
+    },
+    {
+      "key": "./mount",
+      "outFileName": "mount.js",
+      "dev": {
+        "entryPoint": "C:/personal/_advanced_projects/FleetPulseSystem/fleetpulsesystem/fleetpulse.drivers-mgmt/src/app/feature/drivers/drivers-mfe.ts"
+      }
+    }
+  ],
+  "buildNotificationsEndpoint": "/@angular-architects/native-federation:build-notifications",
+  "chunks": {
+    "browser-angular_common": [
+      "chunk-WXVRD7LR.js"
+    ],
+    "browser-rxjs": [
+      "chunk-BBYK5H6S.js"
+    ],
+    "browser-angular_core": [
+      "chunk-FLKYW6K3.js",
+      "chunk-BK625ZYY.js",
+      "chunk-QX2ACJIO.js",
+      "chunk-Y2UB37J5.js",
+      "chunk-FMGVFGPW.js"
+    ],
+    "mapping-or-exposed": [
+      "chunk-OUCHNRK6.js"
+    ]
+  }
+}

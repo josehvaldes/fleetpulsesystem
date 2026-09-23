@@ -34,7 +34,7 @@ const mockDrivers: DriverStateResponse[] = [
 ]
 
 export const handlers = [
-  http.get(`${environment.apiUrl}/api/v1/drivers`, () => {
+  http.get(`${environment.apiUrl}/v1/drivers`, () => {
     console.log("Fetching mock drivers data");
     return HttpResponse.json(mockDrivers);
   }),
