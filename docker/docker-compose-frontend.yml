@@ -14,3 +14,24 @@ services:
       - "5173:80"
     networks:
       - redpanda_network
+  # React+Vite alert mgmt
+  fleetpulse-alert-mgmt:
+    image: fleetpulse.alert-mgmt:1.0
+    env_file:
+      - .env
+    ports:
+      - "5174:80"
+    networks:
+      - redpanda_network
+
+  # React+Vite alert mgmt
+  fleetpulse-drivers-mgmt:
+    image: fleetpulse.drivers-mgmt:1.0
+    env_file:
+      - .env
+    ports:
+      - "5175:8080"
+    networks:
+      - redpanda_network      
+      
+      

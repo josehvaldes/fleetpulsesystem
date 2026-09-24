@@ -37,9 +37,6 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5174,
-    cors:{
-      origin: "http://localhost:5173"
-    }
+    port: 5174
   }
 })

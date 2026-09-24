@@ -15,7 +15,3 @@ docker build -t "fleetpulse-dbwriter:$Version" `
 docker build -t "fleetpulse-ai-worker:$Version" `
     -f .\ai-worker\docker\Dockerfile `
     .\ai-worker\
-
-docker build -t "fleetpulse-frontend:$Version" `
-    -f .\fleetpulse.frontend\Dockerfile `
-    .\fleetpulse.frontend\

@@ -2,6 +2,7 @@ using FleetPulse.MockFleetHub.Configuration;
 using FleetPulse.MockFleetHub.Features.Alerts;
 using FleetPulse.MockFleetHub.Features.GpsPings;
 using FleetPulse.MockFleetHub.Features.Hubs;
+using FleetPulse.MockFleetHub.Features.Login;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,7 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapHubEndpoints();
+app.MapLoginEndpoints(app.Configuration);
 app.MapAlertEndpoints(app.Configuration);
 app.MapDriversEndpoints(app.Configuration);
 

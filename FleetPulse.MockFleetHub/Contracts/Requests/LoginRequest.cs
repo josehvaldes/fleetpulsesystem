@@ -1,4 +1,4 @@
-﻿namespace FleetPulse.Contracts.Requests
+﻿namespace FleetPulse.MockFleetHub.Contracts.Requests
 {
     public class LoginRequest
     {
