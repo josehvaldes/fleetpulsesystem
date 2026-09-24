@@ -1,9 +1,7 @@
-import { loadAppConfig } from '@/utils/appConfig';
+import { config } from '@/utils/appConfig';
 import { init } from '@module-federation/enhanced/runtime';
 
 export async function InitializeReactFederation(): Promise<void> {
-  const config = await loadAppConfig();
-
   init({
     name: 'fleet_host',
     remotes: [

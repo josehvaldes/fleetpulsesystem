@@ -13,14 +13,6 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     federation({
       name: 'fleet_host',
-      remotes: {
-        // Vite remotes serve an ESM remoteEntry.js, so type "module" is required
-        alerts_mfe: {
-          type: 'module',
-          name: 'alerts_mfe',
-          entry: 'http://localhost:5174/remoteEntry.js',
-        },
-      },
       shared: {
         react: { singleton: true, requiredVersion: '^19.2.7' },
         'react-dom': { singleton: true, requiredVersion: '^19.2.7' },

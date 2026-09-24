@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/features/login/hooks/useAuth';
-import { loadAppConfig } from "@/utils/appConfig";
-const appConfig = await loadAppConfig();
+import { config } from "@/utils/appConfig";
 
 export function Login() {
     const { login, isLoading } = useAuth();
@@ -22,7 +21,7 @@ export function Login() {
 
     useEffect(() => {
         console.log("env.mode: ",import.meta.env.MODE);
-        console.log("api.baseUrl: ", appConfig.api.baseUrl);
+        console.log("api.baseUrl: ", config.api.baseUrl);
     }, []);
 
     return (

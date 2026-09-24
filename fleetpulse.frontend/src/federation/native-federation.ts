@@ -3,14 +3,13 @@ import {
   type LoadRemoteModule,
 } from '@softarc/native-federation-orchestrator';
 
-import { loadAppConfig } from '@/utils/appConfig';
+import { config } from '@/utils/appConfig';
 
 let loadRemoteModule: LoadRemoteModule | undefined;
 
 export async function initializeNativeFederation(): Promise<void> {
 
-  const appConfig = await loadAppConfig();
-  const remotes = appConfig.angular_remotes;
+  const remotes = config.angular_remotes;
 
   const federation = await initFederation(remotes);
   loadRemoteModule = federation.loadRemoteModule;

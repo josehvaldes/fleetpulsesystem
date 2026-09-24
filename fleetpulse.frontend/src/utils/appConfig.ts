@@ -22,3 +22,6 @@ export async function loadAppConfig(): Promise<AppConfig> {
 
   return appConfigPromise;
 }
+
+const config = await loadAppConfig();
+export { config };

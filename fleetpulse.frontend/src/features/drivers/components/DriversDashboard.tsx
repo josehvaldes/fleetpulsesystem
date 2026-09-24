@@ -2,8 +2,8 @@ import { Header } from "@/components/layouts/header"
 import DriversMfeWrapper from "@/components/mfe/DriversMfeWrapper";
 import { store } from "@/store/store";
 import React from 'react';
-import { loadAppConfig } from "@/utils/appConfig";
-const appConfig = await loadAppConfig();
+import { config } from "@/utils/appConfig";
+
 export function DriversDashboard() {
 
     // Assuming you store the token in Redux
@@ -14,7 +14,7 @@ export function DriversDashboard() {
     return token;
     }, [token]);
 
-    const apiBaseUrl = appConfig.api.baseUrl || "https://localhost:7234/api";
+    const apiBaseUrl = config.api.baseUrl || "https://localhost:7234/api";
     
     return (
         <>

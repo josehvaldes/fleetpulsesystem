@@ -6,13 +6,11 @@ import {
 } from "@microsoft/signalr";
 import type { GpsPing } from "@/types/gps";
 import type { AlertWire } from "@/api/alerts/types";
-import { loadAppConfig } from "@/utils/appConfig";
+import { config } from "@/utils/appConfig";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.
-const appConfig = await loadAppConfig();
-
-const HUB_URL = appConfig.signalRHubUrl;
+const HUB_URL = config.signalRHubUrl;
 const RECEIVE_GPS_PING = "ReceiveGpsPing";
 const RECEIVE_ALERT = "ReceiveAlert";
 

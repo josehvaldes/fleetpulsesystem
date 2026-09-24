@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
 import { store } from "@/store/store";
 import { loadRemote } from '@module-federation/enhanced/runtime';
-import { loadAppConfig } from "@/utils/appConfig";
-const appConfig = await loadAppConfig();
+import { config} from "@/utils/appConfig";
 
 // Import the remote component
 //const AlertsMfe = React.lazy(() => import('alerts_mfe/AlertsDashboard'));
@@ -31,7 +30,7 @@ export default function AlertsMfeWrapper() {
     return token;
   }, [token]);
 
-  const apiBaseUrl = appConfig.api.baseUrl || "https://localhost:7234/api";
+  const apiBaseUrl = config.api.baseUrl || "https://localhost:7234/api";
 
   return (
     <div className="mfe-wrapper">
