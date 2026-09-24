@@ -3,13 +3,15 @@ import {
   type LoadRemoteModule,
 } from '@softarc/native-federation-orchestrator';
 
-const remotes = {
-  drivers_mfe: 'http://localhost:4200/remoteEntry.json',
-};
+import { loadAppConfig } from '@/utils/appConfig';
 
 let loadRemoteModule: LoadRemoteModule | undefined;
 
 export async function initializeNativeFederation(): Promise<void> {
+
+  const appConfig = await loadAppConfig();
+  const remotes = appConfig.angular_remotes;
+
   const federation = await initFederation(remotes);
   loadRemoteModule = federation.loadRemoteModule;
 }

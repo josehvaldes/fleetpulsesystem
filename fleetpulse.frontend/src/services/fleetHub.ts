@@ -6,12 +6,13 @@ import {
 } from "@microsoft/signalr";
 import type { GpsPing } from "@/types/gps";
 import type { AlertWire } from "@/api/alerts/types";
+import { loadAppConfig } from "@/utils/appConfig";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.
-// const HUB_URL = "https://localhost:7234/v1/fleetHub";
-const HUB_URL = import.meta.env.VITE_FLEET_HUB_URL;
+const appConfig = await loadAppConfig();
 
+const HUB_URL = appConfig.signalRHubUrl;
 const RECEIVE_GPS_PING = "ReceiveGpsPing";
 const RECEIVE_ALERT = "ReceiveAlert";
 

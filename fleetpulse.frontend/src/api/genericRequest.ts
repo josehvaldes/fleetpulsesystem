@@ -1,7 +1,9 @@
 import { store } from "@/store/store";
+import { loadAppConfig } from "@/utils/appConfig";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
-const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
+const config = await loadAppConfig();
+const API_BASE_URL = config.api.baseUrl || "http://localhost:8380/api";
+const API_VERSION = config.api.version || "v1";
 const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
 
 export interface ApiRequestOptions extends RequestInit {

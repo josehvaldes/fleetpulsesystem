@@ -2,7 +2,8 @@ import { Header } from "@/components/layouts/header"
 import DriversMfeWrapper from "@/components/mfe/DriversMfeWrapper";
 import { store } from "@/store/store";
 import React from 'react';
-
+import { loadAppConfig } from "@/utils/appConfig";
+const appConfig = await loadAppConfig();
 export function DriversDashboard() {
 
     // Assuming you store the token in Redux
@@ -13,9 +14,8 @@ export function DriversDashboard() {
     return token;
     }, [token]);
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
+    const apiBaseUrl = appConfig.api.baseUrl || "https://localhost:7234/api";
     
-
     return (
         <>
         <div>

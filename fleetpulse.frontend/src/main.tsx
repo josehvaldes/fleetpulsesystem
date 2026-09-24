@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App.tsx'
 import { initializeNativeFederation } from '@/federation/native-federation';
+import { InitializeReactFederation } from './federation/react-federation.ts';
 
 
 const queryClient = new QueryClient(
@@ -41,12 +42,14 @@ async function enableMocking() {
     await worker.start({ onUnhandledRequest: 'warn' });
   }
 }
-enableMocking().then(() => {
+enableMocking().then(async () => {
   console.log('Mocking enabled');
 
-initializeNativeFederation()
-  .catch((err:any) => console.error('Error initializing federation', err))
-  .then(() => {
+  await Promise.all([
+    InitializeReactFederation(),
+    initializeNativeFederation(),
+  ]);
+
     console.log('Federation initialized successfully');
 
     createRoot(document.getElementById('root')!).render(
@@ -60,7 +63,6 @@ initializeNativeFederation()
       </Provider>
     </StrictMode>,
     );
-  })
 });
 
 

@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/features/login/hooks/useAuth';
+import { loadAppConfig } from "@/utils/appConfig";
+const appConfig = await loadAppConfig();
 
 export function Login() {
     const { login, isLoading } = useAuth();
@@ -20,7 +22,7 @@ export function Login() {
 
     useEffect(() => {
         console.log("env.mode: ",import.meta.env.MODE);
-        console.log("env.VITE_API_BASE_URL: ",import.meta.env.VITE_API_BASE_URL);
+        console.log("api.baseUrl: ", appConfig.api.baseUrl);
     }, []);
 
     return (
