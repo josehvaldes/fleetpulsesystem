@@ -9,6 +9,6 @@
     "alerts": "http://localhost:5174/remoteEntry.js"
   },
   "angular_remotes":{
-    "drivers": "http://localhost:4200/remoteEntry.json"
+    "drivers": "http://localhost:5175/remoteEntry.json"
   }
 }
