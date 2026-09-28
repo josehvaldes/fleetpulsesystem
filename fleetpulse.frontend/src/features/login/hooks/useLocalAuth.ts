@@ -5,7 +5,7 @@ import { login as loginService} from "@/services/authService";
 import { clearSession, setSession } from "@/store/authUserSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 
-export function useAuth() {
+export function useLocalAuth() {
   const dispatch = useDispatch<AppDispatch>();
   const auth = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,12 +37,17 @@ export function useAuth() {
       setIsLoading(false);
     }
   };
+  
+  const getAuthToken = () => {
+    return auth.accessToken || null;
+  };
 
   return {
     ...auth,
     isLoading,
     login,
     logout,
+    getAuthToken,
   };
 }
 

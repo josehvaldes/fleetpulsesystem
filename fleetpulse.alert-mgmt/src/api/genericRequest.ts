@@ -42,7 +42,7 @@ export async function sendRequest<T>(
   const mergedHeaders = new Headers(headers);
   mergedHeaders.set("x-api-key", API_KEY);
 
-  const accessToken = getCurrentAuthToken();
+  const accessToken = await getCurrentAuthToken();
   if (accessToken && !mergedHeaders.has("Authorization")) {
     mergedHeaders.set("Authorization", `Bearer ${accessToken}`);
   }

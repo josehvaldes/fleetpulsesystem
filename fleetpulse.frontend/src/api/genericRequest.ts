@@ -1,4 +1,4 @@
-import { store } from "@/store/store";
+import { getAuthToken } from "@/services/authTokenProvider";
 import { loadAppConfig } from "@/utils/appConfig";
 
 const config = await loadAppConfig();
@@ -38,7 +38,8 @@ export async function sendRequest<T>(
   const mergedHeaders = new Headers(headers);
   mergedHeaders.set("x-api-key", API_KEY);
 
-  const accessToken = store.getState().auth.accessToken;
+  const accessToken = await getAuthToken();
+
   if (accessToken && !mergedHeaders.has("Authorization")) {
     mergedHeaders.set("Authorization", `Bearer ${accessToken}`);
   }

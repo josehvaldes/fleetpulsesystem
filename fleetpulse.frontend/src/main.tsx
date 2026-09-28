@@ -11,6 +11,9 @@ import './index.css'
 import App from './App.tsx'
 import { initializeNativeFederation } from '@/federation/native-federation';
 import { InitializeReactFederation } from './federation/react-federation.ts';
+import { MsalProvider } from '@azure/msal-react';
+import { PublicClientApplication } from '@azure/msal-browser';
+import { msalConfig } from './utils/msalConfig.ts';
 
 
 const queryClient = new QueryClient(
@@ -26,14 +29,40 @@ const queryClient = new QueryClient(
   }
 );
 
-
 const isMockingEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCKS === 'true';
+const appWithSharedProviders = (
+<Provider store={store}>
+  <PersistGate loading={null} persistor={persistor}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter >
+        <App />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </PersistGate>
+</Provider>);
 
-const app = (
-  <BrowserRouter >
-    <App />
-  </BrowserRouter>
-);
+const authMode = import.meta.env.VITE_AUTH_MODE;
+
+if (authMode !== "local" && authMode !== "msal") {
+  throw new Error(
+    `Invalid VITE_AUTH_MODE "${authMode}". Expected "local" or "msal".`,
+  );
+}
+
+async function createAppToRender() {
+  if (authMode === "local") {
+    return appWithSharedProviders;
+  }
+
+  const msalInstance = new PublicClientApplication(msalConfig);
+  await msalInstance.initialize();
+  console.log("MSAL instance initialized:");
+  return (
+    <MsalProvider instance={msalInstance}>
+      {appWithSharedProviders}
+    </MsalProvider>
+  );
+}
 
 async function enableMocking() {
   if (isMockingEnabled) {
@@ -43,7 +72,7 @@ async function enableMocking() {
   }
 }
 enableMocking().then(async () => {
-  console.log('Mocking enabled');
+  console.log('Mocking enabled:', isMockingEnabled);
 
   await Promise.all([
     InitializeReactFederation(),
@@ -51,16 +80,11 @@ enableMocking().then(async () => {
   ]);
 
     console.log('Federation initialized successfully');
-
+    const appToRender = await createAppToRender();
+    
     createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <QueryClientProvider client={queryClient}>
-            {app}
-          </QueryClientProvider>
-        </PersistGate>
-      </Provider>
+      {appToRender}
     </StrictMode>,
     );
 });

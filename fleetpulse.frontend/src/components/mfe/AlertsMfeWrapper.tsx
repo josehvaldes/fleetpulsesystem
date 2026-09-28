@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
-import { store } from "@/store/store";
 import { loadRemote } from '@module-federation/enhanced/runtime';
 import { config} from "@/utils/appConfig";
-
+import { getAuthToken } from "@/services/authTokenProvider";
 // Import the remote component
 //const AlertsMfe = React.lazy(() => import('alerts_mfe/AlertsDashboard'));
 
@@ -22,13 +21,13 @@ const AlertsMfe = React.lazy(async () => {
 );
 
 export default function AlertsMfeWrapper() {
-  // Assuming you store the token in Redux
-  const token = store.getState().auth.accessToken;
+  // // Assuming you store the token in Redux
+  // const token = await getAuthToken();
 
-  // Expose the getToken method as described in frontend.md
-  const getAuthToken = React.useCallback(() => {
-    return token;
-  }, [token]);
+  // // Expose the getToken method as described in frontend.md
+  // const getAuthTokenWrapper = React.useCallback(() => {
+  //   return token;
+  // }, [token]);
 
   const apiBaseUrl = config.api.baseUrl || "https://localhost:7234/api";
 

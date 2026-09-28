@@ -24,5 +24,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
       //"@": path.resolve(__dirname, "./src"),
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        // MSAL redirect bridge page, must be a separate entry so it ships without the app bundle
+        redirect: fileURLToPath(new URL('./redirect.html', import.meta.url)),
+      },
+    },
+  },
 })

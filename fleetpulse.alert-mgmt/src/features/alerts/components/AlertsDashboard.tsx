@@ -24,7 +24,7 @@ import { setAuthTokenGetter, setApiBaseUrlOverride } from "@/api/authTokenProvid
 
 
 export interface AlertsMfeProps {
-  getAuthToken: () => string | null;
+  getAuthToken: () => Promise<string | null> ;
   apiBaseUrl?: string | null;
 }
 

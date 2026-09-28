@@ -7,6 +7,11 @@ export interface AppConfig {
   signalRHubUrl: string; 
   react_remotes: any;
   angular_remotes: any;
+  azure: {
+    clientId: string;
+    tenantId: string;
+    apiclientid: string;
+  }
 }
 
 let appConfigPromise: Promise<AppConfig> | undefined;

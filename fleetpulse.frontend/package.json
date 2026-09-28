@@ -13,6 +13,8 @@
     "build:prod": "node scripts/prepare-config.mjs prod && vite build"
   },
   "dependencies": {
+    "@azure/msal-browser": "^5.23.0",
+    "@azure/msal-react": "^5.7.1",
     "@base-ui/react": "^1.7.0",
     "@fontsource-variable/geist": "^5.3.0",
     "@microsoft/signalr": "^10.0.0",

@@ -15,15 +15,27 @@ graph TD
 
 subgraph Browser[React SPA]
 Shell["Browser Shell<br/>(React+Vite)"]
-Redux[Redux State]
-MfeProps[MfeProps: <br/>getAuthToken <br/> apiBaseUrl]
+
 Service[fleetHub service<br/>HubConnection singleton]
 Hook[useGpsPings hook<br/>drivers + pings state]
+
 Map[FleetMap]
 List[DriversList]
 Log[MessageLog]
+MfeProps[MfeProps: <br/>getAuthToken <br/> apiBaseUrl]
 
+Redux[Redux State]
+
+Auth["Auth Module"]
+local["local<br/>(user/password)"]
+msal["MSAL<br/>(EntraID)"]
 end
+
+Shell --> Auth
+Auth --> msal
+Auth --> local
+
+Auth -- "setToken" --> Redux
 
 Shell --> Service
 Hub -- "ReceiveGpsPing" --> Service
@@ -33,19 +45,23 @@ Hook --> List
 Hook --> Log
 Redux --> MfeProps
 
+EntraID["Azure EntraID"]
+
+msal --> EntraID
+
+
 subgraph MFE[MFE Modules]
 AlertsModule["Alert MFE <br/>(React+Vite)<br/>:5174"]
 DriversModule["Drivers MFE <br/>(Angular 22)<br/>:4200"]
 end
 
-
 subgraph API[FleetPulse API]
 Hub[SignalR Hub<br/>/v1/fleetHub]
 Endpoints[Endpoints]
 end
-
 Database[(FleetApi)]
 
+Shell -- "SetAuth" --> Redux
 Endpoints --> Database
 
 Shell -- "/alerts_mfe/AlertsDashboard"--> AlertsModule
@@ -57,7 +73,7 @@ DriversModule -- "use" -->MfeProps
 AlertsModule --> Endpoints
 DriversModule --> Endpoints
 
-Shell -- "SetAuth" --> Redux
+
 
 ```
 
@@ -147,4 +163,19 @@ Build and styling toolchain:
 
 
 
+### Authentication
+
+The application will support two authentication mechanisms selected at compiling time using a AUTH_MODE flag:
+
+** Local authentication: AUTH_MODE=local
+Username/password authentication.
+Intended primarily for local development, demonstrations, and environments where Entra ID infrastructure is not available.
+
+** Microsoft Entra ID authentication: AUTH_MODE=msal
+The frontend will authenticate users through Microsoft Entra ID using MSAL.
+The SignalRHub API will validate Entra ID access tokens.
+An Azure Entra ID App Registration will be required.
+Users and application roles will be configured in the Entra ID tenant.
+
+The authentication mechanism will be selected through the AUTH_MODE configuration setting.
 

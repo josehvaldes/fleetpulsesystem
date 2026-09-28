@@ -1,10 +1,16 @@
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/features/login/hooks/useAuth';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useLocalAuth } from '@/features/login/hooks/useLocalAuth';
+import { AuthContextProvider } from '@/features/login/hooks/useAuthContext';
 import { config } from "@/utils/appConfig";
+import { store } from "@/store/store";
+import { setAuthTokenProvider } from "@/services/authTokenProvider";
+interface LocalAuthGateProps {
+    children: ReactNode;
+}
 
-export function Login() {
-    const { login, isLoading } = useAuth();
+export function LocalAuthGate({ children }: LocalAuthGateProps) {
+    const { isAuthenticated, login, isLoading, logout, user, getAuthToken } = useLocalAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -20,9 +26,22 @@ export function Login() {
     };
 
     useEffect(() => {
+        console.log("LocalAuthGate:");
         console.log("env.mode: ",import.meta.env.MODE);
         console.log("api.baseUrl: ", config.api.baseUrl);
-    }, []);
+
+        setAuthTokenProvider(async () => store.getState().auth.accessToken);
+
+        return () => setAuthTokenProvider(null);
+    }, [getAuthToken, isAuthenticated]);
+
+    if (isAuthenticated) {
+        return (
+            <AuthContextProvider value={{ logout, user }}>
+                {children}
+            </AuthContextProvider>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">

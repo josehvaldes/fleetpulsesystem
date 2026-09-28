@@ -9,5 +9,10 @@
   },
   "angular_remotes":{
     "drivers": "http://localhost:4200/remoteEntry.json"
+  },
+  "azure": {
+    "clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "apiclientid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
   }
 }

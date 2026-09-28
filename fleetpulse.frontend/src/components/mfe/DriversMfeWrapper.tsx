@@ -1,22 +1,21 @@
 import { useEffect, useRef } from 'react';
 import { loadRemote } from '@/federation/native-federation';
-
-interface DriversMfeProps {
-  apiBaseUrl: string;
-  getAuthToken: () => string | null;
-}
+import { config} from "@/utils/appConfig";
+import { getAuthToken } from "@/services/authTokenProvider";
 
 interface DriversMfeModule {
   mountDriversDashboard(
     hostElement: Element,
     props: {
       apiBaseUrl: string;
-      getAuthToken: () => Promise<string>;
+      getAuthToken: () => Promise<string|null>;
     },
   ): Promise<() => void>;
 }
 
-const DriversMfeWrapper = ({ apiBaseUrl, getAuthToken }: DriversMfeProps) => {
+const apiBaseUrl = config.api.baseUrl || "https://localhost:7234/api";
+
+const DriversMfeWrapper = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +30,7 @@ const DriversMfeWrapper = ({ apiBaseUrl, getAuthToken }: DriversMfeProps) => {
 
         unmount = await mountDriversDashboard(containerRef.current, {
           apiBaseUrl,
-          getAuthToken: async () => getAuthToken() ?? '',
+          getAuthToken: getAuthToken,
         });
 
         if (disposed) {
