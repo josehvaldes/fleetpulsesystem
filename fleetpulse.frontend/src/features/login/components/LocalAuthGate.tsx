@@ -10,7 +10,7 @@ interface LocalAuthGateProps {
 }
 
 export function LocalAuthGate({ children }: LocalAuthGateProps) {
-    const { isAuthenticated, login, isLoading, logout, user, getAuthToken } = useLocalAuth();
+    const { isAuthenticated, login, isLoading, logout, user } = useLocalAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -26,14 +26,13 @@ export function LocalAuthGate({ children }: LocalAuthGateProps) {
     };
 
     useEffect(() => {
-        console.log("LocalAuthGate:");
-        console.log("env.mode: ",import.meta.env.MODE);
+        console.log("env.mode: ",import.meta.env.VITE_AUTH_MODE);
         console.log("api.baseUrl: ", config.api.baseUrl);
 
         setAuthTokenProvider(async () => store.getState().auth.accessToken);
 
         return () => setAuthTokenProvider(null);
-    }, [getAuthToken, isAuthenticated]);
+    }, [isAuthenticated]);
 
     if (isAuthenticated) {
         return (

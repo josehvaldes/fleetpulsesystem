@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login as loginService} from "@/services/authService";
 import { clearSession, setSession } from "@/store/authUserSlice";
@@ -16,7 +16,7 @@ export function useLocalAuth() {
     }
   }, [auth.isAuthenticated, auth.expiresAt, dispatch]);
 
-  const login = async (username: string, password: string) => {
+  const login = useCallback(async (username: string, password: string) => {
     setIsLoading(true);
 
     try {
@@ -26,9 +26,9 @@ export function useLocalAuth() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dispatch]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setIsLoading(true);
 
     try {
@@ -36,11 +36,11 @@ export function useLocalAuth() {
     } finally {
       setIsLoading(false);
     }
-  };
-  
-  const getAuthToken = () => {
+  }, [dispatch]);
+
+  const getAuthToken = useCallback(() => {
     return auth.accessToken || null;
-  };
+  }, [auth.accessToken]);
 
   return {
     ...auth,

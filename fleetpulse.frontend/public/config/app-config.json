@@ -1,9 +1,9 @@
 {
   "api":{
-    "baseUrl": "http://localhost:8380/api",
+    "baseUrl": "http://localhost:5242/api",
     "version": "v1"
   },
-  "signalRHubUrl": "http://localhost:8380/v1/fleetHub",
+  "signalRHubUrl": "http://localhost:5242/v1/fleetHub",
   "react_remotes":{
     "alerts": "http://localhost:5174/remoteEntry.js"
   },

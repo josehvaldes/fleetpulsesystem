@@ -15,9 +15,13 @@ export class DriversApiService {
 
     const baseUrl = apiBaseUrl.replace(/\/$/, '');
     console.log(`Fetching drivers from: [${baseUrl}/v1/drivers]`);
+    
+    const queryParams = new URLSearchParams({
+      from: new Date(Date.now()).toISOString()
+    });
 
     return defer(() => from(getCurrentAuthToken())).pipe(
-      switchMap(token => this.http.get<DriverStateResponse[]>(`${baseUrl}/v1/drivers`, {
+      switchMap(token => this.http.get<DriverStateResponse[]>(`${baseUrl}/v1/drivers?${queryParams.toString()}`, {
         headers: new HttpHeaders({ Authorization: `Bearer ${token ?? ''}` }),
       })),
     );

@@ -7,6 +7,7 @@ import {
 import type { GpsPing } from "@/types/gps";
 import type { AlertWire } from "@/api/alerts/types";
 import { config } from "@/utils/appConfig";
+import { getAuthToken, waitForAuthTokenProvider } from "@/services/authTokenProvider";
 
 // In dev, the .NET hub usually runs on https://localhost:7001 (or http://5000).
 // Adjust to whatever launchSettings.json / appsettings says.
@@ -38,10 +39,16 @@ class FleetHubService {
   private startRetryAttempts = 0;
 
   constructor() {
+    console.log("[FleetHub] initializing connection");
+    
+    
     this.connection = new HubConnectionBuilder()
       .withUrl(HUB_URL, {
         // SignalR needs credentials because the hub allows credentials in CORS.
         withCredentials: true,
+        // Without this, SignalR never appends ?access_token=... to the request,
+        // so the server-side JwtBearerEvents.OnMessageReceived query lookup is always empty.
+        accessTokenFactory: async () => (await getAuthToken()?? "") ,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000]) // backoff
       .configureLogging(LogLevel.Warning)
@@ -92,8 +99,8 @@ class FleetHubService {
     this.clearStartRetryTimer();
     this.emitConnectionState();
 
-    this.startPromise = this.connection
-      .start()
+    this.startPromise = waitForAuthTokenProvider()
+      .then(() => this.connection.start())
       .then(() => {
         this.resetStartRetryState();
         this.emitConnectionState();
