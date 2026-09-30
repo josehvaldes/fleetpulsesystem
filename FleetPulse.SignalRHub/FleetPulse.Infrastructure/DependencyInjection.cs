@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace FleetPulse.Infrastructure
@@ -83,9 +84,8 @@ namespace FleetPulse.Infrastructure
                 services.AddAppEntraIdAuthentication(authenticationBuilder, authSettings.EntraId);
             }
 
-            services.AddAuthorizationBuilder()
-            .AddPolicy("FleetManager", policy => policy.RequireClaim("scope", "fleet:read"))
-            .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            // Define authorization policies based on claims or roles based on AuthService.cs logic and EntraId API permissions
+            services.AddAuthorizationPolicies();
 
             return services;
         }
@@ -120,16 +120,51 @@ namespace FleetPulse.Infrastructure
                         $"https://sts.windows.net/{entraId.TenantId}/"
                     ],
                     ValidAudiences = [entraId.ClientId, $"api://{entraId.ClientId}"],
+                    RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
                     ClockSkew = TimeSpan.Zero  // no tolerance on expiry
                 };
-                
+
+                //scope mapping:
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var identity = context.Principal?.Identity as ClaimsIdentity;
+                        // Find the legacy Entra ID scope claim
+                        var legacyScopeClaim = identity?.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
+
+                        if (identity != null && legacyScopeClaim != null)
+                        {
+                            // Add a clean, short alias claim
+                            identity.AddClaim(new Claim("scope", legacyScopeClaim.Value));
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+
                 // ⚠️ SignalR-specific: 
-                AddJwtEventOptions(options);
+                AddJwtEventOptionsForHub(options);
             });
+
+            
 
             return services;
         }
 
+        public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services) 
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("FleetUser", policy => policy.RequireClaim("scope", "access_as_user"));
+
+                // Define a policy that requires the 'Fleet.admin' role
+                options.AddPolicy("FleetAdminOnly", policy => policy.RequireRole("Fleet.admin")); // 
+
+            });
+
+            return services;
+
+        }
 
         public static IServiceCollection AddAppLocalAuthentication(this IServiceCollection services, AuthenticationBuilder builder, JwtSettings jwt)
         {
@@ -160,17 +195,16 @@ namespace FleetPulse.Infrastructure
                         Encoding.UTF8.GetBytes(jwt.Secret)),
                     ClockSkew = TimeSpan.Zero  // no tolerance on expiry
                 };
-
+               
                 // ⚠️ SignalR-specific: 
-                AddJwtEventOptions(options);
+                AddJwtEventOptionsForHub(options);
             });
-
 
             return services;
         }
 
 
-        private static void AddJwtEventOptions(JwtBearerOptions options)
+        private static void AddJwtEventOptionsForHub(JwtBearerOptions options)
         {
             // ⚠️ SignalR-specific: 
             options.Events = new JwtBearerEvents

@@ -19,8 +19,8 @@ namespace FleetPulse.Infrastructure.Services
             // User/passwor feature will be implemented later. For now, we will use a default user and password from the configuration.
             if (username == _authSetting.DefaultUsername && password == _authSetting.DefaultPassword)
             {
-                List<string> roles = new List<string> { "admin" };
-                List<string> scopes = new List<string> { "fleet:read" };
+                List<string> roles = new List<string> { "Fleet.admin" };
+                List<string> scopes = new List<string> { "access_as_user" };
                 var authUser = new AuthUser() { Id = _authSetting.DefaultUserId, Username = _authSetting.DefaultUsername };
                 var accessToken = _jwtTokenService.GenerateAccessToken(authUser, roles, scopes);
                 var (refreshTokenValue, refreshTokenExpiry) = _jwtTokenService.GenerateRefreshToken();
