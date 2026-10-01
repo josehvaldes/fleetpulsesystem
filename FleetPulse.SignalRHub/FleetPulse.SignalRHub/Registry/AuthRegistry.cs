@@ -12,7 +12,7 @@ namespace FleetPulse.SignalRHub.Registry
     {
         public static void RegisterAuth(this IEndpointRouteBuilder app, string version) 
         {
-            app.MapPost($"/api/{version}/login", async (IMediator mediator,
+            app.MapPost($"/api/{version}/sessions", async (IMediator mediator,
                 IValidator<LoginRequest> loginValidator,
                 [FromBody] LoginRequest request) =>
             {
