@@ -51,7 +51,7 @@ def create_ai_worker_handler(
 
         with tracer.start_as_current_span(
                 "process_gps_ping", context=context, kind=SpanKind.CONSUMER,
-            ) as gpsspan:
+            ):
 
             if len(history) >= MAX_HISTORY_LENGTH:
                 history.pop(0)

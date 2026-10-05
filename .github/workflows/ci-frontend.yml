@@ -1,0 +1,79 @@
+name: ci-frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "fleetpulse.alert-mgmt/**"
+      - "fleetpulse.drivers-mgmt/**"
+      - "fleetpulse.frontend/**"
+      - ".github/workflows/ci-frontend.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "fleetpulse.alert-mgmt/**"
+      - "fleetpulse.drivers-mgmt/**"
+      - "fleetpulse.frontend/**"
+      - ".github/workflows/ci-frontend.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-spa:
+    name: React SPA Frontend
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: fleetpulse.frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: fleetpulse.frontend/package-lock.json
+      - run: npm ci
+        working-directory: fleetpulse.frontend
+      - run: npm run lint
+        working-directory: fleetpulse.frontend
+      - run: npm run build
+        working-directory: fleetpulse.frontend
+      - run: npm test -- --run --passWithNoTests
+        working-directory: fleetpulse.frontend
+  react-mfe:
+    name: React Alert Management MFE Frontend
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: fleetpulse.alert-mgmt } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: fleetpulse.alert-mgmt/package-lock.json
+      - run: npm ci
+        working-directory: fleetpulse.alert-mgmt
+      - run: npm run build
+        working-directory: fleetpulse.alert-mgmt
+      - run: npm test -- --run --passWithNoTests
+        working-directory: fleetpulse.alert-mgmt
+  angular-drivers-mfe:
+    name: Angular Drivers Management MFE Frontend
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: fleetpulse.drivers-mgmt } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: fleetpulse.drivers-mgmt/package-lock.json
+      - run: npm ci
+        working-directory: fleetpulse.drivers-mgmt
+      - run: npx ng build
+        working-directory: fleetpulse.drivers-mgmt
+      - run: npx ng test --watch=false
+        working-directory: fleetpulse.drivers-mgmt

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using FleetPulse.Contracts.Response.Alerts;
+using FleetPulse.Contracts.Response;
 using FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure;
 using FluentAssertions;
 using Npgsql;
@@ -70,14 +71,18 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
             var status = "OnError";
-            var limit = 10;
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status={status}&limit={limit}", CancellationToken.None);
+            var pageSize = 10;
+            var pageNumber = 1;
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status={status}&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
 
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
-            alerts.Should().NotBeEmpty();
-            alerts.Should().HaveCount(1);
-            alerts.First().Status.Should().Be(status);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
+            alertResponse.Should().NotBeNull();
+            
+            var items = alertResponse.Items;
+            items.Should().NotBeEmpty();
+            items.Should().HaveCount(1);
+            items.First().Status.Should().Be(status);
         }
 
         [Fact]
@@ -85,14 +90,17 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
         {
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            alerts.Should().NotBeNull();
-            alerts.Should().HaveCount(3);
-            alerts.Should().OnlyContain(a => a.Status == "New");
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().HaveCount(3);
+            items.Should().OnlyContain(a => a.Status == "New");
         }
 
         [Fact]
@@ -100,13 +108,16 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
         {
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            alerts.Should().NotBeNull();
-            alerts.Should().BeInDescendingOrder(a => a.RaisedAt);
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().BeInDescendingOrder(a => a.RaisedAt);
         }
 
         [Fact]
@@ -114,13 +125,16 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
         {
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 2;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=2", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            alerts.Should().NotBeNull();
-            alerts.Should().HaveCount(2);
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().HaveCount(2);
         }
 
         [Fact]
@@ -129,13 +143,16 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
             // 'Closed' is a valid status, but no seed data uses it
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=Closed&limit=10", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=Closed&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            alerts.Should().NotBeNull();
-            alerts.Should().BeEmpty();
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().BeEmpty();
         }
 
         [Fact]
@@ -145,13 +162,16 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
             // the other alerts (raised 2-12 minutes ago) fall outside it
             var from = DateTime.UtcNow.AddMinutes(-4).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=InProgress&limit=10", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=InProgress&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            alerts.Should().NotBeNull();
-            alerts.Should().BeEmpty();
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().BeEmpty();
         }
 
         [Fact]
@@ -159,12 +179,16 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
         {
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&limit=10", CancellationToken.None);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&status=New&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
-            var alerts = await response.Content.ReadFromJsonAsync<List<AlertResponse>>(CancellationToken.None);
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
 
-            var alert = alerts.Should().ContainSingle(a => a.ZoneName == "Downtown Core").Which;
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            var alert = items.Should().ContainSingle(a => a.ZoneName == "Downtown Core").Which;
             alert.Id.Should().NotBeNullOrEmpty();
             alert.DriverId.Should().Be("driver1");
             alert.ZoneType.Should().Be("restricted");
@@ -175,13 +199,20 @@ namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Alerts
         }
 
         [Fact]
-        public async Task GetAlerts_ShouldReturnBadRequest_WhenStatusIsMissing()
+        public async Task GetAlerts_ShouldReturnAlerts_WhenStatusIsMissing()
         {
             var from = DateTime.UtcNow.AddMinutes(-15).ToString("o");
             var to = DateTime.UtcNow.ToString("o");
+            var pageSize = 10;
+            var pageNumber = 1;
 
-            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&limit=10", CancellationToken.None);
-            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+            var response = await Client.GetAsync($"/api/v1/alerts?from={from}&to={to}&pageSize={pageSize}&pageNumber={pageNumber}", CancellationToken.None);
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+
+            var alertResponse = await response.Content.ReadFromJsonAsync<PagedResponse<AlertResponse>>(CancellationToken.None);
+            alertResponse.Should().NotBeNull();
+            var items = alertResponse.Items;
+            items.Should().HaveCount(8);
         }
     }
 }

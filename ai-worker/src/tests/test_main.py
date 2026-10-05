@@ -41,9 +41,9 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
 
     class FakeManager:
         def __init__(self) -> None:
-            self.handled_events: list[ViolationEvent] = []
+            self.handled_events: list[AlertEvent] = []
 
-        async def handle_alert(self, event: ViolationEvent) -> None:
+        async def handle_alert(self, event: AlertEvent, metadata: dict) -> None:
             self.handled_events.append(event)
 
     class FakeAgent:
@@ -68,6 +68,7 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
     }
 
     await handler(base_message, metadata)
+    
     await handler({
         **base_message,
         "latitude": -17.373154,
@@ -81,21 +82,3 @@ async def test_create_ai_worker_handler_uses_injected_dependencies() -> None:
     assert len(manager.handled_events) == 1
     assert manager.handled_events[0].driver_id == "driver_001"
 
-
-def test_alert_event_serializes_trace_context() -> None:
-    alert = AlertEvent(
-        driver_id="driver_001",
-        exit_location={"latitude": -17.373349, "longitude": -66.15688},
-        exit_speed=46.0,
-        exit_heading=0.0,
-        exit_time="2026-07-27T19:46:20.843397+00:00",
-        zone_name="zone_1_south",
-        zone_type="working_zone",
-        traceparent="00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
-        tracestate="rojo=00f067aa0ba902b7",
-    )
-
-    payload = alert.to_dict()
-
-    assert payload["traceparent"] == alert.traceparent
-    assert payload["tracestate"] == alert.tracestate

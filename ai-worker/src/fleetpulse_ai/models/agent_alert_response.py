@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from fleetpulse_ai.events.violation_event import ViolationEvent
 
 class AgentAlertResponse(BaseModel):
 

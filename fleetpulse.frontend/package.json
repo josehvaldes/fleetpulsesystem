@@ -10,7 +10,11 @@
     "preview": "vite preview",
     "build:local": "node scripts/prepare-config.mjs local && vite build",
     "build:stage": "node scripts/prepare-config.mjs stage && vite build",
-    "build:prod": "node scripts/prepare-config.mjs prod && vite build"
+    "build:prod": "node scripts/prepare-config.mjs prod && vite build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.23.0",
@@ -45,17 +49,23 @@
     "@babel/core": "^7.29.7",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/babel__core": "^7.20.5",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^5.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
+    "jsdom": "^30.1.2",
     "msw": "^2.15.0",
     "oxlint": "^1.71.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^5.0.3"
   },
   "msw": {
     "workerDirectory": [

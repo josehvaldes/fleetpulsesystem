@@ -1,0 +1,49 @@
+name: ci-python
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "ai-worker/**"
+      - "simulator/**"
+      - ".github/workflows/ci-python.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ai-worker/**"
+      - "simulator/**"
+      - ".github/workflows/ci-python.yml"
+  workflow_dispatch:
+concurrency:
+  group: ci-python-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test:
+    name: ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: 
+          - simulator
+          - ai-worker
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}/src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.5"
+          cache: pip
+          cache-dependency-path: ${{ matrix.app }}/src/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: pip install ruff pytest pytest-asyncio
+      - run: ruff check .
+      - name: Run tests
+        if: matrix.app == 'ai-worker'
+        run: python -m pytest -q
+  

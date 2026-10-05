@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 import json
 
-from fleetpulse_ai.events.violation_event import ViolationEvent
-from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
-
 @dataclass
 class AlertEvent:
     """Base class for alert events."""

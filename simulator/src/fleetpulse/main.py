@@ -2,10 +2,6 @@ import asyncio
 import json
 import os
 
-from dotenv import load_dotenv
-from pathlib import Path
-load_dotenv(Path(__file__).resolve().parent / ".env")
-
 from fleetpulse.mqtt_publisher import MQTTMockPublisher, MQTTPublisher, MQTTPublisherInterface
 from fleetpulse.driver_simulator import DriverSimulator
 from fleetpulse.drivers import DriverConfig
@@ -17,10 +13,15 @@ from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace.sampling import TraceIdRatioBased, ALWAYS_ON
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = REPO_ROOT / "data"
+print(f"Data directory is set to: {DATA_DIR}")
 MOCK_MODE = os.getenv("MOCK_MODE", "true").lower() == "true"
 OTEL_SERVER = os.getenv("OTEL_SERVER", "http://localhost:4317")  # Default to localhost if not set
 CONSOLE_TRACE_EXPORTER = os.getenv("CONSOLE_TRACE_EXPORTER", "false").lower() == "true"
@@ -86,7 +87,7 @@ class FleetPulseSimulator:
                 logger.info("FleetPulse Simulator is running. Press Ctrl+C to stop.")
                 # wait for the simulation to complete
                 await task
-            json.dump(publisher.published_messages, open("data/recoleta_route_sample_output.json", "w"), indent=2)
+            json.dump(publisher.published_messages, open(DATA_DIR / "recoleta_route_sample_output.json", "w"), indent=2)
 
 
 
@@ -112,14 +113,14 @@ class FleetPulseSimulator:
             #await task
 
     async def run (self, driver_configs: dict[str, DriverConfig], publisher: MQTTPublisherInterface):
-        driver_route_file = "data/drivers_routes.json"
+        driver_route_file = DATA_DIR / "drivers_routes.json"
         tasks = []
         with open(driver_route_file) as f:
             driver_routes_data = json.load(f)
             for data in driver_routes_data:
                 if data.get("driver_id") in driver_configs:
                     driver_config = driver_configs[data.get("driver_id")]
-                    route_path = f"data/routes/raw/{data.get('route_id')}.geojson"
+                    route_path = DATA_DIR / f"routes/raw/{data.get('route_id')}.geojson"
 
                     route_id = data.get('route_id')
                     logger.info(f"Starting FleetPulse Simulator for driver {driver_config.driver_id} on route {route_id}...")
@@ -142,7 +143,7 @@ class FleetPulseSimulator:
 
     async def exec(self):
         logger.info("Starting FleetPulse Simulator...")
-        drivers_file = "data/drivers.json"
+        drivers_file = DATA_DIR / "drivers.json"
         driver_configs = dict[str, DriverConfig]()
 
         with open(drivers_file) as f:

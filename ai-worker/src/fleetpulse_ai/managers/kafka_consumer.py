@@ -106,14 +106,6 @@ class KafkaConsumer(IKafkaConsumer):
 
                 PINGS_RECEIVED.inc()
                 # Extract metadata
-                message = {
-                    "topic": msg.topic(),
-                    "partition": msg.partition(),
-                    "offset": msg.offset(),
-                    "key": msg.key().decode("utf-8") if msg.key() else None,
-                    "value": msg.value(),
-                    "timestamp": msg.timestamp()[1] if msg.timestamp()[0] != 0 else None,
-                }
 
                 body = {}
                 metadata = {}

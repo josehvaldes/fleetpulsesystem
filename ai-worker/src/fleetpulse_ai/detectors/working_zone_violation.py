@@ -1,5 +1,4 @@
 # detectors/working_zone_violation.py
-import structlog
 
 from fleetpulse_ai.detectors.base_detector import BaseDetector
 from fleetpulse_ai.events.violation_event import ViolationEvent

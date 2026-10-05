@@ -3,12 +3,13 @@ networks:
   fleetpulse_network:
     driver: bridge
 volumes:
-  redpanda-0: null
-  emqx-data: null
-  psgdata: null
+  redpanda-0: 
+  emqx-data: 
+  psgdata: 
   prometheus-data:
   grafana-data:
   tempo-data:
+  loki-data:
 
 services:
   redpanda-0:

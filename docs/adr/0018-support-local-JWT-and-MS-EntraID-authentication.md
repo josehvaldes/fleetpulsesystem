@@ -8,6 +8,9 @@ Support Local and Microsoft Entra ID Authentication
 
 Accepted
 
+## Date
+27/09/2026
+
 ## Context
 
 The application currently uses username/password authentication with JWT bearer tokens.
@@ -80,6 +83,14 @@ The local and both authentication modes should therefore not be enabled in produ
 
 Local/demo credentials must not be treated as production credentials or committed as sensitive secrets to source control.
 
+## Alternatives
+** OKta. 
+Okta is another cloud-based Identity and Access Management platform. Previous experience with the tool make is a good option. It's a strong alternative when being cloud-agnostic is required, and there are external clients that required authentication outside of enterprise infrastructure. Since the apps and users will be handled inside Azure. MSAL EntraID was the natural option instead of OKta
+
+** Cognito
+Cognito is a fully managed identity platform from Amazon Web Services (AWS) that provides the same functionality as EntraID. Previous POC's with Cognito worked well, and it is a strong tools for apps deployed in AWS. Since the main target in this project is Azure and Microsoft infrastructure, Cognito was discarded by now.
+
+
 ## Consequences
 
 ** Positive
@@ -102,3 +113,4 @@ The local authentication mechanism is retained as a development and migration pa
 
 The intended long-term direction for production deployments is to use Microsoft Entra ID or another managed identity provider rather than application-managed username/password credentials.
 
+## Related ADR's

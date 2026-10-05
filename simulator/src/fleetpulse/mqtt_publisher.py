@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
 import paho.mqtt.client as mqtt
 from paho.mqtt.properties import Properties
 from paho.mqtt.packettypes import PacketTypes
@@ -8,15 +7,11 @@ import json
 from utils.logging_config import get_logger    
 logger = get_logger(__name__)
 
-from fleetpulse.drivers import Driver
-
 class MQTTPublisherInterface(ABC):
 
     @abstractmethod
     async def publish(self, message: dict, metadata: dict = None):
         pass
-
-
 
 class MQTTPublisher(MQTTPublisherInterface):
     def __init__(self, broker: str, port: int = 1883):
