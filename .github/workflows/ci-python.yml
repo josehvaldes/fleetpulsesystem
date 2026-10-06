@@ -42,7 +42,8 @@ jobs:
           cache-dependency-path: ${{ matrix.app }}/src/requirements.txt
       - run: pip install -r requirements.txt
       - run: pip install ruff pytest pytest-asyncio
-      - run: ruff check .
+      - run: ruff --version
+      - run: ruff check ${{ matrix.app }}/src/
       - name: Run tests
         if: matrix.app == 'ai-worker'
         run: python -m pytest -q
