@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 
 from fleetpulse_ai.events.violation_event import ViolationEvent
-from fleetpulse_ai.main import load_driver_zones
 from fleetpulse_ai.handlers import create_ai_worker_handler
+from fleetpulse_ai.main import load_driver_zones
 from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
 from fleetpulse_ai.models.alert_event import AlertEvent
 

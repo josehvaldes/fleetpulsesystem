@@ -1,8 +1,8 @@
 from functools import lru_cache
+
 from dotenv import find_dotenv
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 ENV_FILE = find_dotenv(usecwd=True) or ".env"
 
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     #Logging Configuration
     log_level: str = "INFO"
-    log_file: Optional[str] = None # Path to log file. If None, only console logging is used
+    log_file: str | None = None # Path to log file. If None, only console logging is used
     log_to_console: bool = True
 
     # Additional Logging outputs
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
         extra="ignore"
         )
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """
     Get cached application settings.

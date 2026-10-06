@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
 import json
 import signal
+from abc import ABC, abstractmethod
+from collections.abc import Awaitable, Callable
 
-from typing import Callable, Awaitable
 from confluent_kafka import Consumer, KafkaError, KafkaException
+
 from fleetpulse_ai.logging_config import get_logger
 from fleetpulse_ai.prometheus import PINGS_RECEIVED
 

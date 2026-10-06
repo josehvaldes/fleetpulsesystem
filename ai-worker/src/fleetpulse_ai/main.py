@@ -3,15 +3,15 @@ import json
 from pathlib import Path
 
 from shapely.geometry import Polygon, shape
-from fleetpulse_ai.prometheus import setup_prometheus
-from fleetpulse_ai.settings import settings
-from fleetpulse_ai.logging_config import get_logger, setup_logging
-from fleetpulse_ai.handlers import create_ai_worker_handler
 
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
-from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
+from fleetpulse_ai.handlers import create_ai_worker_handler
+from fleetpulse_ai.logging_config import get_logger, setup_logging
+from fleetpulse_ai.managers.alert_manager import AlertManager
 from fleetpulse_ai.managers.kafka_consumer import KafkaConsumer
+from fleetpulse_ai.prometheus import setup_prometheus
+from fleetpulse_ai.settings import settings
 from fleetpulse_ai.tracing import setup_tracing
 
 setup_logging(

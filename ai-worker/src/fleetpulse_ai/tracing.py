@@ -1,13 +1,13 @@
 import atexit
 
-from fleetpulse_ai.settings import settings
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace.sampling import TraceIdRatioBased, ALWAYS_ON
+from opentelemetry.sdk.trace.sampling import ALWAYS_ON, TraceIdRatioBased
 
+from fleetpulse_ai.settings import settings
 
 
 def setup_tracing() -> None:

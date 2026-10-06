@@ -1,7 +1,9 @@
 import json
 import math
 from pathlib import Path
+
 from utils.processed_route import ProcessedRoute
+
 
 def haversine(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
     """Distance in meters between two GPS points"""

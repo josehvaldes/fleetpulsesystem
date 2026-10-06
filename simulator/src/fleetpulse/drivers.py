@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
+
 class DriverStatus(Enum):
     MOVING = "moving"
     STOPPED = "stopped"

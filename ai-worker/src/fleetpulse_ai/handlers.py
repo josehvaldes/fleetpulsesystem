@@ -1,20 +1,25 @@
 
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
-from typing import Awaitable, Callable
 
 import structlog
-from fleetpulse_ai.logging_config import get_logger
+from opentelemetry import propagate, trace
+from opentelemetry.trace import SpanKind
+
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.detectors.working_zone_violation import WorkingZoneViolationDetector
+from fleetpulse_ai.logging_config import get_logger
 from fleetpulse_ai.managers.alert_manager import AlertManager
-from fleetpulse_ai.models.gps_ping import GpsPing
+from fleetpulse_ai.mock_data import (
+    MOCK_DATA_CONTEXT,  # Assuming this is defined somewhere in your codebase
+)
 from fleetpulse_ai.models.alert_event import AlertEvent
-from fleetpulse_ai.prometheus import PINGS_PROCESSED, ALERTS_PUBLISHED, ANOMALY_DETECTION_DURATION
-from fleetpulse_ai.mock_data import MOCK_DATA_CONTEXT  # Assuming this is defined somewhere in your codebase
-
-from opentelemetry import trace
-from opentelemetry import propagate
-from opentelemetry.trace import SpanKind
+from fleetpulse_ai.models.gps_ping import GpsPing
+from fleetpulse_ai.prometheus import (
+    ALERTS_PUBLISHED,
+    ANOMALY_DETECTION_DURATION,
+    PINGS_PROCESSED,
+)
 
 MAX_HISTORY_LENGTH = 10
 

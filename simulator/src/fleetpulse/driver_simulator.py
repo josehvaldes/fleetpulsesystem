@@ -1,17 +1,18 @@
 import asyncio
 import math
-
 import random
-from datetime import datetime, timezone
 import signal
+import sys
 import uuid
-from utils.logging_config import get_logger
-from fleetpulse.mqtt_publisher import MQTTPublisherInterface
-from fleetpulse.drivers import DriverConfig
-from utils.processed_route import ProcessedRoute
-from opentelemetry import trace
-from opentelemetry import propagate
+from datetime import datetime, timezone
+
+from opentelemetry import propagate, trace
 from opentelemetry.trace import SpanKind
+
+from fleetpulse.drivers import DriverConfig
+from fleetpulse.mqtt_publisher import MQTTPublisherInterface
+from utils.logging_config import get_logger
+from utils.processed_route import ProcessedRoute
 
 tracer = trace.get_tracer(__name__)
 logger = get_logger(__name__)
@@ -54,7 +55,7 @@ class DriverSimulator:
     def _signal_handler(self, signum, frame):
         logger.info(f"Received signal {signum}, shutting down...")
         self.running = False
-        exit(0)
+        sys.exit(0)
   
     def _get_point_at_distance(self, distance: float) -> tuple[float, float, float, int]:
         """

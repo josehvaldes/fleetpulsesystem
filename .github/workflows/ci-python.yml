@@ -43,7 +43,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: pip install ruff pytest pytest-asyncio
       - run: ruff --version
-      - run: ruff check ${{ matrix.app }}/src/
+      - run: ruff check .
       - name: Run tests
         if: matrix.app == 'ai-worker'
         run: python -m pytest -q

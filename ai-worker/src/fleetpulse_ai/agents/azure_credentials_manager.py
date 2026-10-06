@@ -1,5 +1,7 @@
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from threading import RLock  # Changed from Lock
+
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
 
 class AzureCredentialManager:
     """Singleton manager for Azure credentials and token providers."""

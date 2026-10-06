@@ -1,11 +1,11 @@
 import logging
 import sys
-from pathlib import Path
 from logging.handlers import RotatingFileHandler
-from typing import Optional
-import structlog
+from pathlib import Path
 
+import structlog
 from opentelemetry import trace
+
 
 def inject_trace_context(_, __, event_dict):
     """Add trace_id and span_id to structlog logs if a span is active."""
@@ -34,11 +34,11 @@ def _shared_processors() -> list:
 
 def setup_logging(
     log_level: str = "INFO",
-    log_file: Optional[str] = None,
+    log_file: str | None = None,
     log_to_console: bool = True,
-    log_format: Optional[str] = None,
-    service_name: Optional[str] = None,
-    version: Optional[str] = None,
+    log_format: str | None = None,
+    service_name: str | None = None,
+    version: str | None = None,
 ) -> None:
     """
     Configure logging for the application.

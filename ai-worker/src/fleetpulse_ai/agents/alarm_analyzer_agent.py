@@ -1,13 +1,17 @@
 import time
-from langchain_openai import AzureChatOpenAI
+
 from langchain_core.prompts import ChatPromptTemplate
-from fleetpulse_ai.prompts.templates import AlertTemplate
+from langchain_openai import AzureChatOpenAI
+
 from fleetpulse_ai.agents.azure_credentials_manager import get_credential_manager
-from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
 from fleetpulse_ai.events.violation_event import ViolationEvent
-from fleetpulse_ai.settings import settings
 from fleetpulse_ai.logging_config import get_logger
+from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
+from fleetpulse_ai.prompts.templates import AlertTemplate
+from fleetpulse_ai.settings import settings
+
 logger = get_logger(__name__)
+
 class AlarmAnalyzerAgent:
     def __init__(self, model_deployment: str):
 

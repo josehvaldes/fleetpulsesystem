@@ -1,16 +1,20 @@
-from abc import ABC, abstractmethod
-import paho.mqtt.client as mqtt
-from paho.mqtt.properties import Properties
-from paho.mqtt.packettypes import PacketTypes
-
 import json
-from utils.logging_config import get_logger    
+from abc import ABC, abstractmethod
+from typing import Self
+
+import paho.mqtt.client as mqtt
+from confluent_kafka import KafkaException
+from paho.mqtt.packettypes import PacketTypes
+from paho.mqtt.properties import Properties
+
+from utils.logging_config import get_logger
+
 logger = get_logger(__name__)
 
 class MQTTPublisherInterface(ABC):
 
     @abstractmethod
-    async def publish(self, message: dict, metadata: dict = None):
+    async def publish(self, message: dict, metadata: dict):
         pass
 
 class MQTTPublisher(MQTTPublisherInterface):
@@ -25,7 +29,7 @@ class MQTTPublisher(MQTTPublisherInterface):
             )
             self.client.on_connect = self._on_connect
 
-        except Exception as e:
+        except (KafkaException, ValueError, TypeError) as e:
             logger.error("Error initializing MQTT client. paho-mqtt 1.x fallback: %s", e)
             # paho-mqtt 1.x fallback
             self.client = mqtt.Client(protocol=mqtt.MQTTv5)
@@ -40,7 +44,7 @@ class MQTTPublisher(MQTTPublisherInterface):
                 reason_code
             )
 
-    async def __aenter__(self) -> 'MQTTPublisher':
+    async def __aenter__(self) -> Self:
         # Configure QoS 1 for at-least-once delivery
         self.client.connect(self.broker, self.port, keepalive=60)
         self.client.loop_start()
@@ -73,7 +77,7 @@ class MQTTPublisher(MQTTPublisherInterface):
         props.UserProperty = user_props  # list of (k, v) tuples
         return props
     
-    async def publish(self, message: dict, metadata: dict = None):
+    async def publish(self, message: dict, metadata: dict):
         topic = f"fleet_pulse/{message['driver_id']}/gps"
         try:
             properties = self._build_properties(metadata)
@@ -87,8 +91,8 @@ class MQTTPublisher(MQTTPublisherInterface):
             if info.rc != mqtt.MQTT_ERR_SUCCESS:
                 logger.warning(f"PUBLISH rc={info.rc} on topic {topic}")
 
-        except Exception as e:
-            logger.error(f"Error publishing message: {e}", exc_info=True)
+        except Exception:
+            logger.exception(f"Error publishing message: {message}")
 
 
 
@@ -100,11 +104,11 @@ class MQTTMockPublisher(MQTTPublisherInterface):
     def __init__(self):
         self.published_messages = []
     
-    async def __aenter__(self) -> 'MQTTMockPublisher':
+    async def __aenter__(self) -> Self:
         return self
     
     async def __aexit__(self, exc_type, exc, tb) -> None:
         pass
 
-    async def publish(self, message: dict, metadata: dict = None):
+    async def publish(self, message: dict, metadata: dict):
         self.published_messages.append(message)

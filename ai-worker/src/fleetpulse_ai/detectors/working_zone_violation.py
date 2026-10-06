@@ -1,10 +1,12 @@
 # detectors/working_zone_violation.py
 
+from shapely.geometry import Point, Polygon
+
 from fleetpulse_ai.detectors.base_detector import BaseDetector
 from fleetpulse_ai.events.violation_event import ViolationEvent
-from fleetpulse_ai.models.gps_ping import GpsPing
-from shapely.geometry import Point, Polygon
 from fleetpulse_ai.logging_config import get_logger
+from fleetpulse_ai.models.gps_ping import GpsPing
+
 logger = get_logger(__name__)
 
 class WorkingZoneViolationDetector(BaseDetector):

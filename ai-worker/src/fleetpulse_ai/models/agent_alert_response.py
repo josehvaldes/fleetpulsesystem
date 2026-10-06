@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class AgentAlertResponse(BaseModel):
 
     risk_level: str = Field(

@@ -1,4 +1,5 @@
 ﻿import time
+
 from paho.mqtt import client as mqtt_client
 
 BROKER = 'localhost'

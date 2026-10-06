@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass
 
+
 @dataclass
 class ProcessedRoute:
     route_id: str

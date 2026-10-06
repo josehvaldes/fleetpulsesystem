@@ -1,10 +1,12 @@
 import logging
+
 import pytest
 import pytest_asyncio
-from fleetpulse_ai.models.gps_ping import GpsPing
+
 from fleetpulse_ai.agents.alarm_analyzer_agent import AlarmAnalyzerAgent
 from fleetpulse_ai.events.violation_event import ViolationEvent
 from fleetpulse_ai.models.agent_alert_response import AgentAlertResponse
+from fleetpulse_ai.models.gps_ping import GpsPing
 
 logger =  logging.getLogger("fleetpulse_ai.agents.alarm_analyzer_agent")
 

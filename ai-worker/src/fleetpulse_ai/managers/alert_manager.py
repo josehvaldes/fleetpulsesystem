@@ -1,8 +1,9 @@
-from confluent_kafka import Producer
-import sys
+from confluent_kafka import KafkaException, Producer
+
+from fleetpulse_ai.logging_config import get_logger
 from fleetpulse_ai.models.alert_event import AlertEvent
 from fleetpulse_ai.settings import settings
-from fleetpulse_ai.logging_config import get_logger
+
 logger = get_logger(__name__)
 
 def delivery_report(err, msg):
@@ -21,10 +22,10 @@ class AlertManager:
         try:
             config = {'bootstrap.servers': settings.kafka_bootstrap_servers}
             self.producer = Producer(config)
-            return self
-        except Exception as e:
-            logger.error("kafka_producer_init_failed", error=str(e))
-            sys.exit(1)
+        except (KafkaException, ValueError, TypeError):
+            logger.exception("kafka_producer_init_failed")
+            raise
+        return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         self.producer.flush()
