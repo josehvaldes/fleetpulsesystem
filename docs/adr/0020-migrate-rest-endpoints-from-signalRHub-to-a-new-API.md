@@ -4,7 +4,7 @@
 ADR 0020: Migrate REST API Endpoints from SignalRHub to a New Dedicated API
 
 ## Status: 
-Proposed
+Accepted
 
 ## Date: 
 2026-10-06
@@ -48,8 +48,12 @@ In this scenario, YARP would validate all incoming tokens. It would require a ne
 ** Alternative 2: Separate Entra ID App Registrations per Service
 Creating a new App Registration (api://fleetpulse-api/access_as_user) for the new API.
 
-- *Rejected because:* This would require the frontend SPA to perform incremental consent and acquire a second access token specifically for the new API. This violates the transparency goal of the Strangler Fig pattern and adds unnecessary complexity to the frontend. (Acknowledged: In a production enterprise system with distinct API ownership, this would be the preferred approach, but it is over-engineered for this portfolio project).
+ - *Rejected because:* This would require the frontend SPA to perform incremental consent and acquire a second access token specifically for the new API. This violates the transparency goal of the Strangler Fig pattern and adds unnecessary complexity to the frontend. (Acknowledged: In a production enterprise system with distinct API ownership, this would be the preferred approach, but it is over-engineered for this portfolio project).
 
+** Alternative 3: Nginx Reverse Proxy
+Deploy an Nginx container to act as the gateway. Nginx natively handles path-based routing for the Strangler Fig pattern via location blocks and could support future canary deployments using the split_clients module.
+
+ - *Rejected because:* While Nginx is an industry-standard tool that demonstrates strong infrastructure skills, YARP was chosen for this portfolio project to provide a fully integrated, .NET-native ecosystem. YARP offers seamless integration with the ASP.NET Core middleware pipeline, making WebSocket configuration and connection management for SignalR easier to implement and debug compared to Nginx's manual Upgrade header configurations.
 
 ## Consequences
 
