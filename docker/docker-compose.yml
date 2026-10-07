@@ -1,3 +1,14 @@
+# docker-compose.yml runs all the container at once. 
+# If you need to run specific services, run the commands below:
+#
+# docker compose -f .\docker-compose-postgresql.yml up -d ; `
+# docker compose -f .\docker-compose-redpanda.yml up -d ; `
+# docker compose -f .\docker-compose-obsv.yml up -d ; `
+# docker compose -f .\docker-compose-tracing.yml up -d ; `
+# docker compose -f .\docker-compose-services.yml up -d ; `
+# docker compose -f .\docker-compose-frontend.yml up -d
+#
+
 name: fleetpulse-system
 networks:
   fleetpulse_network:
@@ -165,6 +176,26 @@ services:
       - "8280:8080"
     networks:
       - fleetpulse_network
+
+  fleetpulse-api:
+    image: fleetpulse-api:1.0
+    env_file:
+      - .env
+    ports:
+      - "8480:8080"
+    networks:
+      - fleetpulse_network
+
+  # Single ingress for the SPA/MFEs: REST -> fleetpulse-api, login and SignalR hub -> signalr-hub
+  fleetpulse-yarpproxy:
+    image: fleetpulse-yarpproxy:1.0
+    ports:
+      - "8580:8080"
+    networks:
+      - fleetpulse_network
+    depends_on:
+      - fleetpulse-api
+      - signalr-hub
 
   ai-worker:
     image: fleetpulse-ai-worker:1.0
