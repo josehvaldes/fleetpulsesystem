@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "fleetpulse.frontend"
+		},
+		{
+			"path": "fleetpulse.alert-mgmt"
+		},
+		{
+			"path": "fleetpulse.drivers-mgmt"
+		},
+		{
+			"path": "docker"
+		},
+		{
+			"path": "docs"
+		}
+	]
+}

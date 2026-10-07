@@ -1,6 +1,6 @@
 import { getCurrentAuthToken, getApiBaseUrlOverride } from "@/api/authTokenProvider";
 
-const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7234/api";
+const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:8580/api";
 const API_VERSION = import.meta.env.VITE_API_VERSION || "v1";
 const API_KEY = import.meta.env.VITE_API_KEY || "your-api-key-here"; // Replace with your actual API key or use environment variables 
 
