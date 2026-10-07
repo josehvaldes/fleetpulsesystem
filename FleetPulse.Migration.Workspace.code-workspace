@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "FleetPulse.Api"
+		},
+		{
+			"path": "FleetPulse.SignalRHub"
+		},
+		{
+			"path": "docs"
+		},
+		{
+			"path": "FleetPulse.YarpProxy"
+		},
+		{
+			"path": "docker"
+		}
+	]
+}

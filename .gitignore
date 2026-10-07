@@ -47,3 +47,4 @@ fleetpulse.alert-mgmt/.github/*
 fleetpulse.alert-mgmt/.env
 fleetpulse.alert-mgmt/.gitignore
 fleetpulse.frontend/.env.production
+docker/.codacy

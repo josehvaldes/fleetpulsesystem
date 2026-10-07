@@ -24,6 +24,26 @@ services:
     networks:
       - redpanda_network
 
+  fleetpulse-api:
+    image: fleetpulse-api:1.0
+    env_file:
+      - .env
+    ports:
+      - "8480:8080"
+    networks:
+      - redpanda_network
+
+  # Single ingress for the SPA/MFEs: REST -> fleetpulse-api, login and SignalR hub -> signalr-hub
+  fleetpulse-yarpproxy:
+    image: fleetpulse-yarpproxy:1.0
+    ports:
+      - "8580:8080"
+    networks:
+      - redpanda_network
+    depends_on:
+      - fleetpulse-api
+      - signalr-hub
+
   ai-worker:
     image: fleetpulse-ai-worker:1.0
     environment:

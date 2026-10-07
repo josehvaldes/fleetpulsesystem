@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="FleetPulse.Api/FleetPulse.Api.csproj" />
+  <Project Path="FleetPulse.Api.Tests/FleetPulse.Api.Tests.csproj" />
+  <Project Path="FleetPulse.Application/FleetPulse.Application.csproj" />
+  <Project Path="FleetPulse.Contracts/FleetPulse.Contracts.csproj" />
+  <Project Path="FleetPulse.Domain/FleetPulse.Domain.csproj" />
+  <Project Path="FleetPulse.Infrastructure/FleetPulse.Infrastructure.csproj" />
+  <Project Path="FleetPulse.Observability/FleetPulse.Observability.csproj" />
+</Solution>

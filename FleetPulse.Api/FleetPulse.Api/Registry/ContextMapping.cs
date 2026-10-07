@@ -1,0 +1,48 @@
+using FleetPulse.Contracts.Response.Alerts;
+using FleetPulse.Contracts.Response.Drivers;
+using FleetPulse.Domain.Entities;
+using Mapster;
+
+namespace FleetPulse.Api.Registry
+{
+    public static class ContextMapping
+    {
+        public static void RegisterMappings()
+        {
+            TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>
+                .NewConfig()
+                .Map(dest => dest.LastSeen, src => src.last_seen.ToString("o"))
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.Status, src => src.status)
+                .Map(dest => dest.Longitude, src => src.longitude)
+                .Map(dest => dest.Latitude, src => src.latitude)
+                .Map(dest => dest.Speed, src => src.speed)
+                .Map(dest => dest.Heading, src => src.heading);
+
+            TypeAdapterConfig<Alert, AlertResponse>.NewConfig()
+                .Map(dest => dest.Id, src => src.id)
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.EventLatitude, src => src.event_latitude)
+                .Map(dest => dest.EventLongitude, src => src.event_longitude)
+                .Map(dest => dest.ExitSpeed, src => src.exit_speed)
+                .Map(dest => dest.ExitTime, src => src.exit_time)
+                .Map(dest => dest.ZoneName, src => src.zone_name)
+                .Map(dest => dest.ZoneType, src => src.zone_type)
+                .Map(dest => dest.RiskLevel, src => src.risk_level.ToString())
+                .Map(dest => dest.Assessment, src => src.assessment)
+                .Map(dest => dest.Recommendation, src => src.recommendation)
+                .Map(dest => dest.AutoEscalate, src => src.auto_escalate)
+                .Map(dest => dest.Status, src => src.status.ToString())
+                .Map(dest => dest.RaisedAt, src => src.raised_at);
+
+            TypeAdapterConfig<GpsPing, GpsPingResponse>
+                .NewConfig()
+                .Map(dest => dest.Timestamp, src => src.timestamp.ToString("o"))
+                .Map(dest => dest.DriverId, src => src.driver_id)
+                .Map(dest => dest.Latitude, src => src.latitude)
+                .Map(dest => dest.Longitude, src => src.longitude)
+                .Map(dest => dest.Speed, src => src.speed)
+                .Map(dest => dest.Heading, src => src.heading);
+        }
+    }
+}

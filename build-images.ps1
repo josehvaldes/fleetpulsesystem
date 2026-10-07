@@ -15,3 +15,11 @@ docker build -t "fleetpulse-dbwriter:$Version" `
 docker build -t "fleetpulse-ai-worker:$Version" `
     -f .\ai-worker\docker\Dockerfile `
     .\ai-worker\
+
+docker build -t "fleetpulse-api:$Version" `
+    -f .\FleetPulse.Api\FleetPulse.Api\Dockerfile `
+    .\FleetPulse.Api\
+
+docker build -t "fleetpulse-yarpproxy:$Version" `
+    -f .\FleetPulse.YarpProxy\FleetPulse.YarpProxy\Dockerfile `
+    .\FleetPulse.YarpProxy\
