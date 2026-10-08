@@ -9,7 +9,92 @@ The `FleetPulse.SignalRHub` is an ASP.NET Core 10 Minimal API + SignalR server. 
 
 ### Architecture
 
+```mermaid
+
+flowchart LR
+
+    %% =========================
+    %% Frontend
+    %% =========================
+    FE["FleetPulse Frontend<br/>React / Angular MFEs"]
+
+    %% =========================
+    %% Backend Edge
+    %% =========================
+    subgraph Backend["Backend"]
+        YARP["YarpProxy<br/>Reverse Proxy / Gateway"]
+
+        HUB["SignalRHub<br/>Real-Time WebSocket"]
+
+        API["Api<br/>REST / HTTP"]
+
+        YARP -->|"WebSocket<br/>/v1/fleetHub"| HUB
+        YARP -->|"HTTP<br/>/api/v1/*"| API
+    end
+
+    %% =========================
+    %% Streaming
+    %% =========================
+    subgraph Streaming["Streaming Layer"]
+        RP[("Redpanda<br/>Kafka API")]
+    end
+
+    %% =========================
+    %% Data
+    %% =========================
+    DB[("TimescaleDB<br/>PostgreSQL")]
+
+    %% =========================
+    %% Other workers
+    %% =========================
+    AI["AI Worker<br/>Python + LangGraph"]
+    DBW["DB Writer<br/>.NET Background Service"]
+
+    %% =========================
+    %% Connections
+    %% =========================
+    FE -->|"HTTPS / HTTP"| YARP
+
+    RP -->|"gps-pings"| HUB
+    RP -->|"ai-alerts"| HUB
+
+    RP -->|"gps-pings"| DBW
+    RP -->|"alerts"| DBW
+
+    HUB -->|"SignalR / WebSocket<br/>ReceiveGpsPing / ReceiveAlert"| FE
+
+    API -->|"Dapper + Npgsql"| DB
+    DBW -->|"Bulk INSERT / UPSERT"| DB
+
+    RP -->|"gps-pings"| AI
+    AI -->|"alerts"| RP
 ```
+
+```text
+
+                    ┌──────────────┐
+                    │ YarpProxy    │
+                    │              │
+Frontend ──────────►│ Single Entry │
+                    │    Point     │
+                    └──────┬───────┘
+                           │
+                  ┌────────┴────────┐
+                  │                 │
+                  ▼                 ▼
+          ┌──────────────┐  ┌──────────────┐
+          │ SignalRHub   │  │     Api      │
+          │              │  │              │
+          │ WebSockets   │  │ REST/HTTP    │
+          │ Kafka        │  │ Queries      │
+          └──────────────┘  └──────┬───────┘
+                                   │
+                                   ▼
+                             TimescaleDB
+```
+
+### FleetPulse.SignalRHub
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        FleetPulse.SignalRHub                        │
 │                                                                     │
@@ -26,6 +111,13 @@ The `FleetPulse.SignalRHub` is an ASP.NET Core 10 Minimal API + SignalR server. 
 │  │  Throttle (max 2 Hz /          │──SendAsync──►│ IHubContext      │
 │  │   driver, 500 ms window)       │   ReceiveGpsPing/ReceiveAlert   │
 │  └────────────────────────────────┘                                 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+### FleetPulse.SignalRHub
+
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                        FleetPulse.Api                        │
 │                                                                     │
 │  ┌──────────────────────────────────────────────────────────┐       │
 │  │  REST Endpoints (Minimal API, v1)                        │       │

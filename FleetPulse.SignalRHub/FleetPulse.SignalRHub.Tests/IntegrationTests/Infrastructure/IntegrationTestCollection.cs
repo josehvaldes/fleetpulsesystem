@@ -1,9 +1,0 @@
-﻿using Xunit;
-
-namespace FleetPulse.SignalRHub.Tests.IntegrationTests.Infrastructure
-{
-    [CollectionDefinition("Integration")]
-    public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
-    {
-    }
-}

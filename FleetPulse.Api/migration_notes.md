@@ -67,13 +67,14 @@ Not migrated: Kafka, `FleetHub`, `RealTimeNotifier`, `SignalRSettings`, `IAuthSe
 - Api container reads the shared `.env`: it needs the same `Authentication__Local__Jwt__{Secret,Issuer,Audience}`, `Authentication__EntraId__{TenantId,ClientId}` and DB connection settings as the Hub (`ConnectionStrings__FleetPulseDb`). `docker/env_sample.txt` still lists old `JwtSettings__*` names and should be refreshed.
 - Image build contexts: Api = `FleetPulse.Api/` solution folder, Proxy = `FleetPulse.YarpProxy/` solution folder (`docker build -f FleetPulse.Api/Dockerfile -t fleetpulse-api:1.0 .`).
 - Frontends must point their API base URL at the proxy (`http://localhost:8580`) and the proxy origin needs no extra CORS (CORS is answered by the backends using `Cors:AllowedOrigins`).
+- SignalRHub cleanup completed after the cutover was confirmed: Hub no longer maps drivers or alerts REST endpoints; its integration tests for those routes and the shared DB test fixture were removed. `IDatabaseService` / `DatabaseService` now only expose `GetVersion` for `/dbversion`. Login, SignalR, Kafka, health checks, and the alert mapping used by SignalR broadcasts remain. The Hub test project is retained as an empty test scaffold until Hub-specific tests are added.
 
 ## Next steps (after Slice 3)
 
 1. Parity check: run Hub and Api against the same DB and diff responses for the 3 endpoints (including 400/401/422 cases).
 2. Decide on the latent bugs listed above (alerts paging stub, `Enum.Parse` on invalid `status`/`riskLevel` throws -> 500, `pagesize`/`pagenumber` validation); fix in the Api first, then mirror or drop in the Hub.
 3. Add the Api service to docker-compose / deployment config; add YARP routes (`/api/v1/drivers`, `/api/v1/alerts` -> Api; `/api/v1/sessions`, `/v1/fleetHub` -> Hub) and fix ADR 0020 (`login` vs `sessions`).
-4. After the cutover is stable, remove REST endpoints, `DatabaseService` read methods and their tests from the Hub.
+4. Hub REST cleanup is complete; add Hub-specific login/SignalR/Kafka tests when appropriate.
 
 ## Slice 1 result
 
@@ -93,7 +94,7 @@ Not migrated: Kafka, `FleetHub`, `RealTimeNotifier`, `SignalRSettings`, `IAuthSe
 - Config: `appsettings.json` has empty Jwt Secret/Issuer/Audience and Entra ids on purpose. `appsettings.Development.json` sets Issuer `FleetPulse`, Audience `FleetPulseAudience` and the Entra ids, but NOT the Secret. Provide the same secret as the Hub via `dotnet user-secrets set "Authentication:Local:Jwt:Secret" "<same as Hub>"` (project `FleetPulse.Api`) or env var `Authentication__Local__Jwt__Secret`. Startup fails with a clear message if it is missing.
 - Dockerfile fixed (base image was `dotnet/10.0-alpine`, now `dotnet/aspnet:10.0-alpine`) and now copies all csprojs; build context must be the `FleetPulse.Api` solution folder. docker-compose entry for the Api is not part of this workspace and still has to be added.
 - Dev DB: same connection string as the Hub (`localhost:5432`, DB `fleetpulse`). `launchSettings` ports: http 5226, https 7038.
-
+- Dev DB: same connection string as the Hub (`localhost:5432`, DB `fleetpulse`). `launchSettings` ports: http 5226, https 7038.
 
 ## Migration Cost in Github Copilot
 
