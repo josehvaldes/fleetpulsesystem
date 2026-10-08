@@ -182,7 +182,14 @@ namespace FleetPulse.Infrastructure
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILoggerFactory>()
                         .CreateLogger("JwtBearerAuthentication");
-                    logger.LogWarning(context.Exception, "JWT authentication failed: {Message}", context.Exception.Message);
+
+                    var innerMessages = new List<string>();
+                    for (var inner = context.Exception.InnerException; inner is not null; inner = inner.InnerException)
+                        innerMessages.Add($"{inner.GetType().Name}: {inner.Message}");
+
+                    logger.LogWarning(context.Exception,
+                        "JWT authentication failed: {Message}. Inner: {InnerMessages}",
+                        context.Exception.Message, string.Join(" -> ", innerMessages));
                     return Task.CompletedTask;
                 }
             };
