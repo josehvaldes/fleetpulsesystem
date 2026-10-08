@@ -1,28 +1,37 @@
-# Default database connection settings for the FleetPulse system. Update these values as needed for your environment.
+# update thes values according to your needs
+# Also Update your app-config files in the frontend to allow msal authenticationo
+# see: fleetpulse.frontend\config\app-config.*.json
+
+# FleetPulse database connection settings
 DB_HOST=timescaledb
 DB_PORT=5432
 DB_NAME=fleetpulse
 DB_USER=db_username
 DB_PASSWORD=db_password
 
-# Origin allowed by the remote (MFE) nginx containers to load their modules (CORS):
-# Update this value in the dockerfiles
+# Connection string to access the FleetPulse database from the services. The values are read from the environment variables above.
+ConnectionStrings__FleetPulseDb=Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+
+# CORS settings for the frontend applications
 CORS_ALLOWED_ORIGIN=http://localhost:5173
 
 # FleetPulse.SignalRHub Web settings:
-AuthSettings__DefaultUserId=default_user_id
-AuthSettings__DefaultUsername=default_user_name
-AuthSettings__DefaultPassword=default_password
+Authentication__EntraId__ClientId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Authentication__EntraId__TenantId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-JwtSettings__Secret=your_jwt_secret_key
-JwtSettings__Issuer=your_jwt_issuer
-JwtSettings__Audience=your_jwt_audience
+Authentication__Local__Auth__DefaultUserId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Authentication__Local__Auth__DefaultUsername=admin
+Authentication__Local__Auth__DefaultPassword=replace-with-a-local-dev-password
+
+Authentication__Local__Jwt__Issuer=FleetPulse
+Authentication__Local__Jwt__Audience=FleetPulseAudience
+Authentication__Local__Jwt__Secret=replace-with-a-random-secret-at-least-32-chars
 
 
 # Environment variables for Azure OpenAI configuration
-AZURE_OPENAI_ENDPOINT=https://oai-petshop-test.openai.azure.com/
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_MODEL_DEPLOYMENT=gpt-4.1-mini_shopassist
+AZURE_OPENAI_MODEL_DEPLOYMENT=your-model-deployment
 
 #Azure Credentials for OpenAI
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -35,8 +44,20 @@ KAFKA_GROUP_ID=ai-worker-group
 KAFKA_TOPICS=gps-pings
 KAFKA_ALERT_TOPIC=ai-alerts
 
+# DOTNET environment settings
+DOTNET_ENVIRONMENT=Production
+DOTNET_USE_POLLING_FILE_WATCHER=1
+
+# Grafana settings
+GF_SECURITY_ADMIN_USER=admin
+GF_SECURITY_ADMIN_PASSWORD=replace-with-a-grafana-password
+
+# Environment variables for Prometheus PostgreSQL Exporter
+DATA_SOURCE_NAME=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable
+
 # OpenTelemetry for ai-worker
 otel_exporter_endpoint=http://otel-collector:4317
 
-
-DOTNET_ENVIRONMENT=Production
+# Frontend MFE test settings
+VITE_API_BASE_URL=https://localhost:8580/api
+VITE_AUTH_MODE=local
