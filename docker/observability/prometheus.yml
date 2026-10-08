@@ -37,7 +37,13 @@ scrape_configs:
     static_configs:
       - targets: ['ai-worker:8000']
     metrics_path: /metrics
-
+  
+  # 10. YARP Proxy
+  - job_name: 'YARP'
+    static_configs:
+      - targets: ['fleetpulse-yarpproxy:8080']
+    metrics_path: /metrics
+    
   # 7. Prometheus self-monitoring
   - job_name: 'prometheus'
     static_configs:
@@ -54,6 +60,7 @@ scrape_configs:
     static_configs:
       - targets: ['loki:3100']
     metrics_path: /metrics
+  
 
 # Alerting rules   
 rule_files:
