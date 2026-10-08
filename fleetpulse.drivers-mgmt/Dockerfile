@@ -15,7 +15,8 @@ WORKDIR /usr/share/nginx/html
 # Replace default nginx static files with Angular build output.
 RUN rm -rf ./*
 COPY --from=builder /app/dist/fleetpulse.drivers-mgmt/browser .
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+ENV CORS_ALLOWED_ORIGIN=http://localhost:5173
 
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/ || exit 1

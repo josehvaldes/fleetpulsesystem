@@ -5,6 +5,10 @@ DB_NAME=fleetpulse
 DB_USER=db_username
 DB_PASSWORD=db_password
 
+# Origin allowed by the remote (MFE) nginx containers to load their modules (CORS):
+# Update this value in the dockerfiles
+CORS_ALLOWED_ORIGIN=http://localhost:5173
+
 # FleetPulse.SignalRHub Web settings:
 AuthSettings__DefaultUserId=default_user_id
 AuthSettings__DefaultUsername=default_user_name
