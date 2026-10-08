@@ -18,7 +18,7 @@ The FleetPulse.SignalRHub service currently serves two fundamentally different a
 
 Combining these workloads creates an architectural mismatch. WebSockets are memory/state-intensive and require sticky sessions if scaled out. REST queries are stateless, compute-light, and scale perfectly horizontally. Keeping them together forces suboptimal scaling profiles and complicates future iterations on either domain.
 
-To modernize the system incrementally, we are applying the *Strangler Fig pattern*. We will extract the REST query layer into a new dedicated service (FleetPulse.Api), while leaving the WebSocket hub and local login (/api/v1/login) in the original FleetPulse.SignalRHub service.
+To modernize the system incrementally, we are applying the *Strangler Fig pattern*. We will extract the REST query layer into a new dedicated service (FleetPulse.Api), while leaving the WebSocket hub and local login (/api/v1/sessions) in the original FleetPulse.SignalRHub service.
 
 Because the frontend consists of a React SPA and two Micro-Frontends (MFEs) that expect a single API origin, the migration must be transparent to the client.
 
@@ -26,7 +26,7 @@ Because the frontend consists of a React SPA and two Micro-Frontends (MFEs) that
 We will implement a *YARP (Yet Another Reverse Proxy)* gateway as a facade to route traffic to the appropriate backend, and we will utilize a shared Resource Server authentication model.
 
 1. Service Split:
- - FleetPulse.SignalRHub: Will retain /v1/fleetHub (SignalR) and /api/v1/login (local JWT issuer).
+ - FleetPulse.SignalRHub: Will retain /v1/fleetHub (SignalR) and /api/v1/sessions (local JWT issuer).
  - FleetPulse.Api: Will handle /api/v1/drivers and /api/v1/alerts (stateless queries).
 
 2. Routing Facade: A YARP gateway service will act as the single ingress point. It will route requests based on path to the respective downstream service, keeping the frontend completely agnostic to the backend split.

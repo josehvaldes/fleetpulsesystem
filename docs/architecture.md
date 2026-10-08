@@ -24,15 +24,31 @@ EMQX -- "Data Bridge (Rule Engine)" --> RP
 end
 
 subgraph Processing [Backend Workers]
-WS[.NET 10 SignalR Worker]
 AI[Python AI Anomaly Worker <br/> LangGraph]
 DB[.NET 10 DB Batch Writer]
 end
+
+subgraph Exposing [Backend Web Apps]
+
+WS[.NET 10 SignalR Worker]
+API[.NET 10 Api]
+YARP["YarpProxy<br/>Reverse Proxy / Gateway"]
+YARP --> API
+YARP <--> WS 
+
+end
+
 subgraph Storage [Data Layer]
 TSDB[(TimescaleDB <br/> Postgres Extension)]
 end
+
 subgraph Presentation [Frontend - Cloudflare CDN]
 UI[Vite + React 19 SPA <br/> Leaflet.js Maps]
+ALERTMFE["Alert Mfe / React"]
+DRIVERMFE["Drivers Mfe/ Angular"]
+
+UI --> ALERTMFE
+UI --> DRIVERMFE
 end
 
 Sim -- "MQTT (paho-mqtt)" --> EMQX
@@ -42,9 +58,8 @@ RP -- "Kafka Topic: gps-pings" --> DB
 
 AI -- "Kafka Topic: ai-alerts" --> WS
 DB -- "Bulk Upsert" --> TSDB
-WS -- "WebSocket (SignalR)" --> UI
-TSDB -- "REST API (Aggregated)" --> UI
-
+YARP -- "WebSocket (SignalR)" <--> UI
+TSDB -- "REST API (Aggregated)" <--> API
 
 ```
 

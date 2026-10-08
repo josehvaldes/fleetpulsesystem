@@ -1,5 +1,4 @@
 ﻿using FleetPulse.Contracts.Response.Alerts;
-using FleetPulse.Contracts.Response.Drivers;
 using FleetPulse.Domain.Entities;
 using FleetPulse.Infrastructure.Kafka;
 using Mapster;
@@ -11,16 +10,6 @@ namespace FleetPulse.SignalRHub.Registry
         public static void RegisterMappings()
         {
             // Register your Mapster mappings here
-            TypeAdapterConfig<LatestDriverState, LastestDriverStateResponse>
-                .NewConfig()
-                .Map(dest => dest.LastSeen, src => src.last_seen.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.driver_id)
-                .Map(dest => dest.Status, src => src.status)
-                .Map(dest => dest.Longitude, src => src.longitude)
-                .Map(dest => dest.Latitude, src => src.latitude)
-                .Map(dest => dest.Speed, src => src.speed)
-                .Map(dest => dest.Heading, src => src.heading);
-
             TypeAdapterConfig<Alert, AlertResponse>.NewConfig()
                 .Map(dest => dest.Id, src => src.id)
                 .Map(dest => dest.DriverId, src => src.driver_id)
@@ -36,15 +25,6 @@ namespace FleetPulse.SignalRHub.Registry
                 .Map(dest => dest.AutoEscalate, src => src.auto_escalate)
                 .Map(dest => dest.Status, src => src.status.ToString())
                 .Map(dest => dest.RaisedAt, src => src.raised_at);
-
-            TypeAdapterConfig<GpsPing, GpsPingResponse>
-                .NewConfig()
-                .Map(dest => dest.Timestamp, src => src.timestamp.ToString("o"))
-                .Map(dest => dest.DriverId, src => src.driver_id)
-                .Map(dest => dest.Latitude, src => src.latitude)
-                .Map(dest => dest.Longitude, src => src.longitude)
-                .Map(dest => dest.Speed, src => src.speed)
-                .Map(dest => dest.Heading, src => src.heading);
 
             KafkaMapping.RegisterMappings(); // Register Kafka mappings
         }

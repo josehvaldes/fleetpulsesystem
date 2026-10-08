@@ -7,8 +7,10 @@ on:
     paths:
       - "FleetPulse.DbWriter/**"
       - "FleetPulse.SignalRHub/**"
+      - "FleetPulse.Api/**"
       - "FleetPulse.DbWriter/**/Directory.Packages.props"
       - "FleetPulse.SignalRHub/**/Directory.Packages.props"
+      - "FleetPulse.Api/**/Directory.Packages.props"
       - ".github/workflows/ci-dotnet.yml"
   pull_request:
     branches:
@@ -16,8 +18,10 @@ on:
     paths:
       - "FleetPulse.DbWriter/**"
       - "FleetPulse.SignalRHub/**"
+      - "FleetPulse.Api/**"
       - "FleetPulse.DbWriter/**/Directory.Packages.props"
       - "FleetPulse.SignalRHub/**/Directory.Packages.props"
+      - "FleetPulse.Api/**/Directory.Packages.props"
       - ".github/workflows/ci-dotnet.yml"
   workflow_dispatch:
 
@@ -35,6 +39,7 @@ jobs:
         solution:
           - FleetPulse.DbWriter/FleetPulse.DbWriter.slnx
           - FleetPulse.SignalRHub/FleetPulse.SignalRHub.slnx
+          - FleetPulse.Api/FleetPulse.Api.slnx
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

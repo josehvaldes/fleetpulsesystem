@@ -5,7 +5,6 @@ using FleetPulse.SignalRHub;
 using FleetPulse.Application;
 using FleetPulse.SignalRHub.Configuration;
 using FleetPulse.SignalRHub.Logging;
-using FleetPulse.SignalRHub.Mapping;
 using FleetPulse.SignalRHub.Middleware;
 using FleetPulse.SignalRHub.Registry;
 using Serilog;
@@ -14,7 +13,6 @@ ContextMapping.RegisterMappings();
 
 var builder = WebApplication.CreateBuilder(args);
 
-SqlMapping.RegisterSqlMappings();
 
 var appSettings = builder.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();
