@@ -1,6 +1,4 @@
 # Architecture Decision Records Template 
-##Title: 
-{Title}
 
 ## Status: 
 {Proposed | Accepted | Deprecated | Superseded}
