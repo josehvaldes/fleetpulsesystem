@@ -1,6 +1,7 @@
-using FleetPulse.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using AlertsValidationException = FleetPulse.Alerts.Application.Common.Exceptions.ValidationException;
+using DriversValidationException = FleetPulse.Drivers.Application.Common.Exceptions.ValidationException;
 
 namespace FleetPulse.Api.Middleware
 {
@@ -9,9 +10,16 @@ namespace FleetPulse.Api.Middleware
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            var validationErrors = exception switch
+            {
+                DriversValidationException e => e.Errors,
+                AlertsValidationException e => e.Errors,
+                _ => null
+            };
+
             var (statusCode, title) = exception switch
             {
-                ValidationException => (StatusCodes.Status422UnprocessableEntity, "Validation Error"),
+                DriversValidationException or AlertsValidationException => (StatusCodes.Status422UnprocessableEntity, "Validation Error"),
                 UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
                 _ => (StatusCodes.Status500InternalServerError, "Server Error")
             };
@@ -23,23 +31,21 @@ namespace FleetPulse.Api.Middleware
                 statusCode,
                 exception.Message);
 
-            ProblemDetails problemDetails = exception switch
-            {
-                ValidationException validationException => new ValidationProblemDetails(validationException.Errors)
-                {
-                    Status = statusCode,
-                    Title = title,
-                    Detail = exception.Message,
-                    Instance = httpContext.Request.Path
-                },
-                _ => new ProblemDetails
+            ProblemDetails problemDetails = validationErrors is not null
+                ? new ValidationProblemDetails(validationErrors)
                 {
                     Status = statusCode,
                     Title = title,
                     Detail = exception.Message,
                     Instance = httpContext.Request.Path
                 }
-            };
+                : new ProblemDetails
+                {
+                    Status = statusCode,
+                    Title = title,
+                    Detail = exception.Message,
+                    Instance = httpContext.Request.Path
+                };
 
             httpContext.Response.StatusCode = statusCode;
 

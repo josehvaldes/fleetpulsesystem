@@ -1,4 +1,6 @@
+using FleetPulse.Alerts.Api;
 using FleetPulse.Api.Configuration;
+using FleetPulse.Drivers.Api;
 
 namespace FleetPulse.Api.Registry
 {
@@ -13,9 +15,9 @@ namespace FleetPulse.Api.Registry
 
             var apiGroup = app.MapGroup($"/api/{appSettings.ApiVersion}").RequireAuthorization();
 
-            apiGroup.RegisterDrivers();
+            apiGroup.MapDriversEndpoints();
 
-            apiGroup.RegisterAlerts();
+            apiGroup.MapAlertsEndpoints();
         }
     }
 }

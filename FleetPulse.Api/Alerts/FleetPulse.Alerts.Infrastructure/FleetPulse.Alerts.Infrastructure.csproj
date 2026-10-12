@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FleetPulse.Alerts.Application\FleetPulse.Alerts.Application.csproj" />
+    <ProjectReference Include="..\FleetPulse.Alerts.Domain\FleetPulse.Alerts.Domain.csproj" />
+  </ItemGroup>
+</Project>

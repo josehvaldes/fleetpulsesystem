@@ -62,7 +62,7 @@ namespace FleetPulse.DbWriter.Services.GpsPing
         {
             await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
 
-            var selectSql = "SELECT * FROM fleetpulse.driver_latest_state WHERE driver_id = @DriverId";
+            var selectSql = "SELECT * FROM drivers.driver_latest_state WHERE driver_id = @DriverId";
             
             var lastState = await connection.QueryFirstOrDefaultAsync<DriverLastState>(selectSql, new { DriverId = driverId });
             return lastState;
@@ -103,7 +103,7 @@ namespace FleetPulse.DbWriter.Services.GpsPing
                 })
                 .ToList();
             const string sql = """
-                        INSERT INTO fleetpulse.driver_latest_state
+                        INSERT INTO drivers.driver_latest_state
                             (driver_id, latitude, longitude, speed, heading, last_seen, status)
                         VALUES
                             (@Driver_Id, @Latitude, @Longitude, @Speed, @Heading, @Last_Seen, @Status)

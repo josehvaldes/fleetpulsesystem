@@ -16,7 +16,7 @@ namespace FleetPulse.DbWriter.Services.Alerts
                 alert.id = Guid.NewGuid();
 
             var sql = """
-                INSERT INTO fleetpulse.alerts (
+                INSERT INTO alerts.alerts (
                     id, driver_id,
                     event_latitude, event_longitude,
                     exit_speed, exit_time,
@@ -49,7 +49,7 @@ namespace FleetPulse.DbWriter.Services.Alerts
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
                        risk_level, assessment, recommendation, auto_escalate, status, raised_at
-                FROM fleetpulse.alerts
+                FROM alerts.alerts
                 WHERE driver_id = @DriverId
                 ORDER BY raised_at DESC
                 """;
@@ -65,7 +65,7 @@ namespace FleetPulse.DbWriter.Services.Alerts
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
                        risk_level, assessment, recommendation, auto_escalate, status, raised_at
-                FROM fleetpulse.alerts
+                FROM alerts.alerts
                 WHERE raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC
                 """;
@@ -81,7 +81,7 @@ namespace FleetPulse.DbWriter.Services.Alerts
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
                        risk_level, assessment, recommendation, auto_escalate, status, raised_at
-                FROM fleetpulse.alerts
+                FROM alerts.alerts
                 WHERE status = @Status AND raised_at >= @StartDate AND raised_at <= @EndDate
                 ORDER BY raised_at DESC
                 """;
@@ -97,7 +97,7 @@ namespace FleetPulse.DbWriter.Services.Alerts
                 SELECT id, driver_id, event_latitude, event_longitude,
                        exit_speed, exit_time, zone_name, zone_type,
                        risk_level, assessment, recommendation, auto_escalate, status, raised_at
-                FROM fleetpulse.alerts
+                FROM alerts.alerts
                 WHERE id = @AlertId
                 """;
 

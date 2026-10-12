@@ -3,6 +3,10 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 CREATE SCHEMA IF NOT EXISTS fleetpulse;
 
+CREATE SCHEMA IF NOT EXISTS alerts;
+
+CREATE SCHEMA IF NOT EXISTS drivers;
+
 -- Hypertable for historical GPS data
 CREATE TABLE IF NOT EXISTS fleetpulse.gps_history (
     event_id       UUID NOT NULL DEFAULT uuidv7(),
@@ -28,7 +32,8 @@ ALTER TABLE fleetpulse.gps_history SET (
 SELECT add_compression_policy('fleetpulse.gps_history', INTERVAL '7 days');
 
 -- Latest state table (one row per driver)
-CREATE TABLE IF NOT EXISTS fleetpulse.driver_latest_state (
+-- Used by the Drivers API Module
+CREATE TABLE IF NOT EXISTS drivers.driver_latest_state (
     driver_id      VARCHAR(50) PRIMARY KEY,
     latitude       DOUBLE PRECISION NOT NULL,
     longitude      DOUBLE PRECISION NOT NULL,
@@ -41,7 +46,8 @@ CREATE TABLE IF NOT EXISTS fleetpulse.driver_latest_state (
 );
 
 -- AI Alerts table
-CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
+-- Useb by the Alerts API Module
+CREATE TABLE IF NOT EXISTS alerts.alerts (
     id               UUID PRIMARY KEY DEFAULT uuidv7(),
     driver_id        VARCHAR(50) NOT NULL,
     
@@ -65,6 +71,6 @@ CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
 -- Indexes for common queries
 CREATE INDEX idx_gps_history_event_id ON fleetpulse.gps_history (event_id);
 CREATE INDEX idx_gps_history_driver_time ON fleetpulse.gps_history (driver_id, timestamp DESC);
-CREATE INDEX idx_ai_alerts_driver ON fleetpulse.alerts (driver_id, raised_at DESC);
-CREATE INDEX idx_ai_alerts_severity ON fleetpulse.alerts (risk_level, raised_at DESC);
-CREATE INDEX idx_ai_alerts_status ON fleetpulse.alerts (status, raised_at DESC);
+CREATE INDEX idx_ai_alerts_driver ON alerts.alerts (driver_id, raised_at DESC);
+CREATE INDEX idx_ai_alerts_severity ON alerts.alerts (risk_level, raised_at DESC);
+CREATE INDEX idx_ai_alerts_status ON alerts.alerts (status, raised_at DESC);

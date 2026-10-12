@@ -1,4 +1,4 @@
-using FleetPulse.Application.Common.Interfaces;
+using Npgsql;
 
 namespace FleetPulse.Api.Registry
 {
@@ -12,7 +12,11 @@ namespace FleetPulse.Api.Registry
 
             app.MapHealthChecks("/healthz");
 
-            app.MapGet("/dbversion", async (IDatabaseService db, CancellationToken cancellationToken) => await db.GetVersion(cancellationToken)).RequireAuthorization();
+            app.MapGet("/dbversion", async (NpgsqlDataSource dataSource, CancellationToken cancellationToken) =>
+            {
+                await using var command = dataSource.CreateCommand("SELECT version();");
+                return await command.ExecuteScalarAsync(cancellationToken) as string ?? "Not Available";
+            }).RequireAuthorization();
         }
     }
 }

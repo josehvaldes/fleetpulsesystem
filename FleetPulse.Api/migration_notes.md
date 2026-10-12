@@ -1,5 +1,7 @@
 # REST migration notes: FleetPulse.SignalRHub -> FleetPulse.Api
 
+> **Update (ADR 0021):** `FleetPulse.Api` was split into the `Drivers` and `Alerts` modules (see `splitMigration.md`). The flat `FleetPulse.Application/Contracts/Domain/Infrastructure/Observability` projects mentioned below no longer exist: their code now lives in `Drivers/*`, `Alerts/*` and the host (`Authentication/`, `Observability/`). Tests are in `Drivers/FleetPulse.Drivers.Tests` and `Alerts/FleetPulse.Alerts.Tests`. The Dockerfile build context is still the `FleetPulse.Api` solution folder.
+
 Context: ADR 0020 (docs/adr/0020-...). Strangler Fig. SignalRHub stays untouched until cutover. Api projects are trimmed (only what the 3 REST endpoints need), not full copies.
 
 ## Endpoints

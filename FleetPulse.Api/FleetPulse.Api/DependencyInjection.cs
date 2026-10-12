@@ -1,7 +1,7 @@
 using FleetPulse.Api.Configuration;
-using FleetPulse.Application.Common.Behaviors;
-using FleetPulse.Application;
-using FleetPulse.Observability.Traces;
+using FleetPulse.Alerts.Application;
+using FleetPulse.Drivers.Application;
+using FleetPulse.Api.Observability;
 using Npgsql;
 using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Resources;
@@ -27,8 +27,8 @@ namespace FleetPulse.Api
 
             services.AddMediator(options =>
             {
-                options.Assemblies = [typeof(ApplicationAssemblyMarker).Assembly];
-                options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
+                options.Assemblies = [typeof(DriversApplicationAssemblyMarker).Assembly, typeof(AlertsApplicationAssemblyMarker).Assembly];
+                options.PipelineBehaviors = [typeof(FleetPulse.Drivers.Application.Common.Behaviors.ValidationBehavior<,>), typeof(FleetPulse.Alerts.Application.Common.Behaviors.ValidationBehavior<,>)];
                 options.ServiceLifetime = ServiceLifetime.Scoped;
             });
 
