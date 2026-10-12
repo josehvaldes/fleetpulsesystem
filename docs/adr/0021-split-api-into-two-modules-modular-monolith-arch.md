@@ -1,7 +1,7 @@
 # ADR 0021 split FleetPulse.API into two in-process modules (Modular Monolith)
 
 ## Status: 
-Proposed
+Accepted
 
 ## Date: 
 2026-10-10
@@ -159,4 +159,15 @@ Considered, not chosen: it is purer from a DDD perspective, but it forces the co
 
 
 ## Related ADRS
-- 
+-
+
+## Addendum: implementation deviations (2026-10-10)
+
+- **No `FleetPulse.Shared.Kernel` project (§4).** The host `FleetPulse.Api` is the only project outside `Alerts/` and `Drivers/`, and no cross-module call exists yet. Create it only when a neutral primitive (e.g. `DriverId`) is actually shared.
+- **Common application code is duplicated per module.** `ValidationBehavior`, `ValidationException` and the assembly marker exist in both `*.Application` projects instead of a shared library.
+- **`.Contracts` projects added next to `.Public`.** `{Module}.Contracts` holds the HTTP response DTOs; `{Module}.Public` is reserved for cross-module ports and events and is empty for now.
+- **Cross-cutting code lives in the host.** Authentication/authorization, OpenTelemetry/Prometheus, CORS, logging, the exception handler, `/health`, `/healthz` and `/dbversion` are in `FleetPulse.Api`.
+- **Module composition.** Each module exposes `Add{Module}Module(IConfiguration)` and `Map{Module}Endpoints()` from its `.Api` project; the host registers both Mediator assemblies and both `ValidationBehavior`s. 
+
+## Addendum: implementation extensions (2026-10-10)
+- **Schema-per-module (§6) is completed.** Tables 'alerts' and 'driver_latest_state' are in different schemas  in `db/init.sql`. This change affected FleetPulse.DbWriter which was already updated. No changes were needed in FleetPulse.SignalRHub

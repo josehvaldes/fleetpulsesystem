@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Mapster" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FleetPulse.Drivers.Application\FleetPulse.Drivers.Application.csproj" />
+    <ProjectReference Include="..\FleetPulse.Drivers.Contracts\FleetPulse.Drivers.Contracts.csproj" />
+    <ProjectReference Include="..\FleetPulse.Drivers.Domain\FleetPulse.Drivers.Domain.csproj" />
+    <ProjectReference Include="..\FleetPulse.Drivers.Infrastructure\FleetPulse.Drivers.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

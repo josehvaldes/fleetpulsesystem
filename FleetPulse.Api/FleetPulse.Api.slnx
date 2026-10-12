@@ -1,9 +1,21 @@
 <Solution>
+  <Folder Name="/Alerts/">
+    <Project Path="Alerts/FleetPulse.Alerts.Api/FleetPulse.Alerts.Api.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Application/FleetPulse.Alerts.Application.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Contracts/FleetPulse.Alerts.Contracts.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Domain/FleetPulse.Alerts.Domain.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Infrastructure/FleetPulse.Alerts.Infrastructure.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Public/FleetPulse.Alerts.Public.csproj" />
+    <Project Path="Alerts/FleetPulse.Alerts.Tests/FleetPulse.Alerts.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Drivers/">
+    <Project Path="Drivers/FleetPulse.Drivers.Api/FleetPulse.Drivers.Api.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Application/FleetPulse.Drivers.Application.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Contracts/FleetPulse.Drivers.Contracts.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Domain/FleetPulse.Drivers.Domain.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Infrastructure/FleetPulse.Drivers.Infrastructure.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Public/FleetPulse.Drivers.Public.csproj" />
+    <Project Path="Drivers/FleetPulse.Drivers.Tests/FleetPulse.Drivers.Tests.csproj" />
+  </Folder>
   <Project Path="FleetPulse.Api/FleetPulse.Api.csproj" />
-  <Project Path="FleetPulse.Api.Tests/FleetPulse.Api.Tests.csproj" />
-  <Project Path="FleetPulse.Application/FleetPulse.Application.csproj" />
-  <Project Path="FleetPulse.Contracts/FleetPulse.Contracts.csproj" />
-  <Project Path="FleetPulse.Domain/FleetPulse.Domain.csproj" />
-  <Project Path="FleetPulse.Infrastructure/FleetPulse.Infrastructure.csproj" />
-  <Project Path="FleetPulse.Observability/FleetPulse.Observability.csproj" />
 </Solution>

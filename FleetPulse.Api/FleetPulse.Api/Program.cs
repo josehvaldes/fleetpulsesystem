@@ -1,18 +1,15 @@
+using FleetPulse.Alerts.Api;
 using FleetPulse.Api;
+using FleetPulse.Api.Authentication;
 using FleetPulse.Api.Configuration;
 using FleetPulse.Api.Logging;
 using FleetPulse.Api.Middleware;
+using FleetPulse.Api.Observability;
 using FleetPulse.Api.Registry;
-using FleetPulse.Application;
-using FleetPulse.Infrastructure;
-using FleetPulse.Infrastructure.Mapping;
-using FleetPulse.Observability;
+using FleetPulse.Drivers.Api;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
-ContextMapping.RegisterMappings();
-SqlMapping.RegisterSqlMappings();
 
 var appSettings = builder.Configuration.GetSection(AppSettings.SectionName)
                                     .Get<AppSettings>() ?? new AppSettings();
@@ -34,8 +31,9 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDependencies(builder.Configuration);
-builder.Services.AddApplicationDependencies();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddDriversModule(builder.Configuration);
+builder.Services.AddAlertsModule(builder.Configuration);
 
 var app = builder.Build();
 

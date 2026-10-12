@@ -5,7 +5,7 @@ Use Dapper for database access.
 
 ```sql
 -- AI Alerts table
-CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
+CREATE TABLE IF NOT EXISTS alerts.alerts (
     id               UUID PRIMARY KEY DEFAULT uuidv7(),
     driver_id        VARCHAR(50) NOT NULL,
     

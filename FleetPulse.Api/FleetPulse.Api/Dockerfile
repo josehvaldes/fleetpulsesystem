@@ -8,12 +8,19 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Drivers/FleetPulse.Drivers.Api/FleetPulse.Drivers.Api.csproj", "Drivers/FleetPulse.Drivers.Api/"]
+COPY ["Drivers/FleetPulse.Drivers.Application/FleetPulse.Drivers.Application.csproj", "Drivers/FleetPulse.Drivers.Application/"]
+COPY ["Drivers/FleetPulse.Drivers.Contracts/FleetPulse.Drivers.Contracts.csproj", "Drivers/FleetPulse.Drivers.Contracts/"]
+COPY ["Drivers/FleetPulse.Drivers.Domain/FleetPulse.Drivers.Domain.csproj", "Drivers/FleetPulse.Drivers.Domain/"]
+COPY ["Drivers/FleetPulse.Drivers.Infrastructure/FleetPulse.Drivers.Infrastructure.csproj", "Drivers/FleetPulse.Drivers.Infrastructure/"]
+COPY ["Drivers/FleetPulse.Drivers.Public/FleetPulse.Drivers.Public.csproj", "Drivers/FleetPulse.Drivers.Public/"]
+COPY ["Alerts/FleetPulse.Alerts.Api/FleetPulse.Alerts.Api.csproj", "Alerts/FleetPulse.Alerts.Api/"]
+COPY ["Alerts/FleetPulse.Alerts.Application/FleetPulse.Alerts.Application.csproj", "Alerts/FleetPulse.Alerts.Application/"]
+COPY ["Alerts/FleetPulse.Alerts.Contracts/FleetPulse.Alerts.Contracts.csproj", "Alerts/FleetPulse.Alerts.Contracts/"]
+COPY ["Alerts/FleetPulse.Alerts.Domain/FleetPulse.Alerts.Domain.csproj", "Alerts/FleetPulse.Alerts.Domain/"]
+COPY ["Alerts/FleetPulse.Alerts.Infrastructure/FleetPulse.Alerts.Infrastructure.csproj", "Alerts/FleetPulse.Alerts.Infrastructure/"]
+COPY ["Alerts/FleetPulse.Alerts.Public/FleetPulse.Alerts.Public.csproj", "Alerts/FleetPulse.Alerts.Public/"]
 COPY ["FleetPulse.Api/FleetPulse.Api.csproj", "FleetPulse.Api/"]
-COPY ["FleetPulse.Application/FleetPulse.Application.csproj", "FleetPulse.Application/"]
-COPY ["FleetPulse.Contracts/FleetPulse.Contracts.csproj", "FleetPulse.Contracts/"]
-COPY ["FleetPulse.Domain/FleetPulse.Domain.csproj", "FleetPulse.Domain/"]
-COPY ["FleetPulse.Infrastructure/FleetPulse.Infrastructure.csproj", "FleetPulse.Infrastructure/"]
-COPY ["FleetPulse.Observability/FleetPulse.Observability.csproj", "FleetPulse.Observability/"]
 RUN dotnet restore "./FleetPulse.Api/FleetPulse.Api.csproj"
 COPY . .
 WORKDIR "/src/FleetPulse.Api"
