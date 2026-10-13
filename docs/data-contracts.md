@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS fleetpulse.driver_latest_state (
 );
 ```
 
-** Alert defintion in database
+** Alert definition in database
 ```sql
 -- AI Alerts table
-CREATE TABLE IF NOT EXISTS fleetpulse.alerts (
+CREATE TABLE IF NOT EXISTS alerts.alerts (
     id               UUID PRIMARY KEY DEFAULT uuidv7(),
     ...
     status           VARCHAR(20) NOT NULL
