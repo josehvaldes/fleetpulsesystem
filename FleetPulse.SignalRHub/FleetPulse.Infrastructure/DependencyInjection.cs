@@ -125,22 +125,18 @@ namespace FleetPulse.Infrastructure
                 };
 
                 //scope mapping:
-                options.Events = new JwtBearerEvents
+                options.Events = CreateJwtEvents(onTokenValidated: context =>
                 {
-                    OnTokenValidated = context =>
-                    {
-                        var identity = context.Principal?.Identity as ClaimsIdentity;
-                        // Find the legacy Entra ID scope claim
-                        var legacyScopeClaim = identity?.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
+                    var identity = context.Principal?.Identity as ClaimsIdentity;
+                    var legacyScopeClaim = identity?.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
 
-                        if (identity != null && legacyScopeClaim != null)
-                        {
-                            // Add a clean, short alias claim
-                            identity.AddClaim(new Claim("scope", legacyScopeClaim.Value));
-                        }
-                        return Task.CompletedTask;
+                    // Expose Entra's long scope claim type under the short "scope" name used by the policies.
+                    if (identity != null && legacyScopeClaim != null)
+                    {
+                        identity.AddClaim(new Claim("scope", legacyScopeClaim.Value));
                     }
-                };
+                    return Task.CompletedTask;
+                });
 
                 // ⚠️ SignalR-specific: 
                 AddJwtEventOptionsForHub(options);
@@ -149,6 +145,30 @@ namespace FleetPulse.Infrastructure
             
 
             return services;
+        }
+
+        private static JwtBearerEvents CreateJwtEvents(Func<TokenValidatedContext, Task>? onTokenValidated = null)
+        {
+            return new JwtBearerEvents
+            {
+                OnTokenValidated = onTokenValidated ?? (_ => Task.CompletedTask),
+                // Surfaces the exact validation failure (issuer/audience/signature/lifetime) instead of a bare 401.
+                OnAuthenticationFailed = context =>
+                {
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("JwtBearerAuthentication");
+
+                    var innerMessages = new List<string>();
+                    for (var inner = context.Exception.InnerException; inner is not null; inner = inner.InnerException)
+                        innerMessages.Add($"{inner.GetType().Name}: {inner.Message}");
+
+                    logger.LogWarning(context.Exception,
+                        "JWT authentication failed: {Message}. Inner: {InnerMessages}",
+                        context.Exception.Message, string.Join(" -> ", innerMessages));
+                    return Task.CompletedTask;
+                }
+            };
         }
 
         public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services) 
