@@ -1,14 +1,3 @@
-# docker-compose.yml runs all the container at once. 
-# If you need to run specific services, run the commands below:
-#
-# docker compose -f .\docker-compose-postgresql.yml up -d ; `
-# docker compose -f .\docker-compose-redpanda.yml up -d ; `
-# docker compose -f .\docker-compose-obsv.yml up -d ; `
-# docker compose -f .\docker-compose-tracing.yml up -d ; `
-# docker compose -f .\docker-compose-services.yml up -d ; `
-# docker compose -f .\docker-compose-frontend.yml up -d
-#
-
 name: fleetpulse-system
 networks:
   fleetpulse_network:
@@ -252,7 +241,7 @@ services:
       - loki-data:/loki
       - ./observability/loki-config.yaml:/etc/loki/local-config.yaml:ro
     networks:
-      - redpanda_network
+      - fleetpulse_network
 
   promtail:
     image: grafana/promtail:2.9.5
@@ -268,7 +257,7 @@ services:
     depends_on:
       - loki
     networks:
-      - redpanda_network
+      - fleetpulse_network
 
   tempo:
     image: grafana/tempo:2.10.6
@@ -282,7 +271,7 @@ services:
       - "4317"        # OTLP gRPC (internal, used by collector)
       - "4318"        # OTLP HTTP (internal, used by collector)
     networks:
-      - redpanda_network
+      - fleetpulse_network
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.158.0
@@ -296,4 +285,4 @@ services:
     depends_on:
       - tempo
     networks:
-      - redpanda_network
+      - fleetpulse_network
