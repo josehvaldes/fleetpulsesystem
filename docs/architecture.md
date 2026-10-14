@@ -25,16 +25,13 @@ end
 
 subgraph Processing [Backend Workers]
 AI[Python AI Anomaly Worker <br/> LangGraph]
-DB[.NET 10 DB Batch Writer]
+DBW[.NET 10 DB Batch Writer]
 end
 
 subgraph Exposing [Backend Web Apps]
-
-WS[.NET 10 SignalR Worker]
 API[.NET 10 Api]
+WS[.NET 10 SignalR Hub]
 YARP["YarpProxy<br/>Reverse Proxy / Gateway"]
-YARP --> API
-YARP <--> WS 
 
 end
 
@@ -46,20 +43,30 @@ subgraph Presentation [Frontend - Cloudflare CDN]
 UI[Vite + React 19 SPA <br/> Leaflet.js Maps]
 ALERTMFE["Alert Mfe / React"]
 DRIVERMFE["Drivers Mfe/ Angular"]
+end
 
 UI --> ALERTMFE
 UI --> DRIVERMFE
-end
 
 Sim -- "MQTT (paho-mqtt)" --> EMQX
-RP -- "Kafka Topic: gps-pings" --> WS
-RP -- "Kafka Topic: gps-pings" --> AI
-RP -- "Kafka Topic: gps-pings" --> DB
+RP -- "Kafka Topic: gps-pings/alerts" --> WS
+RP <-- "Kafka Topic: gps-pings/alerts" --> AI
 
-AI -- "Kafka Topic: ai-alerts" --> WS
-DB -- "Bulk Upsert" --> TSDB
-YARP -- "WebSocket (SignalR)" <--> UI
+RP -- "Kafka Topic: gps-pings" --> DBW
+
+DBW -- "Bulk Upsert" --> TSDB
 TSDB -- "REST API (Aggregated)" <--> API
+
+YARP --> WS 
+YARP -- "WebSocket (SignalR)" --> UI
+YARP --> API
+
+WS --> UI
+
+
+User[" 👤 User"]
+User --"use" --> UI
+
 
 ```
 

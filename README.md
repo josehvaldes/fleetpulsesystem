@@ -17,7 +17,64 @@ The repository is a polyglot monorepo containing .NET, Python, React, and Angula
 
 Telemetry flows from the simulator through MQTT/EMQX to Redpanda. The DB writer persists data, the SignalR hub broadcasts real-time events, and the AI worker can publish enriched alerts. The frontend accesses REST and SignalR through the YARP proxy.
 
-**Diagram placeholder:** Add a high-level architecture diagram here. Diagram format and source are intentionally undecided.
+```mermaid
+graph TD
+
+subgraph Edge [Edge / Simulation]
+Sim[Python GPS Simulator]
+end
+
+subgraph Stream [Streaming Layer - Docker]
+EMQX[(EMQX <br/> MQTT Broker)]
+RP[(Redpanda <br/> Kafka API)]
+EMQX -- "Data Bridge (Rule Engine)" --> RP
+end
+
+subgraph Processing [Backend Workers]
+AI[Python AI Anomaly Worker <br/> LangGraph]
+DBW[.NET 10 DB Batch Writer]
+end
+
+subgraph Exposing [Backend Web Apps]
+API[.NET 10 Api]
+WS[.NET 10 SignalR Hub]
+YARP["YarpProxy<br/>Reverse Proxy / Gateway"]
+
+end
+
+subgraph Storage [Data Layer]
+TSDB[(TimescaleDB <br/> Postgres Extension)]
+end
+
+subgraph Presentation [Frontend - Cloudflare CDN]
+UI[Vite + React 19 SPA <br/> Leaflet.js Maps]
+ALERTMFE["Alert Mfe / React"]
+DRIVERMFE["Drivers Mfe/ Angular"]
+end
+
+UI --> ALERTMFE
+UI --> DRIVERMFE
+
+Sim -- "MQTT (paho-mqtt)" --> EMQX
+RP -- "Kafka Topic: gps-pings/alerts" --> WS
+RP <-- "Kafka Topic: gps-pings/alerts" --> AI
+
+RP -- "Kafka Topic: gps-pings" --> DBW
+
+DBW -- "Bulk Upsert" --> TSDB
+TSDB -- "REST API (Aggregated)" <--> API
+
+YARP --> WS 
+YARP -- "WebSocket (SignalR)" --> UI
+YARP --> API
+
+WS --> UI
+
+
+User[" 👤 User"]
+User --"use" --> UI
+
+```
 
 For the complete overview, see [Architecture](docs/architecture.md) and the [C4 model source and rendered diagrams](docs/c4model/).
 
