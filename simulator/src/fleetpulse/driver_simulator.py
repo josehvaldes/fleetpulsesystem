@@ -4,7 +4,7 @@ import random
 import signal
 import sys
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from opentelemetry import propagate, trace
 from opentelemetry.trace import SpanKind
@@ -243,7 +243,7 @@ class DriverSimulator:
                 message = {
                     "event_id" : event_id,
                     "driver_id": self.config.driver_id,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "latitude": round(lat, 6),
                     "longitude": round(lng, 6),
                     "speed_kmh": round(self.current_speed_kmh, 1),

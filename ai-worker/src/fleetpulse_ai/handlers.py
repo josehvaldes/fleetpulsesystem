@@ -1,6 +1,6 @@
 
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 from opentelemetry import propagate, trace
@@ -91,7 +91,7 @@ def create_ai_worker_handler(
                         agent_assessment=agent_response.assessment,
                         agent_recommendation=agent_response.recommended_action,
                         agent_auto_escalate=agent_response.auto_escalate,
-                        created_at= datetime.now(timezone.utc).isoformat()
+                        created_at= datetime.now(UTC).isoformat()
                     )
 
                     PINGS_PROCESSED.labels(anomaly_detected="true").inc()
