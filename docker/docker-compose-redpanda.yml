@@ -9,7 +9,7 @@ volumes:
   psgdata: null
 services:
   redpanda-0:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.5
     command:
       - redpanda
       - start
@@ -47,7 +47,7 @@ services:
       - redpanda-0
 
   emqx:
-    image: emqx/emqx-enterprise:latest
+    image: emqx/emqx-enterprise:6.3
     container_name: emqx
     ports:
       - "1883:1883"     # MQTT TCP
@@ -68,7 +68,7 @@ services:
       - redpanda-0
 
   emqx-bootstrapper:
-    image: curlimages/curl:latest
+    image: curlimages/curl:8.23.0
     container_name: emqx_bootstrapper
     networks:
       - redpanda_network

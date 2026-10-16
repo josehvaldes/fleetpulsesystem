@@ -8,7 +8,7 @@ volumes:
 services:
   # Add to docker-compose.yml
   timescaledb:
-    image: timescale/timescaledb:latest-pg18
+    image: timescale/timescaledb:2.30.2-pg18
     env_file:
       - .env
     environment:

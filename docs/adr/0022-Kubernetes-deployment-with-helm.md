@@ -63,6 +63,12 @@ Helm was chosen over raw manifests because:
 - Helm release state stored in-cluster; accidental helm uninstall can drop resources. Mitigation: use --keep-history and GitOps tooling (Flux/ArgoCD) as a future step.
 - Image registry strategy: kind load docker-image does not scale toCI. Mitigation: push to a local registry running in kind for CI parity.
 
+## Implementation notes
+- YARP will be discared for Kubernetes deployment and will be replaced by a kubernetes API Gateway API (Envoy Gateway)
+- The Kubernetes implementation will be run in a WSL Ubuntu environment.
+- 
+
+
 ### Related ADRs
 0006-observability-stack-and-grafana.md
 (Future) ADR-0023: GitOps deployment with Flux or ArgoCD
