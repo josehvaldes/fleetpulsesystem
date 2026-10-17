@@ -66,7 +66,13 @@ Helm was chosen over raw manifests because:
 ## Implementation notes
 - YARP will be discared for Kubernetes deployment and will be replaced by a kubernetes API Gateway API (Envoy Gateway)
 - The Kubernetes implementation will be run in a WSL Ubuntu environment.
-- 
+- TimescaleDB will be separated from kubernetes and will be run in docker compose files
+- MetalLB + Envoy Gateway will be handle outside the helm charts. It requires manual deployment in the release
+- Helm charts :
+  1. Redpanda : Official Helm Chart
+  2. Prometheus grafana : Existing chart bundle, such as kube-prometheus-stack
+  3. Loki + telemetry : Official charts or Grafana's chart ecosystem
+  4. .Net + frontendapps: One custom fleetpulse chart
 
 
 ### Related ADRs
