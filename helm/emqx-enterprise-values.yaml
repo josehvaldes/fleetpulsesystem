@@ -1,0 +1,159 @@
+## helm/emqx-enterprise-values.yaml
+# Local development values for EMQX Enterprise on the `fleetpulse` kind cluster.
+# Migrates the `emqx` service from docker-compose-aggregated.yml to Helm.
+#
+# Install:
+#   helm repo add emqx https://repos.emqx.io/charts
+#   helm repo update
+#   helm upgrade --install emqx emqx/emqx-enterprise \
+#     --version 6.3.2 \
+#     --namespace fleetpulse --create-namespace \
+#     --values emqx-enterprise-values.yaml
+
+# ---------------------------------------------------------------------------
+# Image / chart version
+# ---------------------------------------------------------------------------
+# Do NOT set image.tag here. The chart pins it to its appVersion (6.3.2),
+# which matches the emqx/emqx-enterprise:6.3 line used in the Compose stack.
+image:
+  repository: emqx/emqx-enterprise
+  pullPolicy: IfNotPresent
+
+# Single broker node: matches the single Docker container in Compose
+# and the single Redpanda broker already deployed in the cluster.
+replicaCount: 1
+
+# ---------------------------------------------------------------------------
+# Secret-injected env vars (TOP-LEVEL value, NOT under serviceAccount).
+#
+# The chart's StatefulSet template reads this and adds it to envFrom:
+#   envFrom:
+#   - configMapRef:
+#       name: <release>-env
+#   - secretRef:                # <-- this block only renders if envFromSecret is set
+#       name: {{ .Values.envFromSecret }}
+#
+# IMPORTANT — key naming:
+# `envFrom` loads every key from the secret as an env var using the KEY NAME
+# VERBATIM. There is no key remapping in the chart. So the secret's keys MUST
+# match the env var names EMQX actually reads:
+#   EMQX_DASHBOARD__DEFAULT_USERNAME (not EMQX_DEFAULT_USERNAME)
+#   EMQX_DASHBOARD__DEFAULT_PASSWORD (not EMQX_DEFAULT_PASSWORD)
+#
+# Create the secret BEFORE installing/upgrading the release:
+#   kubectl create secret generic emqx-secret \
+#     --namespace fleetpulse \
+#     --from-literal=EMQX_DASHBOARD__DEFAULT_USERNAME='admin' \
+#     --from-literal=EMQX_DASHBOARD__DEFAULT_PASSWORD='emqx!@#$'
+#
+# ALL keys in this secret become env vars on the EMQX pod, so keep this secret
+# scoped to EMQX-only credentials. Don't reuse it for other services.
+# ---------------------------------------------------------------------------
+envFromSecret: emqx-secret
+
+# ---------------------------------------------------------------------------
+# Persistence — equivalent of `emqx-data:/opt/emqx/data` in Compose.
+# Uses the same `standard` StorageClass as the Redpanda release.
+# ---------------------------------------------------------------------------
+persistence:
+  enabled: true
+  storageClassName: standard
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+# ---------------------------------------------------------------------------
+# Resources — local dev budget on Windows/WSL2. Tune down if needed.
+# ---------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+# ---------------------------------------------------------------------------
+# Service — ClusterIP only. In-cluster clients (Redpanda bridge, Prometheus
+# scrape) use the service DNS name. Access the dashboard with
+# `kubectl port-forward`, same pattern as Redpanda Console.
+# ---------------------------------------------------------------------------
+service:
+  type: ClusterIP
+  mqtt: 1883
+  mqttssl: 8883
+  ws: 8083
+  wss: 8084
+  dashboard: 18083
+
+# ---------------------------------------------------------------------------
+# EMQX configuration — env vars equivalent to Compose `environment:`.
+#
+# IMPORTANT: Do NOT set EMQX_NODE__NAME here. The Helm chart auto-derives the
+# Erlang node name from the StatefulSet pod DNS for cluster discovery
+# (emqx@<pod>.<headless-svc>.<ns>.svc.cluster.local). Overriding it (as the
+# Compose file did with `emqx@redpanda-node`) would break DNS-based clustering.
+#
+# VERIFIED against the chart source (templates/configmap.yaml):
+#   {{- range $index, $value := .Values.emqxConfig }}
+#   {{ print "EMQX_" $key }}: "{{ $value }}"
+#   {{- end }}
+# Any EMQX_* key added here flows through as an env var. The default values
+# only list three example keys; that does NOT mean those are the only keys
+# allowed. The chart treats emqxConfig as a free-form map of env vars.
+# ---------------------------------------------------------------------------
+emqxConfig:
+  # Dashboard credentials are intentionally NOT set here — they are injected
+  # from the `emqx-secret` Kubernetes Secret via `envFromSecret` above.
+  # The chart's default `admin` / `public` would still apply if the secret
+  # were absent; the secret overrides them because envFrom loads ConfigMap
+  # first, then Secret (Secret wins on key collisions).
+
+  # Migrate `EMQX_PROMETHEUS__ENABLE=true` from Compose.
+  # In EMQX Enterprise 6.x the metrics endpoint is served on the dashboard
+  # listener (port 18083) at /api/v5/prometheus/stats, so EMQX_PROMETHEUS__PORT
+  # is no longer required and is intentionally omitted.
+  EMQX_PROMETHEUS__ENABLE: "true"
+
+# ---------------------------------------------------------------------------
+# Prometheus — keep `metrics.enabled: false` for now.
+#
+# The chart's `metrics.enabled: true` flag renders a ServiceMonitor CR
+# (monitoring.coreos.com/v1), which requires kube-prometheus-stack to be
+# installed FIRST. Since that's step 5 of your migration plan and not done
+# yet, leave this false to avoid the Helm install failing with:
+#   "no matches for kind ServiceMonitor in version monitoring.coreos.com/v1"
+#
+# EMQX itself will still expose metrics at /api/v5/prometheus/stats thanks to
+# the EMQX_PROMETHEUS__ENABLE env var above — you can verify by port-forwarding
+# port 18083 and curling the endpoint. Flip this to `true` after
+# kube-prometheus-stack is installed.
+# ---------------------------------------------------------------------------
+metrics:
+  enabled: false
+  type: prometheus
+
+# ---------------------------------------------------------------------------
+# Routing — disabled for now. MQTT-to-Redpanda will be wired up by the
+# bootstrap Job (see README notes). HTTP/WS routes for the dashboard will
+# later be handled by the `fleetpulse-app` chart through the existing
+# `fleetpulse-gateway` Envoy Gateway, not by this chart.
+# ---------------------------------------------------------------------------
+ingress:
+  dashboard:
+    enabled: false
+  mqtt:
+    enabled: false
+  ws:
+    enabled: false
+
+httpRoute:
+  dashboard:
+    enabled: false
+  ws:
+    enabled: false
+
+tlsRoute:
+  mqtts:
+    enabled: false
+  wss:
+    enabled: false

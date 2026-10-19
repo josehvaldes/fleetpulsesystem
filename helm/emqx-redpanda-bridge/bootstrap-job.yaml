@@ -1,0 +1,61 @@
+# helm/emqx-redpanda-bridge/bootstrap-job.yaml
+#
+# Kubernetes Job that runs bootstrap.sh against the in-cluster EMQX API.
+# Applies the EMQX -> Redpanda connector + rule.
+#
+# Prequirements: 
+#  - secrets name: emqx-secret
+#     1. secret key : EMQX_DASHBOARD__DEFAULT_USERNAME
+#     2. secret key : EMQX_DASHBOARD__DEFAULT_PASSWORD
+
+# Apply with:
+#   kubectl create configmap emqx-bootstrap-script -n fleetpulse --from-file=bootstrap.sh=./emqx-redpanda-bridge/bootstrap.sh --dry-run=client -o yaml | kubectl apply -f -
+#   kubectl apply -f emqx-redpanda-bridge/bootstrap-job.yaml -n fleetpulse
+
+# Re-apply after changes to bootstrap.sh:
+#   kubectl delete job emqx-bootstrap -n fleetpulse   --ignore-not-found
+#   kubectl apply -f emqx-redpanda-bridge/bootstrap-job.yaml -n fleetpulse
+#
+# Watch logs:
+#   kubectl logs -n fleetpulse job/emqx-bootstrap -f
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: emqx-bootstrap
+  namespace: fleetpulse
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: emqx-bootstrap
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: bootstrap
+          image: curlimages/curl:8.23.0
+          command: ["/bin/sh", "/scripts/bootstrap.sh"]
+          env:
+            - name: EMQX_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: emqx-secret
+                  key: EMQX_DASHBOARD__DEFAULT_USERNAME
+            - name: EMQX_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: emqx-secret
+                  key: EMQX_DASHBOARD__DEFAULT_PASSWORD
+          volumeMounts:
+            - name: bootstrap-script
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: bootstrap-script
+          configMap:
+            name: emqx-bootstrap-script
+            defaultMode: 0555
