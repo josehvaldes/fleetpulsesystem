@@ -67,6 +67,7 @@ Helm was chosen over raw manifests because:
 - YARP will be discared for Kubernetes deployment and will be replaced by a kubernetes API Gateway API (Envoy Gateway)
 - The Kubernetes implementation will be run in a WSL Ubuntu environment.
 - TimescaleDB will be separated from kubernetes and will be run in docker compose files
+- The prometheuscommunity/postgres-exporter:v0.17.1 image used to collect postgres metrics will be outside the kubernetes environment
 - MetalLB + Envoy Gateway will be handle outside the helm charts. It requires manual deployment in the release
 - Helm charts :
   1. Redpanda : Official Helm Chart
