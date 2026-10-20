@@ -1,0 +1,22 @@
+
+dbwriter:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-dbwriter
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+    
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string

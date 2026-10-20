@@ -45,16 +45,6 @@ services:
     networks:
       - redpanda_network
 
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.17.1
-    container_name: fleetpulse-postgres-exporter
-    env_file:
-      - .env
-    ports:
-      - "9187:9187"
-    networks:
-      - redpanda_network
-
   loki:
     image: grafana/loki:2.9.5
     container_name: loki

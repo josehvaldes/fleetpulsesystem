@@ -69,11 +69,13 @@ Helm was chosen over raw manifests because:
 - TimescaleDB will be separated from kubernetes and will be run in docker compose files
 - The prometheuscommunity/postgres-exporter:v0.17.1 image used to collect postgres metrics will be outside the kubernetes environment
 - MetalLB + Envoy Gateway will be handle outside the helm charts. It requires manual deployment in the release
-- Helm charts :
+- Grafana, Loki, Tempo, Otel Collector will run outside the cluster in docker compose files.
+
+- Helm charts run inside the cluster :
   1. Redpanda : Official Helm Chart
-  2. Prometheus grafana : Existing chart bundle, such as kube-prometheus-stack
-  3. Loki + telemetry : Official charts or Grafana's chart ecosystem
-  4. .Net + frontendapps: One custom fleetpulse chart
+  1. Prometheus : kube-prometheus-stack without grafana
+  2. .Net + frontendapps: One custom fleetpulse chart
+
 
 
 ### Related ADRs

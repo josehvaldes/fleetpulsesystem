@@ -102,6 +102,16 @@ services:
     networks:
       - fleetpulse_network
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: fleetpulse-postgres-exporter
+    env_file:
+      - .env   
+    ports:
+      - "9187:9187"
+    networks:
+      - fleetpulse_network
+
   prometheus:
     image: prom/prometheus:v3.6.0
     container_name: fleetpulse-prometheus
@@ -137,15 +147,6 @@ services:
     networks:
       - fleetpulse_network
 
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.17.1
-    container_name: fleetpulse-postgres-exporter
-    env_file:
-      - .env   
-    ports:
-      - "9187:9187"
-    networks:
-      - fleetpulse_network
 
   db-writer:
     image: fleetpulse-dbwriter:1.0
