@@ -49,3 +49,4 @@ fleetpulse.alert-mgmt/.gitignore
 fleetpulse.frontend/.env.production
 docker/.codacy
 k8s/database/database-secret.env
+helm/auth-credentials.env

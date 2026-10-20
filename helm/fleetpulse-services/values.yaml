@@ -1,3 +1,11 @@
+# fleetpulse values
+# pre-requirements
+#
+# secret : fleetpulse-db-credentials
+#   - key :connection-string
+# env variables in : fleetpulse-auth-credentials 
+# see: auth-credentials.env.sample
+# 
 
 dbwriter:
   enabled: true
@@ -20,3 +28,61 @@ dbwriter:
         secretKeyRef:
           name: fleetpulse-db-credentials
           key: connection-string
+    - name: Kafka__BootstrapServers
+      value: "redpanda.fleetpulse.svc.cluster.local:9093" 
+
+api:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-api
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string
+  envFrom:
+    - secretRef:
+        name: fleetpulse-auth-credentials
+        
+signalrHub:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-signalrhub
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string
+
+    - name: Kafka__BootstrapServers
+      value: "redpanda.fleetpulse.svc.cluster.local:9093"
+
+    - name: DOTNET_SYSTEM_NET_DISABLEIPV6
+      value: "1"
+
+  envFrom:
+    - secretRef:
+        name: fleetpulse-auth-credentials

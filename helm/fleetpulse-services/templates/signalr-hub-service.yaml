@@ -1,0 +1,18 @@
+
+{{- if .Values.signalrHub.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-signalr-hub
+  labels:
+    app: signalr-hub
+spec:
+  type: {{ .Values.signalrHub.service.type }}
+  selector:
+    app: signalr-hub
+  ports:
+    - name: http
+      port: {{ .Values.signalrHub.service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

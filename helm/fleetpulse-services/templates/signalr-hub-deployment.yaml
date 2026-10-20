@@ -1,0 +1,31 @@
+
+{{- if .Values.signalrHub.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-signalr-hub
+  labels:
+    app: signalr-hub
+spec:
+  replicas: {{ .Values.signalrHub.replicaCount }}
+  selector:
+    matchLabels:
+      app: signalr-hub
+  template:
+    metadata:
+      labels:
+        app: signalr-hub
+    spec:
+      containers:
+        - name: signalr-hub
+          image: "{{ .Values.signalrHub.image.repository }}:{{ .Values.signalrHub.image.tag }}"
+          imagePullPolicy: {{ .Values.signalrHub.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.signalrHub.containerPort }}
+              protocol: TCP
+          env:
+            {{- toYaml .Values.signalrHub.env | nindent 12 }}
+          envFrom:
+            {{- toYaml .Values.signalrHub.envFrom | nindent 12 }}
+{{- end }}
