@@ -1,5 +1,5 @@
 
-{{- if .Values.signalrHub.enabled }}
+{{- if .Values.signalrhub.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +7,7 @@ metadata:
   labels:
     app: signalr-hub
 spec:
-  replicas: {{ .Values.signalrHub.replicaCount }}
+  replicas: {{ .Values.signalrhub.replicaCount }}
   selector:
     matchLabels:
       app: signalr-hub
@@ -18,14 +18,14 @@ spec:
     spec:
       containers:
         - name: signalr-hub
-          image: "{{ .Values.signalrHub.image.repository }}:{{ .Values.signalrHub.image.tag }}"
-          imagePullPolicy: {{ .Values.signalrHub.image.pullPolicy }}
+          image: "{{ .Values.signalrhub.image.repository }}:{{ .Values.signalrhub.image.tag }}"
+          imagePullPolicy: {{ .Values.signalrhub.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.signalrHub.containerPort }}
+              containerPort: {{ .Values.signalrhub.containerPort }}
               protocol: TCP
           env:
-            {{- toYaml .Values.signalrHub.env | nindent 12 }}
+            {{- toYaml .Values.signalrhub.env | nindent 12 }}
           envFrom:
-            {{- toYaml .Values.signalrHub.envFrom | nindent 12 }}
+            {{- toYaml .Values.signalrhub.envFrom | nindent 12 }}
 {{- end }}
