@@ -13,7 +13,7 @@ volumes:
 
 services:
   redpanda-0:
-    image: docker.redpanda.com/redpandadata/redpanda:latest
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.5
     command:
       - redpanda
       - start
@@ -51,7 +51,7 @@ services:
       - redpanda-0
 
   emqx:
-    image: emqx/emqx-enterprise:latest
+    image: emqx/emqx-enterprise:6.3
     container_name: emqx
     ports:
       - "1883:1883"     # MQTT TCP
@@ -72,7 +72,7 @@ services:
       - redpanda-0
 
   emqx-bootstrapper:
-    image: curlimages/curl:latest
+    image: curlimages/curl:8.23.0
     container_name: emqx_bootstrapper
     networks:
       - fleetpulse_network
@@ -87,7 +87,7 @@ services:
   
   # Add to docker-compose.yml
   timescaledb:
-    image: timescale/timescaledb:latest-pg18
+    image: timescale/timescaledb:2.30.2-pg18           
     env_file:
       - .env
     environment:
@@ -99,6 +99,16 @@ services:
     volumes:
       - psgdata:/var/lib/postgresql/
       - ../db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - fleetpulse_network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: fleetpulse-postgres-exporter
+    env_file:
+      - .env   
+    ports:
+      - "9187:9187"
     networks:
       - fleetpulse_network
 
@@ -137,15 +147,6 @@ services:
     networks:
       - fleetpulse_network
 
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.17.1
-    container_name: fleetpulse-postgres-exporter
-    env_file:
-      - .env   
-    ports:
-      - "9187:9187"
-    networks:
-      - fleetpulse_network
 
   db-writer:
     image: fleetpulse-dbwriter:1.0

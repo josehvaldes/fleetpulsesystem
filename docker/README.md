@@ -8,9 +8,9 @@ All these services docker files use an external "redpanda_network" network so th
 
  docker compose -f .\docker-compose-postgresql.yml up -d ; `
  docker compose -f .\docker-compose-redpanda.yml up -d ; `
- docker compose -f .\docker-compose-obsv.yml up -d ; `
- docker compose -f .\docker-compose-tracing.yml up -d ; `
+ docker compose -f .\docker-compose-observability.yml up -d ; `
  docker compose -f .\docker-compose-services.yml up -d ; `
+ docker compose -f .\docker-compose-prometheus.yml up -d ; ` 
  docker compose -f .\docker-compose-frontend.yml up -d
 
 

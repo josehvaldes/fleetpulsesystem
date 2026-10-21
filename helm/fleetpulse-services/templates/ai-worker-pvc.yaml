@@ -1,0 +1,14 @@
+{{- if .Values.aiworker.enabled }}
+{{- if .Values.aiworker.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-ai-worker-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.aiworker.persistence.size }}
+{{- end }}
+{{- end }}

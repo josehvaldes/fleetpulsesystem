@@ -1,0 +1,52 @@
+
+# helm/observability/kube-prometheus-stack/values-kind.yaml
+# for local deployment
+# chart and version: chart prometheus-community/kube-prometheus-stack --version 92.10.1
+
+# Installation:
+# 1. helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#     helm repo update
+#
+# 2. Customized your kube-prometheus-stack-values-kind.yaml 
+#
+# 3. helm upgrade --install fleetpulse-monitoring \
+#   prometheus-community/kube-prometheus-stack \
+#   --version 92.10.1 \
+#   --namespace monitoring \
+#   --create-namespace \
+#   -f ./kube-prometheus-stack-values-kind.yaml 
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: false
+
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi

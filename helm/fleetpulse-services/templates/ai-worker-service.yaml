@@ -1,0 +1,18 @@
+
+{{- if .Values.aiworker.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-ai-worker
+  labels:
+    app: ai-worker
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-worker
+  ports:
+    - name: http
+      port: {{ .Values.aiworker.containerPort }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

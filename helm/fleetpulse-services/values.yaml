@@ -1,0 +1,123 @@
+# fleetpulse values
+# pre-requirements
+#
+# secret : fleetpulse-db-credentials
+#   - key :connection-string
+#
+# env variables in : fleetpulse-auth-credentials 
+# see: env/auth-credentials.env.sample
+# 
+# env varialbes in : fleetpulse-ai-worker-config
+# see: env/fleetpulse-ai-worker-config.env
+
+dbwriter:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-dbwriter
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+    
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string
+    - name: Kafka__BootstrapServers
+      value: "redpanda.fleetpulse.svc.cluster.local:9093" 
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
+
+api:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-api
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
+  envFrom:
+    - secretRef:
+        name: fleetpulse-auth-credentials
+        
+signalrhub:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-signalrhub
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8080
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  env:
+    - name: ConnectionStrings__FleetPulseDb
+      valueFrom:
+        secretKeyRef:
+          name: fleetpulse-db-credentials
+          key: connection-string
+
+    - name: Kafka__BootstrapServers
+      value: "redpanda.fleetpulse.svc.cluster.local:9093"
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
+    - name: DOTNET_SYSTEM_NET_DISABLEIPV6
+      value: "1"
+
+  envFrom:
+    - secretRef:
+        name: fleetpulse-auth-credentials
+        
+aiworker:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: fleetpulse-ai-worker
+    tag: "1.0"
+    pullPolicy: IfNotPresent
+
+  containerPort: 8000
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    mountPath: /app/data
+
+  env:
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: "redpanda.fleetpulse.svc.cluster.local:9093"
+    - name: otel_exporter_endpoint
+      value: "http://otel-collector:4317"
+  envFrom:
+    - secretRef:
+        name: fleetpulse-ai-worker-config

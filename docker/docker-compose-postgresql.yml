@@ -8,7 +8,7 @@ volumes:
 services:
   # Add to docker-compose.yml
   timescaledb:
-    image: timescale/timescaledb:latest-pg18
+    image: timescale/timescaledb:2.30.2-pg18
     env_file:
       - .env
     environment:
@@ -23,4 +23,12 @@ services:
     networks:
       - redpanda_network
 
-
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: fleetpulse-postgres-exporter
+    env_file:
+      - .env
+    ports:
+      - "9187:9187"
+    networks:
+      - redpanda_network

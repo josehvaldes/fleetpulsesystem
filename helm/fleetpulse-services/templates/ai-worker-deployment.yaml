@@ -1,0 +1,41 @@
+{{- if .Values.aiworker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-ai-worker
+  labels:
+    app: ai-worker
+spec:
+  replicas: {{ .Values.aiworker.replicaCount }}
+  selector:
+    matchLabels:
+      app: ai-worker
+  template:
+    metadata:
+      labels:
+        app: ai-worker
+    spec:
+      containers:
+        - name: ai-worker
+          image: "{{ .Values.aiworker.image.repository }}:{{ .Values.aiworker.image.tag }}"
+          imagePullPolicy: {{ .Values.aiworker.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.aiworker.containerPort }}
+              protocol: TCP
+          env:
+            {{- toYaml .Values.aiworker.env | nindent 12 }}
+          envFrom:
+            {{- toYaml .Values.aiworker.envFrom | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.aiworker.persistence.enabled }}
+            - name: ai-worker-data
+              mountPath: {{ .Values.aiworker.persistence.mountPath }}
+            {{- end }}
+      volumes:
+        {{- if .Values.aiworker.persistence.enabled }}
+        - name: ai-worker-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-ai-worker-data
+        {{- end }}
+{{- end }}

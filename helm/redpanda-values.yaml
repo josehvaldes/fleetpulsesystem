@@ -1,0 +1,106 @@
+# helm/redpanda-values.yaml
+# Local-development values for Redpanda on the `fleetpulse` kind cluster.
+# These settings migrate the `redpanda` service from
+# `docker/docker-compose-aggregated.yml` to the Redpanda Helm chart.
+# Chart version: 26.2.4
+#
+# Install the chart:
+#   helm repo add redpanda https://charts.redpanda.com/
+#   helm repo update
+#   helm upgrade --install redpanda redpanda/redpanda \
+#     --version 26.2.4 --namespace fleetpulse \
+#     --create-namespace --values redpanda-values.yaml
+#
+# This file is intentionally sized for a single-node local cluster. It is not
+# a production security or high-availability configuration: external access,
+# TLS, and SASL authentication are disabled below.
+
+# ---------------------------------------------------------------------------
+# Stateful broker
+# ---------------------------------------------------------------------------
+# One broker keeps the local resource footprint aligned with the single-node
+# kind development environment. Soft pod anti-affinity permits scheduling
+# when there is no second node available for spreading replicas.
+statefulset:
+  replicas: 1
+
+  podAntiAffinity:
+    type: soft
+
+  # ---------------------------------------------------------------------------
+  # Resource budget
+  # ---------------------------------------------------------------------------
+  # Local development requests one CPU core and caps the container memory at
+  # 2.5 GiB. Adjust these values if the kind cluster has a smaller resource
+  # budget; Redpanda's actual memory use depends on workload and configuration.
+resources:
+  cpu:
+    cores: 1
+  memory:
+    container:
+      max: 2.5Gi
+
+    # ---------------------------------------------------------------------------
+    # Persistent broker storage
+    # ---------------------------------------------------------------------------
+    # Keep broker data across pod restarts, equivalent to the persistent data
+    # volume used by the Compose deployment. The `standard` StorageClass must be
+    # available in the target cluster (kind clusters commonly provide it).
+storage:
+  persistentVolume:
+    enabled: true
+    size: 5Gi
+    storageClass: standard
+
+  # ---------------------------------------------------------------------------
+  # External access
+  # ---------------------------------------------------------------------------
+  # Disable externally reachable services for this local setup. Applications
+  # inside the cluster should connect through the chart's internal services.
+  # Use an intentional, secured exposure configuration before enabling access
+  # outside the cluster.
+external:
+  enabled: false
+  service:
+    enabled: false
+
+  # ---------------------------------------------------------------------------
+  # Transport security and authentication
+  # ---------------------------------------------------------------------------
+  # TLS and SASL are disabled to match the trusted, isolated local development
+  # environment. Do not carry these settings into a shared or production
+  # cluster without enabling appropriate encryption and authentication.
+tls:
+  enabled: false
+
+auth:
+  sasl:
+    enabled: false
+
+  # ---------------------------------------------------------------------------
+  # Host tuning
+  # ---------------------------------------------------------------------------
+  # Avoid host-level asynchronous-I/O tuning in the local kind environment.
+  # Keep this disabled unless the cluster nodes and workload have been
+  # specifically configured and tested for it.
+tuning:
+  tune_aio_events: false
+
+# ---------------------------------------------------------------------------
+# Redpanda Console
+# ---------------------------------------------------------------------------
+# Run the bundled Console for local broker inspection. The chart creates its
+# ConfigMap and Deployment, but not a Secret; no additional Console settings
+# are supplied here. Console monitoring integration stays disabled until a
+# compatible monitoring stack is installed and configured.
+console:
+  enabled: true
+  configmap:
+    create: true
+  secret:
+    create: false
+  deployment:
+    create: true
+  config: {}
+  monitoring:
+    enabled: false
