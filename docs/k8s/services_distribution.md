@@ -29,8 +29,8 @@
 	grafana:
 	- grafana/grafana:13.1.1
 	
-	promtail:
-	- Replaced by Kubernetes pod log (grafana/promtail:2.9.5) 
+	promtail (grafana/promtail:2.9.5):
+	- Replaced by Grafana Alloy in Kubernetes  
 	
 	loki:
 	- grafana/loki:2.9.5
@@ -48,5 +48,5 @@
 ## Docker compose files to run along with the kubernetes cluster
 
 - docker-compose-frontend.yml
-- docker-compose-obserbavility.yml
+- docker-compose-observability.yml
 - docker-compose-postgresql.yml

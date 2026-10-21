@@ -155,6 +155,7 @@ For individual Compose groups and their separate external-network setup, see [do
 - [CI workflows](docs/ci.md)
 - [Architecture Decision Records](docs/adr/)
 - [Service documentation](docs/services/)
+- [Kubernetes implementation](docs/k8s/README.md)
 
 ## Development and tests
 
