@@ -4,28 +4,12 @@ networks:
     external: true
     name: redpanda_network
 volumes:
-  prometheus-data:
   grafana-data:
   loki-data:
-  
+  tempo-data:
+
 services:
   # --- Observability Stack ---
-  prometheus:
-    image: prom/prometheus:v3.6.0
-    container_name: fleetpulse-prometheus
-    volumes:
-      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./observability/prometheus-alerts.yml:/etc/prometheus/alerts.yml:ro
-      - prometheus-data:/prometheus
-    ports:
-      - "9090:9090"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-lifecycle'
-    networks:
-      - redpanda_network
 
   grafana:
     image: grafana/grafana:13.1.1
@@ -70,5 +54,34 @@ services:
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
+    networks:
+      - redpanda_network
+
+
+  tempo:
+    image: grafana/tempo:2.10.6
+    container_name: fleetpulse-tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./observability/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200"   # Tempo UI and API
+      - "4317"        # OTLP gRPC (internal, used by collector)
+      - "4318"        # OTLP HTTP (internal, used by collector)
+    networks:
+      - redpanda_network
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.158.0
+    container_name: fleetpulse-otel-collector
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./observability/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC (Apps send traces here)
+      - "4318:4318" # OTLP HTTP (Apps send traces here)
+    depends_on:
+      - tempo
     networks:
       - redpanda_network

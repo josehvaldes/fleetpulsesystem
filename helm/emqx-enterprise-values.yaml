@@ -45,6 +45,8 @@ replicaCount: 1
 #     --namespace fleetpulse \
 #     --from-literal=EMQX_DASHBOARD__DEFAULT_USERNAME='admin' \
 #     --from-literal=EMQX_DASHBOARD__DEFAULT_PASSWORD='emqx!@#$'
+# Or use # kubectl create secret generic emqx-secret -n fleetpulse \
+#     --from-env-file=env/emqx.env --dry-run=client -o yaml | kubectl apply -f -
 #
 # ALL keys in this secret become env vars on the EMQX pod, so keep this secret
 # scoped to EMQX-only credentials. Don't reuse it for other services.

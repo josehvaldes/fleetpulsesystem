@@ -1,5 +1,7 @@
 
-Inside FleetPulse Sluster:
+# Service Distribution:
+
+**Inside FleetPulse Cluster:**
 	Redpanda helm:
 	- docker.redpanda.com/redpandadata/redpanda:v26.2.5
 	- docker.redpanda.com/redpandadata/console:v3.8.0
@@ -17,14 +19,9 @@ Inside FleetPulse Sluster:
 	- fleetpulse-api:1.0
 	- fleetpulse-ai-worker:1.0
 	- (YAR is replaced by the Envoy Gateway API in k8s) fleetpulse-yarpproxy:1.0
-	
-	frontend:
-	- fleetpulse-frontend:1.0
-	- fleetpulse.alert-mgmt:1.0
-	- fleetpulse.drivers-mgmt:1.0
-	
 
-outside cluster 
+**outside FleetPulse cluster:**
+
 	database: 
 	- timescale/timescaledb:2.30.2-pg18
 	- prometheuscommunity/postgres-exporter:v0.17.1
@@ -41,3 +38,15 @@ outside cluster
 	tempo:
 	- grafana/tempo:2.10.6
 	- otel/opentelemetry-collector-contrib:0.158.0
+	
+	frontend:
+	- fleetpulse-frontend:1.0
+	- fleetpulse.alert-mgmt:1.0
+	- fleetpulse.drivers-mgmt:1.0
+
+
+## Docker compose files to run along with the kubernetes cluster
+
+- docker-compose-frontend.yml
+- docker-compose-obserbavility.yml
+- docker-compose-postgresql.yml

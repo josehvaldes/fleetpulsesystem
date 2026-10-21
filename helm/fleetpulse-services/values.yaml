@@ -3,9 +3,12 @@
 #
 # secret : fleetpulse-db-credentials
 #   - key :connection-string
+#
 # env variables in : fleetpulse-auth-credentials 
-# see: auth-credentials.env.sample
+# see: env/auth-credentials.env.sample
 # 
+# env varialbes in : fleetpulse-ai-worker-config
+# see: env/fleetpulse-ai-worker-config.env
 
 dbwriter:
   enabled: true
@@ -30,6 +33,8 @@ dbwriter:
           key: connection-string
     - name: Kafka__BootstrapServers
       value: "redpanda.fleetpulse.svc.cluster.local:9093" 
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
 
 api:
   enabled: true
@@ -51,6 +56,8 @@ api:
         secretKeyRef:
           name: fleetpulse-db-credentials
           key: connection-string
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
   envFrom:
     - secretRef:
         name: fleetpulse-auth-credentials
@@ -79,7 +86,8 @@ signalrhub:
 
     - name: Kafka__BootstrapServers
       value: "redpanda.fleetpulse.svc.cluster.local:9093"
-
+    - name: OpenTelemetry__OtlpEndpoint
+      value: "http://otel-collector:4317"
     - name: DOTNET_SYSTEM_NET_DISABLEIPV6
       value: "1"
 
@@ -108,7 +116,8 @@ aiworker:
       value: "1"
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: "redpanda.fleetpulse.svc.cluster.local:9093"
-
+    - name: otel_exporter_endpoint
+      value: "http://otel-collector:4317"
   envFrom:
     - secretRef:
         name: fleetpulse-ai-worker-config

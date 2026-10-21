@@ -1,0 +1,9 @@
+
+# external-observability-services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+spec:
+  type: ExternalName
+  externalName: host.docker.internal

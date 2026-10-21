@@ -51,3 +51,6 @@ docker/.codacy
 k8s/database/database-secret.env
 helm/auth-credentials.env
 helm/fleetpulse-ai-worker-config.env
+helm/env/fleetpulse-ai-worker-config.env
+helm/env/emqx.env
+helm/env/auth-credentials.env
