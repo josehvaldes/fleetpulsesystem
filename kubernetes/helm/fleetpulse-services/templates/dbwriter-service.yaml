@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-dbwriter
   labels:
-    app.kubernetes.io/name: dbwriter
+    app: dbwriter
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: ClusterIP

@@ -50,3 +50,6 @@ prometheus:
           resources:
             requests:
               storage: 5Gi
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}

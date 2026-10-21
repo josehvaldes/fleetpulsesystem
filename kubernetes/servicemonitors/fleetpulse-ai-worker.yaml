@@ -1,0 +1,19 @@
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fleetpulse-ai-worker
+  namespace: fleetpulse
+  labels:
+    app.kubernetes.io/name: fleetpulse-ai-worker
+spec:
+  namespaceSelector:
+    matchNames:
+      - fleetpulse
+  selector:
+    matchLabels:
+      app: ai-worker
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

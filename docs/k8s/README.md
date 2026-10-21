@@ -191,6 +191,17 @@ kubectl logs --namespace fleetpulse \
 
 This replaces the Docker-oriented Promtail setup for Kubernetes pod logs; it does not move Loki into the cluster.
 
+
+### Install Prometheus configuration
+Execute the following commands to apply the Prometheus configuration:
+
+```sh
+kubectl apply -f kubernetes/servicemonitors/fleetpulse-dbwriter.yaml
+kubectl apply -f kubernetes/servicemonitors/fleetpulse-ai-worker.yaml
+kubectl apply -f kubernetes/servicemonitors/fleetpulse-dbwriter.yaml
+kubectl apply -f kubernetes/servicemonitors/fleetpulse-signalr-hub.yaml
+```
+
 ## 5. Apply routes and access the services
 
 The Gateway resource lives in `default`; the HTTPRoute in `fleetpulse` routes driver and alert REST paths to the API and session/SignalR paths to the hub:

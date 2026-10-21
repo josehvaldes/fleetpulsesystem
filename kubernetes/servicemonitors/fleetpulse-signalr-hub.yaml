@@ -1,0 +1,19 @@
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fleetpulse-signalr-hub
+  namespace: fleetpulse
+  labels:
+    app.kubernetes.io/name: fleetpulse-signalr-hub
+spec:
+  namespaceSelector:
+    matchNames:
+      - fleetpulse
+  selector:
+    matchLabels:
+      app: signalr-hub
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
