@@ -114,7 +114,7 @@ emqxConfig:
   # In EMQX Enterprise 6.x the metrics endpoint is served on the dashboard
   # listener (port 18083) at /api/v5/prometheus/stats, so EMQX_PROMETHEUS__PORT
   # is no longer required and is intentionally omitted.
-  EMQX_PROMETHEUS__ENABLE: "true"
+  EMQX_PROMETHEUS__ENABLE: "false"
 
 # ---------------------------------------------------------------------------
 # Prometheus — keep `metrics.enabled: false` for now.
