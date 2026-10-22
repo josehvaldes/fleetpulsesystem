@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: emqx-mqtt-external
+  namespace: fleetpulse
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/instance: emqx
+    app.kubernetes.io/name: emqx-enterprise
+  ports:
+    - name: mqtt-tcp
+      protocol: TCP
+      port: 1883
+      targetPort: 1883

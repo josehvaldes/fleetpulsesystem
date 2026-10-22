@@ -151,6 +151,15 @@ helm upgrade --install fleetpulse-monitoring \
   prometheus-community/kube-prometheus-stack --version 92.10.1 \
   --namespace monitoring --create-namespace \
   --values kubernetes/helm/kube-prometheus-stack-values-kind.yaml
+
+kubectl apply -f kubernetes/infrastructure/emqx-mqtt-loadbalancer.yaml
+```
+
+For development, expose the EMQX's port configured in the `emqx-mqtt-loadbalancer.yaml` manifest
+That will be used by the simulator to load GPS data
+
+```sh
+kubectl port-forward -n fleetpulse svc/emqx-mqtt-external 1883:1883
 ```
 
 Install the FleetPulse application chart and apply the EMQX-to-Redpanda bootstrap Job:
