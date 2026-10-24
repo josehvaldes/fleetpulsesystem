@@ -12,7 +12,7 @@ spec:
       - fleetpulse
   selector:
     matchLabels:
-      app: signalr-hub
+      app.kubernetes.io/name: signalr-hub
   endpoints:
     - port: http
       path: /metrics

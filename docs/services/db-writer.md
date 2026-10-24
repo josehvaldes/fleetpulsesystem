@@ -9,9 +9,9 @@
 │  │ RedpandaConsumer    │     │  Flush Loop (every 5s)       │   │
 │  │ Service             │     │                              │   │
 │  │                     │     │  1. GetBatchedPings()        │   │
-│  │  Consume() ────────►│     │  2. Compress (TODO)          │   │
-│  │       │             │     │  3. BulkInsert (TODO)        │   │
-│  │       ▼             │     │  4. UpsertLatest (TODO)      │   │
+│  │  Consume() ────────►│     │  2. Compress ()          │   │
+│  │       │             │     │  3. BulkInsert ()        │   │
+│  │       ▼             │     │  4. UpsertLatest ()      │   │
 │  │  ┌──────────────┐   │     │  5. ClearBatch()             │   │
 │  │  │  Concurrent  │   │     └──────────────────────────────┘   │
 │  │  │  Bag<GpsPing>│   │                                        │

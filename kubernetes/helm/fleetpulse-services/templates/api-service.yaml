@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: fleetpulse-api
   labels:
-    app: fleetpulse-api
+    app.kubernetes.io/name: fleetpulse-api
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: {{ .Values.api.service.type }}

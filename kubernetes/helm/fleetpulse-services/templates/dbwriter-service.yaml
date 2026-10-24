@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-dbwriter
   labels:
-    app: dbwriter
+    app.kubernetes.io/name: dbwriter
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: ClusterIP
@@ -13,7 +13,7 @@ spec:
     app.kubernetes.io/name: dbwriter
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
-    - name: metrics
+    - name: http
       port: {{ .Values.dbwriter.service.port }}
       targetPort: metrics
       protocol: TCP

@@ -54,3 +54,7 @@ helm/fleetpulse-ai-worker-config.env
 helm/env/fleetpulse-ai-worker-config.env
 helm/env/emqx.env
 helm/env/auth-credentials.env
+kubernetes/.codacy/.gitignore
+kubernetes/.codacy/codacy.config.baseline.json
+kubernetes/.codacy/codacy.config.json
+kubernetes/.github/instructions/codacy.instructions.md

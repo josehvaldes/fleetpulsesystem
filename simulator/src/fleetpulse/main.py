@@ -22,7 +22,7 @@ from utils.logging_config import get_logger, setup_logging
 from utils.processed_route import ProcessedRoute
 from utils.route_preprocessor import resample_geojson
 
-load_dotenv(Path(__file__).resolve().parent / ".env")
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data"

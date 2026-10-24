@@ -12,7 +12,7 @@ spec:
       - fleetpulse
   selector:
     matchLabels:
-      app: dbwriter
+      app.kubernetes.io/name: dbwriter
   endpoints:
     - port: http
       path: /metrics

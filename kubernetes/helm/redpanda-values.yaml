@@ -38,7 +38,7 @@ resources:
     cores: 1
   memory:
     container:
-      max: 2.5Gi
+      max: 3Gi
 
     # ---------------------------------------------------------------------------
     # Persistent broker storage
@@ -49,7 +49,7 @@ resources:
 storage:
   persistentVolume:
     enabled: true
-    size: 5Gi
+    size: 10Gi
     storageClass: standard
 
   # ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-ai-worker
   labels:
-    app: ai-worker
+    app.kubernetes.io/name: ai-worker
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: ClusterIP

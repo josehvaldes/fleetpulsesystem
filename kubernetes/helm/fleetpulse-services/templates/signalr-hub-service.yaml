@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-signalr-hub
   labels:
-    app: signalr-hub
+    app.kubernetes.io/name: signalr-hub
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: {{ .Values.signalrhub.service.type }}

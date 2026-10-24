@@ -12,7 +12,7 @@ spec:
       - fleetpulse
   selector:
     matchLabels:
-      app: ai-worker
+      app.kubernetes.io/name: ai-worker
   endpoints:
     - port: http
       path: /metrics

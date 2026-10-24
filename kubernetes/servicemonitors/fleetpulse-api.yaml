@@ -12,7 +12,7 @@ spec:
       - fleetpulse
   selector:
     matchLabels:
-      app: fleetpulse-api
+      app.kubernetes.io/name: fleetpulse-api
   endpoints:
     - port: http
       path: /metrics
