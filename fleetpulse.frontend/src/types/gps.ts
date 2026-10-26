@@ -1,5 +1,5 @@
 export interface GpsPing {
-  driverId:        string;
+  driver_id:        string;
   latitude:         number;
   longitude:        number;
   speed:        number;

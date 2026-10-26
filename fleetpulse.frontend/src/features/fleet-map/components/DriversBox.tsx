@@ -11,8 +11,8 @@ export function DriversBox() {
           <p>No drivers found.</p>
         ) : (
             Object.values(drivers).map((ping) => (
-              <li key={ping.driverId} className="text-xs">
-                <strong>{ping.driverId}</strong>
+              <li key={ping.driver_id} className="text-xs">
+                <strong>{ping.driver_id}</strong>
                 (<span style={{color: ping.status=='stopped'?'orange':'blue'}} >{ping.status}</span>)                 
               </li>
             ))

@@ -58,3 +58,4 @@ kubernetes/.codacy/.gitignore
 kubernetes/.codacy/codacy.config.baseline.json
 kubernetes/.codacy/codacy.config.json
 kubernetes/.github/instructions/codacy.instructions.md
+kubernetes/helm/env/fleetpulse-ai-worker-config.env

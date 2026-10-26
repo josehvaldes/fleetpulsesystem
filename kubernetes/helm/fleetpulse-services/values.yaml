@@ -58,6 +58,8 @@ api:
           key: connection-string
     - name: OpenTelemetry__OtlpEndpoint
       value: "http://otel-collector:4317"
+    - name: DOTNET_SYSTEM_NET_DISABLEIPV6
+      value: "1"
   envFrom:
     - secretRef:
         name: fleetpulse-auth-credentials
