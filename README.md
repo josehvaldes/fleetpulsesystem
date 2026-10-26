@@ -157,6 +157,9 @@ For individual Compose groups and their separate external-network setup, see [do
 - [Service documentation](docs/services/)
 - [Kubernetes implementation](docs/k8s/README.md)
 
+## Demo Recording
+- [Basic Demo Recording](docs/demo/basic-demo.mp4)
+
 ## Development and tests
 
 The services can be developed and tested independently. Build and test commands vary by application and are covered by the service documentation and [CI workflow guide](docs/ci.md). The CI workflows run frontend, .NET, and Python checks separately.
