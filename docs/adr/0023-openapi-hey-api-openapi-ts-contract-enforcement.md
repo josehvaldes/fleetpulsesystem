@@ -1,4 +1,4 @@
-# ADR 0023: Adopt OpenAPI + openapi-typescript for Frontend-Backend Contract Enforcement
+# ADR 0023: Adopt OpenAPI + @hey-api/openapi-ts for Frontend-Backend Contract Enforcement
 
 ## Status:
 Proposed
@@ -16,15 +16,15 @@ This is, at its core, a contract problem between two independently-deployed code
 
 ## Decision
 
-Adopt **OpenAPI schema generation on the backend** combined with **`openapi-typescript`** on the frontend as the structural contract enforcement mechanism between `fleetpulse-api` and the frontend applications (React SPA, React alert MFE, Angular drivers MFE).
+Adopt **OpenAPI schema generation on the backend** combined with **`@hey-api/openapi-ts`** on the frontend as the structural contract enforcement mechanism between `fleetpulse-api` and the frontend applications (React SPA, React alert MFE, Angular drivers MFE).
 
 Concretely:
 
-1. The `fleetpulse-api` .NET 10 project emits its `openapi.json` document using the built-in ASP.NET Core OpenAPI support (Microsoft's `Microsoft.AspNetCore.OpenApi` package, no Swashbuckle required for .NET 10).
-2. A build step in the API project (or a dedicated CI job) publishes the generated `openapi.json` as a build artifact alongside the API image.
-3. The frontend monorepo consumes the published `openapi.json` and runs `openapi-typescript` to generate typed schema files into a known location (e.g., `frontend/src/generated/api-schema.ts`).
+1. The `fleetpulse-api` .NET 10 project emits its `openapi\FleetPulse.Api.json` document using the built-in ASP.NET Core OpenAPI support (Microsoft's `Microsoft.AspNetCore.OpenApi` package, no Swashbuckle required for .NET 10).
+2. A build step in the API project (or a dedicated CI job) publishes the generated `openapi\FleetPulse.Api.json` as a build artifact alongside the API image.
+3. The frontend monorepo consumes the published `openapi\FleetPulse.Api.json` and runs `@hey-api/openapi-ts` to generate typed schema files into a known location (e.g., `frontend/src/generated/api-schema.ts`).
 4. Frontend code imports types from the generated file instead of declaring hand-written interfaces for API responses. Existing `fetch` wrappers are refactored to be generic over the generated types; new thin client functions replace ad-hoc calls over time.
-5. CI runs a verification step that regenerates types from the latest committed `openapi.json` and fails the build if the generated file differs from what is committed. This catches the "developer changed the DTO but forgot to regenerate" failure mode.
+5. CI runs a verification step that regenerates types from the latest committed `openapi\FleetPulse.Api.json` and fails the build if the generated file differs from what is committed. This catches the "developer changed the DTO but forgot to regenerate" failure mode.
 
 **Scope:** This ADR covers the REST endpoints exposed by `fleetpulse-api` (drivers, alerts, and any future REST surface). It does **not** cover SignalR message shapes, MQTT payloads, or Kafka event schemas — those cross different transports and will be addressed in separate ADRs if needed.
 
@@ -39,9 +39,13 @@ Concretely:
 - Pros: Zero tooling cost; no new dependencies.
 - Cons: This is the status quo and the source of the problem. Relies on developers remembering to update both sides and on reviewers catching drift manually. Has already failed multiple times in practice.
 
+**openapi-typescript 
+- Rejected. becasue TypeScript conflicts. The openapi-typescript@7.13.0 version of `openapi-typescript` requires  typescript@"^5.x" and the current version of the application is `typescript@6.0.3`
+
+
 **NSwag / Swagger Codegen for full client generation**
 - Pros: Generates a complete HTTP client, not just types — fewer hand-written fetch wrappers.
-- Cons: Heavier output; opinionated client structure that fights the existing fetch-based code in the React SPA. `openapi-typescript` produces only types, which is lighter, less intrusive, and lets us keep our own thin fetch wrappers and error-handling patterns.
+- Cons: Heavier output; opinionated client structure that fights the existing fetch-based code in the React SPA. `@hey-api/openapi-ts` produces only types, which is lighter, less intrusive, and lets us keep our own thin fetch wrappers and error-handling patterns.
 
 
 ## Consequences
@@ -49,19 +53,20 @@ Concretely:
 **Benefits:**
 - Compile-time type safety on the frontend: a renamed .NET DTO field becomes a TypeScript compile error in CI, blocking the breaking change before it merges — not after QA catches it.
 - Single source of truth: the .NET DTOs are the contract; the frontend cannot drift from them by accident.
-- Low operational overhead: no additional services to operate (unlike a Pact broker); just a build step on the API side and an `openapi-typescript` npm devDependency on the frontend.
+- Low operational overhead: no additional services to operate (unlike a Pact broker); just a build step on the API side and an `@hey-api/openapi-ts` npm devDependency on the frontend.
 - Better developer experience: frontend developers get IDE autocomplete and inline documentation for API responses, derived from .NET XML doc comments when emitted.
 - Foundation for future tooling: once types are flowing from the schema, adopting a generated HTTP client (`openapi-fetch`, `@hey-api/openapi-ts`) becomes a small incremental step rather than a rewrite.
 
 **Trade-offs:**
-- The frontend now has a build-time dependency on the backend's `openapi.json` artifact. CI ordering must ensure the API build runs (and publishes its schema) before the frontend type-regeneration step; otherwise the frontend must consume a pinned `openapi.json` from the last merged API build.
-- Generated type files are large and not human-readable. They should be committed (so diffs are reviewable in PRs) but treated as build output — reviewers will need to learn to read `openapi-typescript` output and resist the urge to hand-edit it.
+- The frontend now has a build-time dependency on the backend's `openapi\FleetPulse.Api.json` artifact. CI ordering must ensure the API build runs (and publishes its schema) before the frontend type-regeneration step; otherwise the frontend must consume a pinned `openapi\FleetPulse.Api.json` from the last merged API build.
+- Generated type files are large and not human-readable. They should be committed (so diffs are reviewable in PRs) but treated as build output — reviewers will need to learn to read `@hey-api/openapi-ts` output and resist the urge to hand-edit it.
 - The contract enforced is **structural** (types and shapes), not **behavioral**. The frontend can still misinterpret a field's semantics, and the backend can return a structurally-valid-but-semantically-wrong value. OpenAPI does not catch "the API returns 200 OK with the wrong data" — that remains a job for integration tests to be implemented in future ADRs.
 
 **Risks:**
 - If developers skip the local regeneration step and commit hand-edited generated files, contract enforcement weakens. Mitigated by the CI verification step that regenerates and diffs against the committed file.
 - If the .NET project does not annotate DTOs with `[Description]` attributes or XML doc comments, the generated types carry no documentation and the IDE experience is diminished. Mitigated by adopting DTO annotation conventions as part of the rollout.
 - OpenAPI does not capture runtime-only contracts (conditional fields, enum values defined in code rather than schema, header-driven variants). The team must be disciplined about representing all meaningful contracts in the schema; otherwise structural safety is incomplete.
-- `openapi-typescript` is a single community library; if it is abandoned, migration effort is non-trivial. Mitigated by the fact that the generated output is plain TypeScript types, portable to any other generator with a small adapter.
+- `@hey-api/openapi-ts` is a single community library; if it is abandoned, migration effort is non-trivial. Mitigated by the fact that the generated output is plain TypeScript types, portable to any other generator with a small adapter.
+- "requires Node ≥ 22.18 on all dev/CI machines" as an environment requirement.
 
 ## Related ADRs
