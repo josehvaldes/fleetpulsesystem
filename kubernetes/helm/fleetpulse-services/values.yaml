@@ -15,8 +15,8 @@ dbwriter:
   replicaCount: 1
 
   image:
-    repository: fleetpulse-dbwriter
-    tag: "1.0"
+    repository: ghcr.io/josehvaldes/fleetpulse-dbwriter
+    tag: latest
     pullPolicy: IfNotPresent
 
   containerPort: 8080
@@ -41,8 +41,8 @@ api:
   replicaCount: 1
 
   image:
-    repository: fleetpulse-api
-    tag: "1.0"
+    repository: ghcr.io/josehvaldes/fleetpulse-api
+    tag: latest
     pullPolicy: IfNotPresent
 
   containerPort: 8080
@@ -69,8 +69,8 @@ signalrhub:
   replicaCount: 1
 
   image:
-    repository: fleetpulse-signalrhub
-    tag: "1.0"
+    repository: ghcr.io/josehvaldes/fleetpulse-signalrhub
+    tag: latest
     pullPolicy: IfNotPresent
 
   containerPort: 8080
@@ -102,8 +102,8 @@ aiworker:
   replicaCount: 1
 
   image:
-    repository: fleetpulse-ai-worker
-    tag: "1.0"
+    repository: ghcr.io/josehvaldes/fleetpulse-ai-worker
+    tag: latest
     pullPolicy: IfNotPresent
 
   containerPort: 8000
