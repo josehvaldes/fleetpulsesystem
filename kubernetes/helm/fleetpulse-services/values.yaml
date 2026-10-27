@@ -17,7 +17,7 @@ dbwriter:
   image:
     repository: ghcr.io/josehvaldes/fleetpulse-dbwriter
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   containerPort: 8080
 
@@ -43,7 +43,7 @@ api:
   image:
     repository: ghcr.io/josehvaldes/fleetpulse-api
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   containerPort: 8080
 
@@ -71,7 +71,7 @@ signalrhub:
   image:
     repository: ghcr.io/josehvaldes/fleetpulse-signalrhub
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   containerPort: 8080
 
@@ -104,7 +104,7 @@ aiworker:
   image:
     repository: ghcr.io/josehvaldes/fleetpulse-ai-worker
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   containerPort: 8000
 

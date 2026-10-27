@@ -4,6 +4,14 @@ name: Publish FleetPulse images
 on:
   push:
     branches: [main]
+    paths:
+      - "ai-worker/**"
+      - "FleetPulse.DbWriter/**"
+      - "FleetPulse.SignalRHub/**"
+      - "FleetPulse.Api/**"
+      - ".github/workflows/publish-images.yml"
+      - ".github/workflows/ci-python.yml"      
+      - ".github/workflows/ci-dotnet.yml"
   workflow_dispatch:
 
 permissions:
