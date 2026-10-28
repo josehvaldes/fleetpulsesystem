@@ -21,19 +21,26 @@ Adopt **OpenAPI schema generation on the backend** combined with **`@hey-api/ope
 Concretely:
 
 1. The `fleetpulse-api` .NET 10 project emits its `openapi\FleetPulse.Api.json` document using the built-in ASP.NET Core OpenAPI support (Microsoft's `Microsoft.AspNetCore.OpenApi` package, no Swashbuckle required for .NET 10).
-2. A build step in the API project (or a dedicated CI job) publishes the generated `openapi\FleetPulse.Api.json` as a build artifact alongside the API image.
-3. The frontend monorepo consumes the published `openapi\FleetPulse.Api.json` and runs `@hey-api/openapi-ts` to generate typed schema files into a known location (e.g., `frontend/src/generated/api-schema.ts`).
-4. Frontend code imports types from the generated file instead of declaring hand-written interfaces for API responses. Existing `fetch` wrappers are refactored to be generic over the generated types; new thin client functions replace ad-hoc calls over time.
-5. CI runs a verification step that regenerates types from the latest committed `openapi\FleetPulse.Api.json` and fails the build if the generated file differs from what is committed. This catches the "developer changed the DTO but forgot to regenerate" failure mode.
 
-**Scope:** This ADR covers the REST endpoints exposed by `fleetpulse-api` (drivers, alerts, and any future REST surface). It does **not** cover SignalR message shapes, MQTT payloads, or Kafka event schemas — those cross different transports and will be addressed in separate ADRs if needed.
+2. A build step in the API project (or a dedicated CI job) publishes the generated `openapi\FleetPulse.Api.json` as a build artifact alongside the API image.
+
+3. A build step in the SignalRHub project that includes a document transformet class that will generate `openapi\FleetPulse.SignalRHub.json` as a build artifact.
+
+4. The frontend monorepo consumes the published `openapi\FleetPulse.Api.json`, and `openapi\FleetPulse.SignalRHub.json` and runs `@hey-api/openapi-ts` to generate typed schema files into a known location (e.g., `frontend/src/generated/api-schema.ts`).
+
+
+5. Frontend code imports types from the generated file instead of declaring hand-written interfaces for API responses. Existing `fetch` wrappers are refactored to be generic over the generated types; new thin client functions replace ad-hoc calls over time.
+
+6. CI runs a verification step that regenerates types from the latest committed `openapi\FleetPulse.Api.json` and fails the build if the generated file differs from what is committed. This catches the "developer changed the DTO but forgot to regenerate" failure mode.
+
+**Scope:** This ADR covers the REST endpoints exposed by `fleetpulse-api` (drivers, alerts, and any future REST surface) AND `SignalRHub` . It does **not** cover MQTT payloads, or Kafka event schemas — those cross different transports and will be addressed in separate ADRs if needed.
 
 ## Alternatives
 
 **Pact (consumer-driven contract testing)**
 - Pros: True behavioral contracts — verifies actual request/response cycles including status codes, headers, and payloads, not just types. Works across HTTP and message boundaries. Stronger guarantee than schema-only checks.
 - Cons: Higher setup cost; requires writing consumer tests in the frontend and provider tests in the backend, plus operating a Pact broker for contract exchange. Overkill for the common failure mode of "I renamed a field and the FE silently broke".
-- Decision: Defer to a future ADR for the 5–10 most critical endpoints (driver latest state, alert list, live SignalR message shapes) where behavioral verification adds value beyond structural type safety.
+
 
 **Hand-written TypeScript types with manual code review**
 - Pros: Zero tooling cost; no new dependencies.

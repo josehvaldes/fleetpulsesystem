@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { fleetHub } from "@/services/fleetHub";
-import type { GpsPing } from "@/types/gps";
+import type { GpsPingResponse } from "@/generated/signalrhub";
 import type { FleetHubConnectionStatus } from "@/services/fleetHub";
 
 // Keep at most N most-recent pings in memory for the textarea view.
 const MAX_PINGS = 200;
 
-export type DriverLocations = Record<string, GpsPing>;
+export type DriverLocations = Record<string, GpsPingResponse>;
 
 export function useGpsPings() {
-  const [pings, setPings] = useState<GpsPing[]>([]);
+  const [pings, setPings] = useState<GpsPingResponse[]>([]);
   const [drivers, setDrivers] = useState<DriverLocations>({});
   const [status, setStatus] = useState<FleetHubConnectionStatus>(
     fleetHub.getConnectionStatus()
@@ -21,7 +21,7 @@ export function useGpsPings() {
     const unsubscribePing = fleetHub.onPing((ping) => {
       setDrivers((prev) => ({
         ...prev,
-        [ping.driver_id]: ping,
+        [ping.driver_id ?? ""]: ping,
       }));
       setPings((prev) => {
         const next = [ping, ...prev];

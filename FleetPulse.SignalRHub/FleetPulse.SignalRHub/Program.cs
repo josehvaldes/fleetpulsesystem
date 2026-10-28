@@ -1,13 +1,15 @@
+using FleetPulse.Application;
 using FleetPulse.Infrastructure;
 using FleetPulse.Infrastructure.Kafka;
 using FleetPulse.Observability;
 using FleetPulse.SignalRHub;
-using FleetPulse.Application;
 using FleetPulse.SignalRHub.Configuration;
+using FleetPulse.SignalRHub.Extensions;
 using FleetPulse.SignalRHub.Logging;
 using FleetPulse.SignalRHub.Middleware;
 using FleetPulse.SignalRHub.Registry;
 using Serilog;
+using System.Text.Json.Serialization;
 
 ContextMapping.RegisterMappings();
 
@@ -34,6 +36,17 @@ builder.Services.AddProblemDetails();
 
 // --- SignalR ---
 builder.Services.AddSignalR();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<SignalRContractsDocumentTransformer>();
+});
+
 
 builder.Services.AddDependencies(builder.Configuration); // API Dependencies
 builder.Services.AddApplicationDependencies(builder.Configuration); // Application Dependencies
