@@ -9,6 +9,8 @@ on:
       - "fleetpulse.drivers-mgmt/**"
       - "fleetpulse.frontend/**"
       - ".github/workflows/ci-frontend.yml"
+      - "FleetPulse.Api/FleetPulse.Api/openapi/**"
+      - "FleetPulse.SignalRHub/FleetPulse.SignalRHub/openapi/**"
   pull_request:
     branches:
       - main
@@ -17,6 +19,8 @@ on:
       - "fleetpulse.drivers-mgmt/**"
       - "fleetpulse.frontend/**"
       - ".github/workflows/ci-frontend.yml"
+      - "FleetPulse.Api/FleetPulse.Api/openapi/**"
+      - "FleetPulse.SignalRHub/FleetPulse.SignalRHub/openapi/**"
   workflow_dispatch:
 
 concurrency:
@@ -37,6 +41,11 @@ jobs:
           cache-dependency-path: fleetpulse.frontend/package-lock.json
       - run: npm ci
         working-directory: fleetpulse.frontend
+      - run: npm run generate:contracts
+        working-directory: fleetpulse.frontend
+      - name: Verify generated API client is up to date
+        run: git diff --exit-code -- src/generated
+        working-directory: fleetpulse.frontend
       - run: npm run lint
         working-directory: fleetpulse.frontend
       - run: npm run build
@@ -56,6 +65,11 @@ jobs:
           cache-dependency-path: fleetpulse.alert-mgmt/package-lock.json
       - run: npm ci
         working-directory: fleetpulse.alert-mgmt
+      - run: npm run generate:contracts
+        working-directory: fleetpulse.alert-mgmt
+      - name: Verify generated API client is up to date
+        run: git diff --exit-code -- src/generated
+        working-directory: fleetpulse.alert-mgmt
       - run: npm run build
         working-directory: fleetpulse.alert-mgmt
       - run: npm test -- --run --passWithNoTests
@@ -72,6 +86,11 @@ jobs:
           cache: npm
           cache-dependency-path: fleetpulse.drivers-mgmt/package-lock.json
       - run: npm ci
+        working-directory: fleetpulse.drivers-mgmt
+      - run: npm run generate:contracts
+        working-directory: fleetpulse.drivers-mgmt
+      - name: Verify generated API client is up to date
+        run: git diff --exit-code -- src/generated
         working-directory: fleetpulse.drivers-mgmt
       - run: npx ng build
         working-directory: fleetpulse.drivers-mgmt
