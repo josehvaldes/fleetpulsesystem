@@ -7,9 +7,9 @@ export type ClientOptions = {
 export type AlertResponse = {
     id?: string;
     driverId?: string;
-    eventLatitude?: number | string;
-    eventLongitude?: number | string;
-    exitSpeed?: number | string;
+    eventLatitude?: number;
+    eventLongitude?: number;
+    exitSpeed?: number;
     exitTime?: string;
     zoneName?: string;
     zoneType?: string;
@@ -23,29 +23,29 @@ export type AlertResponse = {
 
 export type GpsPingResponse = {
     driverId?: string;
-    latitude?: number | string;
-    longitude?: number | string;
-    speed?: number | string;
-    heading?: number | string;
+    latitude?: number;
+    longitude?: number;
+    speed?: number;
+    heading?: number;
     timestamp?: string;
 };
 
 export type LastestDriverStateResponse = {
     driverId?: string;
-    latitude?: number | string;
-    longitude?: number | string;
-    speed?: number | string;
-    heading?: number | string;
+    latitude?: number;
+    longitude?: number;
+    speed?: number;
+    heading?: number;
     lastSeen?: string;
     status?: string;
 };
 
 export type PagedResponseOfAlertResponse = {
     items: Array<AlertResponse>;
-    totalCount: number | string;
-    pageNumber: number | string;
-    pageSize: number | string;
-    totalPages: number | string;
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
 };
@@ -142,8 +142,8 @@ export type GetApiV1AlertsData = {
     body?: never;
     path?: never;
     query: {
-        pagesize: number | string;
-        pagenumber: number | string;
+        pagesize: number;
+        pagenumber: number;
         status?: string;
         riskLevel?: string;
         from?: string;
