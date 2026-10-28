@@ -8,6 +8,7 @@ using FleetPulse.Api.Observability;
 using FleetPulse.Api.Registry;
 using FleetPulse.Drivers.Api;
 using Serilog;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,12 @@ builder.Host.UseSerilog();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddDependencies(builder.Configuration);

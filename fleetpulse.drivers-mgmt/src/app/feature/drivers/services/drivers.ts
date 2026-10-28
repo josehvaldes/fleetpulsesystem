@@ -11,12 +11,12 @@ export class Drivers {
         const drivers =  driversDto.pipe(
             map(apiDrivers => apiDrivers.map((apiDriver): Driver => (
                 {
-                id: apiDriver.id,
-                name: apiDriver.name,
-                speed: apiDriver.speed,
-                LastTimeSeen: apiDriver.LastTimeSeen,
-                status: apiDriver.status,
-                location: { latitude: apiDriver.latitude, longitude: apiDriver.longitude },
+                id: apiDriver.driverId?? '',
+                name: 'missing property',
+                speed: apiDriver.speed ?? 0,
+                LastTimeSeen: apiDriver.lastSeen ?? '',
+                status: apiDriver.status ?? '',
+                location: { latitude: apiDriver.latitude?? 0, longitude: apiDriver.longitude?? 0 },
             }
         )))
         );

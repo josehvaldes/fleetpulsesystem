@@ -4,8 +4,8 @@ import {
   LogLevel,
   type HubConnection,
 } from "@microsoft/signalr";
-import type { GpsPing } from "@/types/gps";
-import type { AlertWire } from "@/api/alerts/types";
+import type { GpsPingResponse } from "@/generated/signalrhub";
+import type { AlertResponse } from "@/generated/signalrhub";
 import { config } from "@/utils/appConfig";
 import { getAuthToken, waitForAuthTokenProvider } from "@/services/authTokenProvider";
 
@@ -15,9 +15,9 @@ const HUB_URL = config.signalRHubUrl;
 const RECEIVE_GPS_PING = "ReceiveGpsPing";
 const RECEIVE_ALERT = "ReceiveAlert";
 
-export type PingHandler = (ping: GpsPing) => void;
+export type PingHandler = (ping: GpsPingResponse) => void;
 
-export type AlertHandler = (alert: AlertWire) => void;
+export type AlertHandler = (alert: AlertResponse) => void;
 
 export type FleetHubConnectionStatus =
   | "disconnected"
@@ -55,11 +55,11 @@ class FleetHubService {
       .build();
 
     // The single server→client callback. We fan out to local subscribers.
-    this.connection.on(RECEIVE_GPS_PING, (ping: GpsPing) => {
+    this.connection.on(RECEIVE_GPS_PING, (ping: GpsPingResponse) => {
       this.pingHandlers.forEach((h) => h(ping));
     });
 
-    this.connection.on(RECEIVE_ALERT, (alert: AlertWire) => {
+    this.connection.on(RECEIVE_ALERT, (alert: AlertResponse) => {
       this.alertHandlers.forEach((h) => h(alert));
     });
 

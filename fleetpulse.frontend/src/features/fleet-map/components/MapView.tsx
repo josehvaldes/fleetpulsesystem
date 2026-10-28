@@ -56,7 +56,7 @@ export function MapView() {
           {Object.values(drivers).map((ping) => (
             <Marker
               key={ping.driver_id}
-              position={[ping.latitude, ping.longitude]}
+              position={[ping.latitude?? 0 , ping.longitude?? 0 ]}
             >
               <Popup>
                 <strong>{ping.driver_id}</strong>

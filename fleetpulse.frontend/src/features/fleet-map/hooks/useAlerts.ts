@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fleetHub } from "@/services/fleetHub";
 import { parseRiskLevel, parseAlertStatus, type Alert } from "@/types/alert";
-import type { AlertWire } from "@/api/alerts/types";
+import type { AlertResponse } from "@/generated/signalrhub";
 import { addAlert  } from "@/store/alertSlice";
 import type { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
@@ -14,24 +14,23 @@ export function useAlerts() {
   useEffect(() => {
     fleetHub.start();
 
-    const unsubscribe = fleetHub.onAlerts((newAlertDto: AlertWire) => {
+    const unsubscribe = fleetHub.onAlerts((newAlertDto: AlertResponse) => {
       const newAlert: Alert = {
-        id: newAlertDto.id,
-        driverId: newAlertDto.driverId,
+        id: newAlertDto.id?? "",
+        driverId: newAlertDto.driverId ?? "",
         eventLocation: {
-          latitude: newAlertDto.eventLatitude,
-          longitude: newAlertDto.eventLongitude,
+          latitude: newAlertDto.eventLatitude ?? 0,
+          longitude: newAlertDto.eventLongitude ?? 0,
         },
-        exitSpeed: newAlertDto.exitSpeed,
-        exitHeading: newAlertDto.exitHeading,
-        exitTime: newAlertDto.exitTime,
-        zoneName: newAlertDto.zoneName,
-        assessment: newAlertDto.assessment,
-        recommendation: newAlertDto.recommendation,
-        raisedAt: newAlertDto.raisedAt,
-        zoneType: newAlertDto.zoneType,
-        status: parseAlertStatus(newAlertDto.status),
-        riskLevel: parseRiskLevel(newAlertDto.riskLevel),
+        exitSpeed: newAlertDto.exitSpeed ?? 0,
+        exitTime: newAlertDto.exitTime ?? "",
+        zoneName: newAlertDto.zoneName ?? "",
+        assessment: newAlertDto.assessment ?? "",
+        recommendation: newAlertDto.recommendation ?? "",
+        raisedAt: newAlertDto.raisedAt ?? "",
+        zoneType: newAlertDto.zoneType ?? "",
+        status: parseAlertStatus(newAlertDto.status ?? ""),
+        riskLevel: parseRiskLevel(newAlertDto.riskLevel ?? ""),
       };
 
       setAlerts((prev) => {

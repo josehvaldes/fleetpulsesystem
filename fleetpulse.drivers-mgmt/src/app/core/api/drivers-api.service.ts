@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { DriverStateResponse } from '@app/core/contracts/driverstateresponse';
+import { LastestDriverStateResponse } from '@app/generated/api';
 import { defer, from, Observable, switchMap } from 'rxjs';
 import { getCurrentAuthToken, getApiBaseUrlOverride } from "@app/core/api/authTokenProvider";
 
@@ -9,7 +9,7 @@ import { getCurrentAuthToken, getApiBaseUrlOverride } from "@app/core/api/authTo
 })
 export class DriversApiService {
     private readonly http = inject(HttpClient);
-  getDrivers(): Observable<DriverStateResponse[]>  {
+  getDrivers(): Observable<LastestDriverStateResponse[]>  {
     
     const apiBaseUrl = getApiBaseUrlOverride() || '';
 
@@ -21,7 +21,7 @@ export class DriversApiService {
     });
 
     return defer(() => from(getCurrentAuthToken())).pipe(
-      switchMap(token => this.http.get<DriverStateResponse[]>(`${baseUrl}/v1/drivers?${queryParams.toString()}`, {
+      switchMap(token => this.http.get<LastestDriverStateResponse[]>(`${baseUrl}/v1/drivers?${queryParams.toString()}`, {
         headers: new HttpHeaders({ Authorization: `Bearer ${token ?? ''}` }),
       })),
     );

@@ -73,7 +73,6 @@ export function AlertPopup({ alert }: AlertPopupProps) {
                     <p><strong>Zone Name:</strong> {alert.zoneName}</p>
                     <p><strong>Driver ID:</strong> {alert.driverId}</p>
                     <p><strong>Exit Speed:</strong> {alert.exitSpeed} km/h</p>
-                    <p><strong>Exit Heading:</strong> {alert.exitHeading}°</p>
                     <p><strong>Exit Time:</strong> {new Date(alert.exitTime).toLocaleString()}</p>
                     <p><strong>Raised At:</strong> {new Date(alert.raisedAt).toLocaleString()} ({timelabel})</p>
                     <p><strong>Assessment:</strong> {alert.assessment}</p>

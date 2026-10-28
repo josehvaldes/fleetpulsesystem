@@ -1,11 +1,10 @@
-import type { PageResponse } from "../genericTypes";
 import type { AlertRequestParams } from "./types";
-import type { AlertWire } from "@/api/alerts/types";
+import type { PagedResponseOfAlertResponse  } from "@/generated/api";
 import { sendRequest } from "@/api/genericRequest";
 
 export async function fetchAlerts(
     requestParams: AlertRequestParams
-): Promise<PageResponse<AlertWire>> {
+): Promise<PagedResponseOfAlertResponse> {
   try {
     const queryParams = new URLSearchParams({
       pagenumber: requestParams.pageNumber.toString(),
@@ -16,7 +15,7 @@ export async function fetchAlerts(
       ...(requestParams.to ? { toDate: requestParams.to } : {}),
     });
     console.log('Fetching alerts with query params:', queryParams.toString());
-    const data = await sendRequest<PageResponse<AlertWire>>(`/alerts?${queryParams.toString()}`, {
+    const data = await sendRequest<PagedResponseOfAlertResponse>(`/alerts?${queryParams.toString()}`, {
       method: "GET",
     });
     return data;

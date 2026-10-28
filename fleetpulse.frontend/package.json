@@ -14,7 +14,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "generate:contracts": "openapi-ts"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.23.0",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@hey-api/openapi-ts": "^0.99.0",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
