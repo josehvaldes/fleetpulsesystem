@@ -1,7 +1,8 @@
 import { fetchAlerts } from "@/api/alerts/alerts";
 import type { AlertRequestParams } from "@/api/alerts/types";
-import type { PageResponse } from "@/api/genericTypes";
+
 import { parseRiskLevel, parseAlertStatus, type Alert } from "@/types/alert";
+import type { PageResponse } from "@/types/PageResponse";
 
 
 export async function getAlerts(  pageNumber: number, 
@@ -16,22 +17,21 @@ export async function getAlerts(  pageNumber: number,
     const alerts = data.map((dto) => 
     { 
         const alert: Alert = {
-            id: dto.id,
-            driverId: dto.driverId,
+            id: dto.id ?? "",
+            driverId: dto.driverId ?? "",
             eventLocation: {
-                latitude: dto.eventLatitude,
-                longitude: dto.eventLongitude,
+                latitude: dto.eventLatitude ?? 0,
+                longitude: dto.eventLongitude ?? 0,
             },
-            exitSpeed: dto.exitSpeed,
-            exitHeading: dto.exitHeading,
-            exitTime: dto.exitTime,
-            zoneName: dto.zoneName,
-            zoneType: dto.zoneType,
-            assessment: dto.assessment,
-            recommendation: dto.recommendation,
-            raisedAt: dto.raisedAt,
-            status: parseAlertStatus(dto.status),
-            riskLevel: parseRiskLevel(dto.riskLevel)
+            exitSpeed: dto.exitSpeed ?? 0,
+            exitTime: dto.exitTime ?? "",
+            zoneName: dto.zoneName ?? "",
+            zoneType: dto.zoneType ?? "",
+            assessment: dto.assessment ?? "",
+            recommendation: dto.recommendation ?? "",
+            raisedAt: dto.raisedAt ?? "",
+            status: parseAlertStatus(dto.status ?? ""),
+            riskLevel: parseRiskLevel(dto.riskLevel ?? "")
             };
             return alert;
         }

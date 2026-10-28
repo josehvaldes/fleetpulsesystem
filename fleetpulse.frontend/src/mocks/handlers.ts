@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { mockAlerts as alerts } from './data';
-import type { AlertWire } from '@/api/alerts/types';
+    import type { AlertResponse } from "@/generated/signalrhub";
 import type { PageResponse } from '@/api/genericTypes';
 
 const ENDPOINT_LATENCY_MS = {
@@ -49,17 +49,17 @@ export const handlers = [
             if (status && alert.status !== status) {
                 matches = false;
             }
-            if (fromDate && new Date(alert.raisedAt) < new Date(fromDate)) {
+            if (fromDate && new Date(alert.raisedAt??0) < new Date(fromDate)) {
                 matches = false;
             }
-            if (toDate && new Date(alert.raisedAt) > new Date(toDate)) {
+            if (toDate && new Date(alert.raisedAt??0) > new Date(toDate)) {
                 matches = false;
             }
             return matches;
         });
 
         const sliced = filteredAlerts.slice((pagenumber - 1) * pagesize, pagenumber * pagesize);
-        const response:PageResponse<AlertWire> = {
+        const response:PageResponse<AlertResponse> = {
             items: sliced,
             totalCount: filteredAlerts.length,
             totalPages: Math.ceil(filteredAlerts.length / pagesize),

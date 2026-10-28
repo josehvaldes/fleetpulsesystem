@@ -37,7 +37,6 @@ export interface Alert {
         longitude: number;
     };
     exitSpeed: number;
-    exitHeading: number;
     exitTime: string;
     zoneName: string;
     zoneType: string;

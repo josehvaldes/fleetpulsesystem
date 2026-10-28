@@ -5,7 +5,7 @@ import {
   type HubConnection,
 } from "@microsoft/signalr";
 import type { GpsPingResponse } from "@/generated/signalrhub";
-import type { AlertWire } from "@/api/alerts/types";
+import type { AlertResponse } from "@/generated/signalrhub";
 import { config } from "@/utils/appConfig";
 import { getAuthToken, waitForAuthTokenProvider } from "@/services/authTokenProvider";
 
@@ -17,7 +17,7 @@ const RECEIVE_ALERT = "ReceiveAlert";
 
 export type PingHandler = (ping: GpsPingResponse) => void;
 
-export type AlertHandler = (alert: AlertWire) => void;
+export type AlertHandler = (alert: AlertResponse) => void;
 
 export type FleetHubConnectionStatus =
   | "disconnected"
@@ -59,7 +59,7 @@ class FleetHubService {
       this.pingHandlers.forEach((h) => h(ping));
     });
 
-    this.connection.on(RECEIVE_ALERT, (alert: AlertWire) => {
+    this.connection.on(RECEIVE_ALERT, (alert: AlertResponse) => {
       this.alertHandlers.forEach((h) => h(alert));
     });
 
