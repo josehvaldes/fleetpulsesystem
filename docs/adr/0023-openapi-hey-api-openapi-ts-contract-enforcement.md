@@ -1,7 +1,7 @@
 # ADR 0023: Adopt OpenAPI + @hey-api/openapi-ts for Frontend-Backend Contract Enforcement
 
 ## Status:
-Proposed
+Accepted
 
 ## Date:
 2026-10-28
