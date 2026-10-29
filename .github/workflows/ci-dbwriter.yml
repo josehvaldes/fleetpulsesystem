@@ -28,7 +28,7 @@ jobs:
     uses: ./.github/workflows/build-dotnet.yml
     with:
       service: db-writer
-      image-name: fleetpulse-db-writer
+      image-name: fleetpulse-dbwriter
       solution: FleetPulse.DbWriter/FleetPulse.DbWriter.slnx
       context: ./FleetPulse.DbWriter
       dockerfile: FleetPulse.DbWriter/FleetPulse.DbWriter/Dockerfile
