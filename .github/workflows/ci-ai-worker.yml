@@ -1,0 +1,37 @@
+name: ci-ai-worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ai-worker/**"
+      - ".github/workflows/ci-ai-worker.yml"
+      - ".github/workflows/build-python.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "ai-worker/**"
+      - ".github/workflows/ci-ai-worker.yml"
+      - ".github/workflows/build-python.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-ai-worker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-python.yml
+    with:
+      service: ai-worker
+      image-name: fleetpulse-ai-worker
+      working-directory: ai-worker/src
+      requirements-path: ai-worker/src/requirements.txt
+      docker-context: ./ai-worker
+      dockerfile: ai-worker/docker/Dockerfile
+      run-tests: true
+      publish: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    secrets: inherit
