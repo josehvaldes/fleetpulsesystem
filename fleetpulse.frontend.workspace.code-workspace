@@ -1,22 +1,16 @@
 {
 	"folders": [
 		{
-			"path": "fleetpulse.frontend"
+			"path": "frontend/fleetpulse.frontend"
 		},
 		{
-			"path": "fleetpulse.alert-mgmt"
+			"path": "frontend/fleetpulse.drivers-mgmt"
 		},
 		{
-			"path": "fleetpulse.drivers-mgmt"
+			"path": "frontend/fleetpulse.alert-mgmt"
 		},
 		{
-			"path": "docker"
-		},
-		{
-			"path": "docs"
-		},
-		{
-			"path": ".github"
+			"path": "frontend/tests"
 		}
 	]
 }

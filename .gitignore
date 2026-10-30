@@ -17,10 +17,10 @@ FleetPulse.DbWriter/.dockerignore
 FleetPulse.DbWriter/FleetPulse.DbWriter/appsettings.Development.json
 
 FleetPulse.SignalRHub/FleetPulse.SignalRHub/FleetPulse.SignalRHub.csproj.user
-fleetpulse.frontend/.env
-fleetpulse.frontend/.github/instructions/codacy.instructions.md
-fleetpulse.frontend/.codacy/cli.sh
-fleetpulse.frontend/.codacy/codacy.yaml
+frontend/fleetpulse.frontend/.env
+frontend/fleetpulse.frontend/.github/instructions/codacy.instructions.md
+frontend/fleetpulse.frontend/.codacy/cli.sh
+frontend/fleetpulse.frontend/.codacy/codacy.yaml
 FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
 FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
 ai-worker/.codacy/cli.sh
@@ -33,7 +33,7 @@ FleetPulse.SignalRHub/FleetPulse.SignalRHub/appsettings.Development.json
 docker/.env
 ai-worker/.codacy/*
 simulator/.codacy/*
-fleetpulse.frontend/.codacy/*
+frontend/fleetpulse.frontend/.codacy/*
 simulator/.env
 ai-worker/.pytest_cache/*
 FleetPulse.DbWriter/.codacy/*
@@ -41,12 +41,11 @@ FleetPulse.DbWriter/.github/instructions/codacy.instructions.md
 FleetPulse.DbWriter/.gitignore
 FleetPulse.SignalRHub/.github/instructions/codacy.instructions.md
 FleetPulse.SignalRHub/.gitignore
-FleetPulse.MockFleetHub/appsettings.Development.json
-fleetpulse.alert-mgmt/.codacy/*
-fleetpulse.alert-mgmt/.github/*
-fleetpulse.alert-mgmt/.env
-fleetpulse.alert-mgmt/.gitignore
-fleetpulse.frontend/.env.production
+frontend/fleetpulse.alert-mgmt/.codacy/*
+frontend/fleetpulse.alert-mgmt/.github/*
+frontend/fleetpulse.alert-mgmt/.env
+frontend/fleetpulse.alert-mgmt/.gitignore
+frontend/fleetpulse.frontend/.env.production
 docker/.codacy
 k8s/database/database-secret.env
 helm/auth-credentials.env
