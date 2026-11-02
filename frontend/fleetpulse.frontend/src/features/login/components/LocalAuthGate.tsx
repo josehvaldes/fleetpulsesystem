@@ -63,7 +63,7 @@ export function LocalAuthGate({ children }: LocalAuthGateProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                {error && <div className="text-red-400 text-sm text-center">{error}</div>}
+                {error && <div className="error-message text-red-400 text-sm text-center">{error}</div>}
 
 
                 <button
@@ -74,6 +74,13 @@ export function LocalAuthGate({ children }: LocalAuthGateProps) {
                     {isLoading ? 'Authenticating...' : 'Sign In'}
                 </button>
             </form>
+            { import.meta.env.DEV && (
+                <div className="text-sm text-gray-500 mt-4 text-left">
+                    Mock mode: {import.meta.env.VITE_ENABLE_MOCKS === 'true' ? 'enabled' : 'disabled'}.
+                    <br/>
+                    Auth mode: {import.meta.env.VITE_AUTH_MODE}.
+                </div>
+            )}
         </div>
     );
 }

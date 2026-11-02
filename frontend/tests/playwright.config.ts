@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 const frontendRoot = path.resolve(__dirname, '..');
+const authFile = path.join(__dirname, '.auth', 'user.json');
 
 export default defineConfig({
   testDir: './e2e',
@@ -25,8 +26,46 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'setup',
+      testMatch: 'setup/auth.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173',
+      },
+    },
+    {
+      name: 'authentication',
+      testMatch: 'local-authentication/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173',
+      }
+    },
+    {
+      name: 'spa',
+      testMatch: 'spa/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173',
+        storageState: authFile,
+      },
+      dependencies: ['setup']
+    },
+    {
+      name: 'alerts',
+      testMatch: 'alerts/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5174',
+      },
+    },
+    {
+      name: 'drivers',
+      testMatch: 'drivers/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5175',
+      },
     },
   ],
 
@@ -37,6 +76,10 @@ export default defineConfig({
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+      env: {
+        VITE_AUTH_MODE: 'local',
+        VITE_ENABLE_MOCKS: 'true',
+      }
     },
     {
       command: 'npm run dev -- --port 5174 --host 127.0.0.1',
@@ -44,6 +87,10 @@ export default defineConfig({
       url: 'http://127.0.0.1:5174',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+      env: {
+        VITE_AUTH_MODE: 'local',
+        VITE_ENABLE_MOCKS: 'true'
+      }
     },
     {
       command: 'npx ng serve --port 5175',

@@ -1,4 +1,11 @@
+import type { LastestDriverStateResponse } from "@/generated/api/types.gen";
 import type { AlertResponse } from "@/generated/signalrhub";
+
+const mockUserInfo = {
+    username: 'admin',
+    password: 'adminfleet',
+    role: 'admin'
+};
 
 const mockAlerts:AlertResponse[] = [
     {
@@ -83,4 +90,33 @@ const mockAlerts:AlertResponse[] = [
     }as AlertResponse,
 ];
 
-export { mockAlerts };
+
+
+const mockDrivers: LastestDriverStateResponse[] = [
+    {
+        driverId: "test-01",
+        speed: 50,
+        lastSeen: "2026-09-21T00:00:00Z",
+        status: "moving",
+        latitude: -17.98650,
+        longitude: -14.98754,
+    },
+    {
+      driverId: "test-02",
+      speed: 0,
+      lastSeen: "2026-09-21T00:00:00Z",
+      status: "stopped",
+      latitude: -18.12345,
+      longitude: -15.12345,
+    },
+    {
+      driverId: "test-03",
+      speed: 30,
+      lastSeen: "2026-09-21T00:00:00Z",
+      status: "moving",
+      latitude: -19.54321,
+      longitude: -16.54321,
+    }
+]
+    
+export { mockAlerts, mockUserInfo, mockDrivers };

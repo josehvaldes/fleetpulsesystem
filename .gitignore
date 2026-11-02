@@ -61,3 +61,4 @@ kubernetes/helm/env/fleetpulse-ai-worker-config.env
 kubernetes/helm/env/auth-credentials.env
 kubernetes/helm/env/emqx.env
 simulator/src/.env
+frontend/tests/.auth/user.json
