@@ -25,6 +25,7 @@ export function MessageLog() {
       <div className="">
         <textarea
             className=""
+            data-testid="gps-pings-log"
             readOnly
             value={text}
             placeholder="Waiting for messages from /v1/fleetHub…"

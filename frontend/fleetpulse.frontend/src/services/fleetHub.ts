@@ -40,8 +40,8 @@ class FleetHubService {
 
   constructor() {
     console.log("[FleetHub] initializing connection");
-    
-    
+
+    // When VITE_ENABLE_MOCKS=true, vite.config.ts aliases "@microsoft/signalr" to the fake.
     this.connection = new HubConnectionBuilder()
       .withUrl(HUB_URL, {
         // SignalR needs credentials because the hub allows credentials in CORS.

@@ -5,8 +5,8 @@ export function DriversBox() {
 
   return(
     <>
-        <h3 className="font-bold">Drivers</h3>
-        <ul>
+        <h3 className="font-bold">Live Drivers</h3>
+        <ul data-testid="live-drivers-list">
         {Object.keys(drivers).length === 0 ? (
           <p>No drivers found.</p>
         ) : (

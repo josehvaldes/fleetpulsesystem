@@ -22,13 +22,7 @@ export const handlers = [
 
     //Mock for login
     http.post(/\/api\/v1\/sessions$/i, async ({request}) => {
-        console.log('Mocking sessions endpoint');
-
-        console.log('Mocking login with userInfo:', userInfo);
-        
         const body:any = await request.json();
-        console.log('Request body:', body);
-
         if (!body.username || !body.password || 
             body.username !== userInfo.username || 
             body.password !== userInfo.password) {
