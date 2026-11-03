@@ -19,8 +19,8 @@ export default defineConfig({
         './AlertsDashboard': './src/features/alerts/components/AlertsDashboard.tsx'
       },
       shared: {
-        react: { singleton: true, requiredVersion: '^19.2.7' },
-        'react-dom': { singleton: true, requiredVersion: '^19.2.7' },
+        react: { singleton: true },
+        'react-dom': { singleton: true },
       },
       dts: {
         tsConfigPath: './tsconfig.app.json'

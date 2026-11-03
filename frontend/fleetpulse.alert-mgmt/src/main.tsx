@@ -7,6 +7,7 @@ import './index.css'
 import App from './App.tsx'
 import { persistor, store } from './store/store.ts';
 
+const isMockingEnabled = import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCKS === 'true';
 
 const queryClient = new QueryClient(
   {
@@ -21,15 +22,28 @@ const queryClient = new QueryClient(
   }
 );
 
+async function enableMocking() {
+  if (isMockingEnabled) {
+    const { worker } = await import('./mocks/browser');
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </PersistGate>
-    </Provider>
-  </StrictMode>,
-)
+    await worker.start({ onUnhandledFrame: 'warn' });
+  }
+}
+
+enableMocking().then(async ()=>{
+    console.log('Alert MFE Mocking enabled:', isMockingEnabled);
+
+    createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+        <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+            <QueryClientProvider client={queryClient}>
+            <App />
+            </QueryClientProvider>
+        </PersistGate>
+        </Provider>
+    </StrictMode>,
+    );
+});
+
+

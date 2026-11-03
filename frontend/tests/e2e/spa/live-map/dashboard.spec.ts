@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ping, alert } from './mock-data';
 
 test('dashboard is visible', async ({ page }) => {
   await page.goto('/');
@@ -17,7 +18,6 @@ test('dashboard has alerts section', async ({ page }) => {
 
 test('dashboard has drivers section', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(1000);
   await expect(page.getByText('Live Drivers')).toBeVisible();
 });
 
@@ -25,9 +25,9 @@ test('dashboard has drivers section', async ({ page }) => {
 test('Receive live gps pings', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('Fleet Map')).toBeVisible();
-  await page.evaluate(() => {
-    window.__mockHub.emit('ReceiveGpsPing', {event_id: "123",driver_id: "driver_123", latitude: -17.3785, longitude:-66.15203, speed:15, heading:'', status:"moving", accuracy:1, timestamp:1793652278})
-  });
+  await page.evaluate((payload) => {
+    window.__mockHub.emit('ReceiveGpsPing', payload)
+  }, ping);
   
   // Verify that the GPS ping was received and processed by the map component
   await expect(page.locator('.leaflet-marker-icon')).toBeVisible(); // Assuming the map marker has a class 'leaflet-marker-icon'
@@ -35,4 +35,15 @@ test('Receive live gps pings', async ({ page }) => {
   await expect(page.getByTestId('live-drivers-list').getByText('driver_123')).toBeVisible();
   await expect(page.getByTestId('gps-pings-log')).toHaveValue(/driver_123/);
 
+});
+
+test('Receive live alert', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('Live Alerts')).toBeVisible();
+  await page.evaluate((payload) => {
+    window.__mockHub.emit('ReceiveAlert', payload)
+  }, alert);
+
+  // Verify that the alert was received and displayed in the alerts section
+  await expect(page.getByTestId('live-alerts-list').getByText('driver_2')).toBeVisible();
 });

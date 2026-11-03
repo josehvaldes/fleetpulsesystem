@@ -14,7 +14,7 @@ export function AlertsBox()
             {alerts.length === 0 ? (
                 <p>No alerts received.</p>
             ) : (
-                <ul className="flex flex-col justify-start text-left">
+                <ul data-testid="live-alerts-list" className="flex flex-col justify-start text-left">
                     {alerts.map((alert) => (
                         (() => {
                             
