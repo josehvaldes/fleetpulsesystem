@@ -49,7 +49,7 @@ export default function AlertsDashboard(props: AlertsMfeProps) {
 }
 
 export function AlertsDashboardContent({ getAuthToken, apiBaseUrl }: AlertsMfeProps) {
-    const pagesize = 2;
+    const pagesize = 5;
     const [page, setPage] = useState(1);
 
     // Register the host's token getter so API calls can read a fresh token on demand.

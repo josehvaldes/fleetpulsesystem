@@ -7,3 +7,8 @@ test('alerts mfe dashboard is visible', async ({ page }) => {
 
 });
 
+test('alerts mfe dashboard shows correct number of alerts', async ({ page }) => {
+  await page.goto('/');
+  // 5 items are expected from mock data
+  await expect(page.getByText('Showing 5 of 5')).toBeVisible();
+});
