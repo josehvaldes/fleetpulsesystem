@@ -1,0 +1,44 @@
+
+
+<div>
+    <div class="font-bold text-lg">Drivers Management Dashboard from MFE</div>
+    @if (drivers().length === 0) {
+        <p>No drivers available.</p>
+    }
+    @else
+    {
+        <div hlmTableContainer> 
+        <table hlmTable>
+            <caption hlmTableCaption>
+                 Showing {{ drivers().length }} drivers
+            </caption>
+            <thead hlmTableHeader>
+            <tr hlmTableRow>
+                <th hlmTableHead class="w-[100px]">Name</th>
+                <th hlmTableHead>Status</th>
+                <th hlmTableHead>Speed</th>
+                <th hlmTableHead class="text-right">Last Time Seen</th>
+            </tr>
+            </thead>
+            <tbody hlmTableBody>
+                
+            @for (driver of drivers(); track driver.id) {
+            <tr hlmTableRow>
+                <td hlmTableCell class="font-medium">{{ driver.name }}</td>
+                <td hlmTableCell>{{ driver.status }}</td>
+                <td hlmTableCell>{{ driver.speed }}</td>
+                <td hlmTableCell class="text-right">
+                    {{ driver.LastTimeSeen  | date:'dd/MM/yyyy HH:mm:ss' }}
+                </td>
+            </tr>
+            }
+            </tbody>
+            <tfoot hlmTableFooter>
+            <tr hlmTableRow>
+                <td hlmTableCell [attr.colSpan]="3"></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    }
+</div>

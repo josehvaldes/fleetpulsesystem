@@ -112,8 +112,8 @@ The aggregate Compose file runs the application and supporting containers on a p
 2. From the repository root, build the service images referenced by Compose:
 
     ```powershell
-    .\build-images.ps1
-    .\build-frontend.ps1
+    .\scripts\build-images.ps1
+    .\scripts\build-frontend.ps1
     ```
 
     The aggregate Compose file expects these images to exist locally before starting.

@@ -1,0 +1,24 @@
+import { useGpsPings } from "@/features/fleet-map/hooks/useGpsPings";
+
+export function DriversBox() {
+  const { drivers } = useGpsPings();
+
+  return(
+    <>
+        <h3 className="font-bold">Live Drivers</h3>
+        <ul data-testid="live-drivers-list">
+        {Object.keys(drivers).length === 0 ? (
+          <p>No drivers found.</p>
+        ) : (
+            Object.values(drivers).map((ping) => (
+              <li key={ping.driver_id} className="text-xs">
+                <strong>{ping.driver_id}</strong>
+                (<span style={{color: ping.status=='stopped'?'orange':'blue'}} >{ping.status}</span>)                 
+              </li>
+            ))
+        )}
+        </ul>
+    </>
+  );
+}
+
