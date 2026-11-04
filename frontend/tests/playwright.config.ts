@@ -16,6 +16,9 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
 
+  // Vite/Angular dev servers compile on first request, which is slow when all projects run together
+  expect: { timeout: 30000 },
+
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: 'http://127.0.0.1:5173',
@@ -56,7 +59,7 @@ export default defineConfig({
       testMatch: 'alerts/**/*.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:5174',
+        baseURL: 'http://localhost:5176', // use the standalone server for e2e testing
       },
     },
     {
@@ -85,6 +88,17 @@ export default defineConfig({
       command: 'npm run dev -- --port 5174 --host 127.0.0.1',
       cwd: path.join(frontendRoot, 'fleetpulse.alert-mgmt'),
       url: 'http://127.0.0.1:5174',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+      env: {
+        VITE_AUTH_MODE: 'local',
+        VITE_ENABLE_MOCKS: 'true'
+      }
+    },
+    {
+      command: 'npm run dev:standalone -- --port 5176 --host 127.0.0.1',
+      cwd: path.join(frontendRoot, 'fleetpulse.alert-mgmt'),
+      url: 'http://127.0.0.1:5176',
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
       env: {

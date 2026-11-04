@@ -6,13 +6,15 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite' // 1. Import Tailwind
 import { federation } from '@module-federation/vite'
 
+const standalone = process.env.VITE_STANDALONE === 'true'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(), // 2. Add Tailwind to the Vite plugins
-    federation({
+    // Standalone runs skip federation so they don't clobber the remote's shared temp files/dts
+    ...(standalone ? [] : [federation({
       name: 'alerts_mfe',
       filename: 'remoteEntry.js',
       exposes: {
@@ -25,8 +27,9 @@ export default defineConfig({
       dts: {
         tsConfigPath: './tsconfig.app.json'
       },
-    })
+    })])
   ],
+  cacheDir: standalone ? 'node_modules/.vite-standalone' : 'node_modules/.vite',
   test: {
     globals: true,
     environment: "jsdom",

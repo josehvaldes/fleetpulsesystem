@@ -5,9 +5,10 @@ on:
     branches:
       - main
     paths:
-      - "fleetpulse.alert-mgmt/**"
-      - "fleetpulse.drivers-mgmt/**"
-      - "fleetpulse.frontend/**"
+      - "frontend/fleetpulse.alert-mgmt/**"
+      - "frontend/fleetpulse.drivers-mgmt/**"
+      - "frontend/fleetpulse.frontend/**"
+      - "frontend/tests/**"
       - ".github/workflows/ci-frontend.yml"
       - "FleetPulse.Api/FleetPulse.Api/openapi/**"
       - "FleetPulse.SignalRHub/FleetPulse.SignalRHub/openapi/**"
@@ -15,9 +16,10 @@ on:
     branches:
       - main
     paths:
-      - "fleetpulse.alert-mgmt/**"
-      - "fleetpulse.drivers-mgmt/**"
-      - "fleetpulse.frontend/**"
+      - "frontend/fleetpulse.alert-mgmt/**"
+      - "frontend/fleetpulse.drivers-mgmt/**"
+      - "frontend/fleetpulse.frontend/**"
+      - "frontend/tests/**"
       - ".github/workflows/ci-frontend.yml"
       - "FleetPulse.Api/FleetPulse.Api/openapi/**"
       - "FleetPulse.SignalRHub/FleetPulse.SignalRHub/openapi/**"
@@ -31,68 +33,104 @@ jobs:
   react-spa:
     name: React SPA Frontend
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: fleetpulse.frontend } }
+    defaults: { run: { working-directory: frontend/fleetpulse.frontend } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: fleetpulse.frontend/package-lock.json
+          cache-dependency-path: frontend/fleetpulse.frontend/package-lock.json
       - run: npm ci
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
       - run: npm run generate:contracts
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
       - name: Verify generated API client is up to date
         run: git diff --exit-code -- src/generated
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
       - run: npm run lint
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
       - run: npm run build
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
       - run: npm test -- --run --passWithNoTests
-        working-directory: fleetpulse.frontend
+        working-directory: frontend/fleetpulse.frontend
   react-mfe:
     name: React Alert Management MFE Frontend
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: fleetpulse.alert-mgmt } }
+    defaults: { run: { working-directory: frontend/fleetpulse.alert-mgmt } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: fleetpulse.alert-mgmt/package-lock.json
+          cache-dependency-path: frontend/fleetpulse.alert-mgmt/package-lock.json
       - run: npm ci
-        working-directory: fleetpulse.alert-mgmt
+        working-directory: frontend/fleetpulse.alert-mgmt
       - run: npm run generate:contracts
-        working-directory: fleetpulse.alert-mgmt
+        working-directory: frontend/fleetpulse.alert-mgmt
       - name: Verify generated API client is up to date
         run: git diff --exit-code -- src/generated
-        working-directory: fleetpulse.alert-mgmt
+        working-directory: frontend/fleetpulse.alert-mgmt
       - run: npm run build
-        working-directory: fleetpulse.alert-mgmt
+        working-directory: frontend/fleetpulse.alert-mgmt
       - run: npm test -- --run --passWithNoTests
-        working-directory: fleetpulse.alert-mgmt
+        working-directory: frontend/fleetpulse.alert-mgmt
   angular-drivers-mfe:
     name: Angular Drivers Management MFE Frontend
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: fleetpulse.drivers-mgmt } }
+    defaults: { run: { working-directory: frontend/fleetpulse.drivers-mgmt } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: fleetpulse.drivers-mgmt/package-lock.json
+          cache-dependency-path: frontend/fleetpulse.drivers-mgmt/package-lock.json
       - run: npm ci
-        working-directory: fleetpulse.drivers-mgmt
+        working-directory: frontend/fleetpulse.drivers-mgmt
       - run: npm run generate:contracts
-        working-directory: fleetpulse.drivers-mgmt
+        working-directory: frontend/fleetpulse.drivers-mgmt
       - name: Verify generated API client is up to date
         run: git diff --exit-code -- src/generated
-        working-directory: fleetpulse.drivers-mgmt
+        working-directory: frontend/fleetpulse.drivers-mgmt
       - run: npx ng build
-        working-directory: fleetpulse.drivers-mgmt
+        working-directory: frontend/fleetpulse.drivers-mgmt
       - run: npx ng test --watch=false
-        working-directory: fleetpulse.drivers-mgmt
+        working-directory: frontend/fleetpulse.drivers-mgmt
+  
+  playwright:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Playwright's webServer config launches these apps during the test run,
+      # so their dependencies must be installed first.
+      - run: npm ci
+        working-directory: frontend/fleetpulse.frontend
+      - run: npm ci
+        working-directory: frontend/fleetpulse.alert-mgmt
+      - run: npm ci
+        working-directory: frontend/fleetpulse.drivers-mgmt
+      - run: npm ci
+        working-directory: frontend/tests
+
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend/tests
+
+      - run: npm run test:e2e
+        working-directory: frontend/tests
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            frontend/tests/playwright-report/
+            frontend/tests/test-results/
+          if-no-files-found: ignore
