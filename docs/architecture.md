@@ -77,7 +77,7 @@ User --"use" --> UI
 | **MQTT Broker** | EMQX Broker (Docker) | MQTT broker for IoT that nativily integrates to Kafka-compatible RedPanda. |
 | **Message Broker** | Redpanda (Docker) | Native Kafka API compatibility.  |
 | **Real-Time Push** | .NET 10 Worker + SignalR | Maintains persistent WebSocket state. SignalR Groups natively handle routing updates to specific fleet managers. |
-| **AI / Analytics** | Python + `aiokafka` + LangGraph | Decoupled async worker. Consumes streams without blocking, uses LLMs for contextual anomaly explanations. |
+| **AI / Analytics** | Python + `aiokafka` + LangGraph (in a V2 version) | Decoupled async worker. Consumes streams without blocking, uses LLMs for contextual anomaly explanations. |
 | **Data Storage** | PostgreSQL + TimescaleDB | Relational reliability for transactions, combined with TimescaleDB's `Hypertables` for high-performance time-series compression and `time_bucket()` aggregations. |
 | **Frontend** | Vite + React 19 + TS | Pure SPA. Server-Side Rendering (Next.js) is intentionally avoided as real-time data is stale the moment it's rendered. Vite provides superior HMR for map UI tuning. |
 | **DB Batch Writer** | .NET DB Batch Writer (background service) | Fast developement with Dapper + inline SQL. Using Npgsql library  |
@@ -86,7 +86,7 @@ User --"use" --> UI
 | **Tracing** | Tempo + otel-collector | otel-collector is a open source vendor-agnostic implementation of OpenTelemetry. Easy to configure and and integrate into python and .net services. Tempo, as part of grafana ecosystem was the default choice since it is open-source easy-to-use and conteinerized solution  |
 | **Observability and data visualization platform** | grafana | provides a unified dashboards to connect all the data sources used in the project |
 | **Deployment (FE)** | Cloudflare Pages | Static assets served at the edge. Zero cold starts, zero cost, inherently secure. |
-| **Deployment (BE)** | Docker Compose (Local) <br> AWS ECS / Azure Container Apps (Prod) | Containerized workloads allow independent scaling of the AI worker vs. the DB writer based on load. |
+| **Deployment (BE)** | Docker Compose (Local) <br> Local kubernetes cluster with Kind | Containerized workloads allow independent scaling of the AI worker vs. the DB writer based on load. |
 
 
 

@@ -1,54 +1,69 @@
 # Continuous integration workflows
 
-The repository's GitHub Actions CI is split by technology stack. Push and pull-request runs target `main` and use path filters, so a workflow normally runs only when its own application directories or workflow definition changes. Each workflow can also be started manually with `workflow_dispatch`.
+The repository's GitHub Actions CI is split into application workflows and reusable build workflows. Application workflows run on pushes and pull requests targeting `main` when their path filters match, and can also be started manually with `workflow_dispatch`. Reusable workflows run only when called by an application workflow.
 
-All three workflows define a concurrency group per workflow and Git ref, with `cancel-in-progress: true`. A newer run for the same ref therefore cancels the older run; runs for different refs or workflows do not share a group.
+Each application workflow defines a concurrency group using its workflow name and Git ref, with `cancel-in-progress: true`. A newer run for the same workflow and ref cancels the older run; different workflows and refs use separate groups.
 
 ## Workflow overview
 
-| Workflow | Applications | Runtime | Jobs |
+| Workflow | Purpose | Runtime | Jobs |
 | --- | --- | --- | --- |
-| `ci-frontend.yml` | React SPA, React Alerts MFE, Angular Drivers MFE | Node.js 24 | Three independent application jobs |
-| `ci-dotnet.yml` | DbWriter, SignalRHub, API | .NET 10 | One matrix job with one entry per solution |
-| `ci-python.yml` | GPS simulator, AI anomaly worker | Python 3.13.5 | One matrix job with one entry per application |
+| `ci-frontend.yml` | React SPA, React Alerts MFE, Angular Drivers MFE, and browser E2E tests | Node.js 24 | Three application jobs and one Playwright job |
+| `ci-api.yml` | API | .NET 10 | Calls `build-dotnet.yml` |
+| `ci-dbwriter.yml` | DbWriter | .NET 10 | Calls `build-dotnet.yml` |
+| `ci-signalrhub.yml` | SignalRHub | .NET 10 | Calls `build-dotnet.yml` |
+| `ci-simulator.yml` | GPS simulator | Python 3.13.5 | Calls `build-python.yml` |
+| `ci-ai-worker.yml` | AI anomaly worker | Python 3.13.5 | Calls `build-python.yml` |
+| `build-dotnet.yml` | Reusable .NET restore, build, test, and optional container publish | .NET 10 | One build job |
+| `build-python.yml` | Reusable Python lint, optional tests, and optional container publish | Python 3.13.5 | One build job |
 
 ## Frontend: `ci-frontend.yml`
 
-**Triggers:** Pushes and pull requests to `main` that change files under `fleetpulse.frontend/`, `fleetpulse.alert-mgmt/`, or `fleetpulse.drivers-mgmt/`, or change this workflow. It can also be run manually.
+**Triggers:** Pushes and pull requests to `main` that change `frontend/fleetpulse.frontend/`, `frontend/fleetpulse.alert-mgmt/`, `frontend/fleetpulse.drivers-mgmt/`, `frontend/tests/`, either API or SignalRHub OpenAPI definitions, or this workflow. It can also be run manually.
 
-The workflow has one Ubuntu job for each frontend application. Each job checks out the repository, configures Node.js 24 with npm dependency caching keyed by that application's `package-lock.json`, and performs a clean install using `npm ci`.
+The workflow has three independent application jobs. Each checks out the repository, sets up Node.js 24, installs dependencies with `npm ci`, generates API contracts, and verifies that the generated client is committed and up to date using `git diff --exit-code -- src/generated`.
 
-| Job | Checks after install |
+| Job | Checks after contract verification |
 | --- | --- |
-| React SPA (`fleetpulse.frontend`) | `npm run lint`, `npm run build`, then `npm test -- --run --passWithNoTests` |
-| React Alerts MFE (`fleetpulse.alert-mgmt`) | `npm run build`, then `npm test -- --run --passWithNoTests` |
-| Angular Drivers MFE (`fleetpulse.drivers-mgmt`) | `npx ng build`, then `npx ng test --watch=false` |
+| React SPA (`frontend/fleetpulse.frontend`) | `npm run lint`, `npm run build`, then `npm test -- --run --passWithNoTests` |
+| React Alerts MFE (`frontend/fleetpulse.alert-mgmt`) | `npm run build`, then `npm test -- --run --passWithNoTests` |
+| Angular Drivers MFE (`frontend/fleetpulse.drivers-mgmt`) | `npx ng build`, then `npx ng test --watch=false` |
 
-The React SPA is the only frontend job that currently runs a lint command. The React test command permits a successful run when no tests are found; the Angular test command does not use that option.
+The fourth job, Playwright E2E, installs dependencies for all three applications and `frontend/tests`, installs Chromium with its system dependencies, and runs `npm run test:e2e` from `frontend/tests`. It uploads the Playwright report and test results even when earlier steps fail; missing report files are ignored.
 
-## .NET: `ci-dotnet.yml`
+## .NET application workflows
 
-**Triggers:** Pushes and pull requests to `main` that change files under `FleetPulse.DbWriter/`, `FleetPulse.SignalRHub/`, or `FleetPulse.Api/`, or change this workflow. It can also be run manually.
+`ci-api.yml`, `ci-dbwriter.yml`, and `ci-signalrhub.yml` run on pushes and pull requests to `main` when the corresponding service directory, `Directory.Packages.props`, the calling workflow, or `build-dotnet.yml` changes. Each can also be run manually.
 
-The `build-test` job runs on Ubuntu and expands a matrix over these solutions:
+Each application workflow calls the reusable `build-dotnet.yml` with its solution, Docker build context, Dockerfile, and image name:
 
-- `FleetPulse.DbWriter/FleetPulse.DbWriter.slnx` — DbWriter worker
-- `FleetPulse.SignalRHub/FleetPulse.SignalRHub.slnx` — SignalRHub worker
-- `FleetPulse.Api/FleetPulse.Api.slnx` — API service
+| Application workflow | Solution | Image |
+| --- | --- | --- |
+| `ci-api.yml` | `FleetPulse.Api/FleetPulse.Api.slnx` | `fleetpulse-api` |
+| `ci-dbwriter.yml` | `FleetPulse.DbWriter/FleetPulse.DbWriter.slnx` | `fleetpulse-dbwriter` |
+| `ci-signalrhub.yml` | `FleetPulse.SignalRHub/FleetPulse.SignalRHub.slnx` | `fleetpulse-signalrhub` |
 
-For each solution, the job checks out the repository, configures .NET 10 with NuGet caching (using `**/*.csproj` as the cache dependency path), restores, builds in Release without restoring again, and runs tests in Release without rebuilding. Test output uses normal console verbosity. Matrix `fail-fast` is enabled, so a failing solution cancels other in-progress matrix entries.
+The reusable workflow checks out the repository, sets up .NET 10 with NuGet caching keyed by `**/*.csproj`, then restores, builds in Release without restoring again, and tests in Release without rebuilding. Tests use normal console verbosity.
 
-## Python: `ci-python.yml`
+Container publishing is enabled only for pushes to `main`, not pull requests or manual runs. When enabled, the workflow logs in to GitHub Container Registry (GHCR) and builds and pushes the image tagged `latest` and `sha-<commit>`, with GitHub Actions build caching and OCI source/revision labels.
 
-**Triggers:** Pushes and pull requests to `main` that change files under `ai-worker/` or `simulator/`, or change this workflow. It can also be run manually.
+## Python application workflows
 
-The `lint-test` job runs on Ubuntu and expands a matrix across `simulator` and `ai-worker`. Each entry uses Python 3.13.5, caches pip dependencies against that application's `src/requirements.txt`, and runs from the corresponding `src/` directory. The steps install the requirements and the CI tools (`ruff`, `pytest`, and `pytest-asyncio`), then run `ruff --version` and `ruff check .`.
+`ci-simulator.yml` and `ci-ai-worker.yml` run on pushes and pull requests to `main` when the corresponding application directory or either the calling workflow or `build-python.yml` changes. Each can also be run manually.
 
-Pytest is currently run only for `ai-worker` (`python -m pytest -q`); the simulator matrix entry is linted but has no test step. Matrix `fail-fast` is disabled, so a failure in one application does not cancel the other application's checks.
+Both call the reusable `build-python.yml`, which sets up Python 3.13.5, caches pip using the application's `src/requirements.txt`, installs the requirements and `ruff`, `pytest`, and `pytest-asyncio`, and runs `ruff check .` from the application's `src/` directory.
+
+| Application workflow | Tests | Container publishing |
+| --- | --- | --- |
+| `ci-simulator.yml` | None; `run-tests` is false | Disabled |
+| `ci-ai-worker.yml` | `python -m pytest -q` | Enabled only on pushes to `main` |
+
+When enabled for the AI worker, publishing builds and pushes to GHCR with `latest` and `sha-<commit>` tags, GitHub Actions build caching, and OCI source/revision labels.
 
 ## Maintenance notes
 
-- Keep each workflow's `paths` filters aligned with the applications it validates. Changes outside those paths do not start push or pull-request CI for that workflow.
-- Changes to a workflow file itself are included in that workflow's path filter.
-- Manual runs are not restricted by the path filters.
-- If a new application, solution, runtime version, or test command is added, update both the corresponding workflow and this document.
+- Keep application path filters aligned with the code and shared inputs each workflow validates. Changes outside those paths do not start its push or pull-request CI.
+- The frontend workflow also watches API and SignalRHub OpenAPI definitions because its applications generate API contracts from them.
+- .NET workflows watch `Directory.Packages.props`; application workflows also watch their reusable workflow definition so shared build changes trigger CI.
+- Manual runs are not restricted by path filters. Reusable `build-dotnet.yml` and `build-python.yml` are called workflows and do not define independent push, pull-request, or manual triggers.
+- Update this document when workflow triggers, application coverage, runtimes, validation commands, or publishing behavior changes.
